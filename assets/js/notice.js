@@ -17,6 +17,6 @@
 
     $(function() {
         // 調用 公告滾動函數
-        setInterval("noticeUp('.notice ul','-35px',500)", 2000);
+        setInterval("noticeUp('.notice ul','-500px',2000)", 2000);
     });
 </script>

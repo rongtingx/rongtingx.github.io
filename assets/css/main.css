@@ -3108,12 +3108,12 @@
 		}
 
 /* notice */
-	.notice 8{
-		width: 80%;
+	.notice {
+		width: 90%;
 		margin: 20px 10px;
 		font-size: 14px;
 		line-height: 30px;
-		background-color: #666;
+		background-color: #333;
 		box-shadow: 0 0 4px #333;
 		height: 30px;
 		overflow: hidden;

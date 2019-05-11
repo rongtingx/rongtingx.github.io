@@ -3152,7 +3152,7 @@
 
 
 		.more {
-			position: absolute;
+			position: relative;
 			top: 27px;
 			left: 633px;
 			width: auto;
@@ -3162,7 +3162,7 @@
 
 
 	.notice-text {
-		position: absolute;
+		position: relative;
 		top: 23px;
 		left: 33px;
 		color: #aaa;

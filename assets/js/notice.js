@@ -10,12 +10,12 @@
     function noticeUp(obj,top,time) {
         $(obj).animate({
         marginTop: top
-        }, time, function () {
+        }, time, function() {
         $(this).css({marginTop:"0"}).find(":first").appendTo(this);
         })
     };
 
-    $(function () {
+    $(function() {
         // 調用 公告滾動函數
         setInterval("noticeUp('.notice ul','-35px',500)", 2000);
     });

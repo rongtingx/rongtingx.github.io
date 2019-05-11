@@ -1585,7 +1585,7 @@
 /* Type */
 
 	body, input, select, textarea {
-		color: #9a9a9a;
+		color: #fff;
 		font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
 		font-size: 14pt;
 		font-weight: 400;
@@ -1633,7 +1633,7 @@
 		}
 
 	a {
-		color: #C1272D;
+		color: #D65C5C;
 		text-decoration: underline;
 	}
 
@@ -1655,7 +1655,7 @@
 	}
 
 	h1, h2, h3, h4, h5, h6 {
-		color: #555;
+		color: #ccc;
 		font-weight: 400;
 		line-height: 1.5;
 		margin: 0 0 1em 0;
@@ -1974,7 +1974,7 @@
 		-webkit-appearance: none;
 		-ms-appearance: none;
 		appearance: none;
-		background: #C1272D;
+		background: #D65C5C;
 		border-radius: 10px;
 		border: none;
 		border: solid 2px #8dcca9;
@@ -2104,16 +2104,16 @@
 
 		input[type="checkbox"]:checked + label:before,
 		input[type="radio"]:checked + label:before {
-			background: #C1272D;
-			border-color: #C1272D;
+			background: #D65C5C;
+			border-color: #D65C5C;
 			color: #ffffff;
 			content: '\f00c';
 		}
 
 		input[type="checkbox"]:focus + label:before,
 		input[type="radio"]:focus + label:before {
-			border-color: #C1272D;
-			box-shadow: 0 0 0 1px #C1272D;
+			border-color: #D65C5C;
+			box-shadow: 0 0 0 1px #D65C5C;
 		}
 
 	input[type="checkbox"] + label:before {
@@ -2526,8 +2526,8 @@
 		-ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 		transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 		background-color: transparent;
-		box-shadow: inset 0 0 0 3px #C1272D;
-		color: #C1272D !important;
+		box-shadow: inset 0 0 0 3px #D65C5C;
+		color: #D65C5C !important;
 		border-radius: 30px;
 		border: 0;
 		cursor: pointer;
@@ -2641,7 +2641,7 @@
 		input[type="button"].special,
 		button.special,
 		.button.special {
-			background-color: #C1272D;
+			background-color: #D65C5C;
 			color: #ffffff !important;
 		}
 
@@ -2697,7 +2697,7 @@
 	}
 
 		.subpage #header {
-			background: #C1272D;
+			background: #D65C5C;
 			top: 0;
 			height: 44px;
 			line-height: 44px;
@@ -2838,7 +2838,7 @@
 		position: fixed;
 		right: 0;
 		top: 0;
-		background: #C1272D;
+		background: #D65C5C;
 		color: #daefe3;
 		height: 100%;
 		max-width: 80%;
@@ -2960,7 +2960,7 @@
 		}
 
 		#banner .icon {
-			color: #C1272D;
+			color: #D65C5C;
 			font-size: 2em;
 		}
 

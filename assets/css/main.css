@@ -2707,9 +2707,9 @@
 	#header {
 		color: #fff;
 		cursor: default;
-		height: 3.25em;
+		height: 2.5em;
 		left: 0;
-		line-height: 3.25em;
+		line-height: 2.5em;
 		position: absolute;
 		text-align: right;
 		top: 2em;
@@ -2733,7 +2733,7 @@
 			padding: 0;
 			position: absolute;
 			top: 0;
-			font-size: 1em;
+			font-size: 16pt;
 		}
 
 			#header .logo strong {
@@ -2838,8 +2838,8 @@
 		position: fixed;
 		right: 0;
 		top: 0;
-		background: #D65C5C;
-		color: #daefe3;
+		background: #C1272D;
+		color: #fff;
 		height: 100%;
 		max-width: 80%;
 		width: 20em;

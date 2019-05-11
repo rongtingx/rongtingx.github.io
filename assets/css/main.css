@@ -2720,6 +2720,7 @@
 		#header .inner {
 			margin: 0 auto;
 			position: relative;
+			height: 56px
 		}
 
 		#header .logo {

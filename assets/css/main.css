@@ -3112,9 +3112,9 @@
 		background: #111;
 	}
 
-	#notice h2{
+	#notice .inner h2{
 		line-height: 2.5em;
-		margin-top: -60px
+		text-align: center;
 	}
 		
 	#notice .list {

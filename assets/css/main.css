@@ -3127,10 +3127,10 @@
 		
 	#notice .list {
 		width: 100%;
-		margin: 0px 20px 20px 20px;
+		margin: 0px 20px 0px 20px;
 		font-size: 14px;
 		line-height: 30px;
-		box-shadow: 0 0 4px #333;
+		box-shadow: 0 0 6px #333;
 		height: 100%;
 		overflow: hidden;
 	}
@@ -3143,7 +3143,7 @@
 		}
 
 		#notice .list li:hover {
-			background-color: #333
+			background-color: #666
 		}
 
 		#notice .list a {
@@ -3174,13 +3174,13 @@
 
 		#notice .more {
 			width: 100%;
+			margin-top: 20px;
 		}
 			
 		#notice .more a {
-			position: absolute;
-			left: calc(50% - 71px);
+			position: static;
 			font-size: 12px;
-			display: block
+			display: block;
 		}
 
 /* Footer */

@@ -3159,18 +3159,18 @@
 
 
 		.more {
-			position: relative;
+			position: absolute;
 			top: 27px;
-			left: 27px;
+			left: 50%;
+			right: 50%;
 			width: auto;
 			font-size: 12px;
-			color: #ff9900;
 			display: block
 		}
 
 
 	.notice-text {
-		position: relative;
+		position: absolute;
 		top: 23px;
 		left: 33px;
 		color: #aaa;

@@ -3124,6 +3124,7 @@
 		line-height: 30px;
 		box-shadow: 0 0 6px #333;
 		height: 100%;
+		width: auto;
 		overflow: hidden;
 	}
 

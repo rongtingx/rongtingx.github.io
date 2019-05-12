@@ -3111,15 +3111,23 @@
 	#notice {
 		background: #000;
 		border-color: #000;
-		height: 100%
+		height: auto;
 	}
+
+	#notice .inner{
+		background: #000;
+		border-color: #000;
+		padding-bottom: 75px;
+	}
+
 	#notice h2{
-		margin-top: 10px
+		line-height: 2.5em;
+		margin-bottom: -30px
 	}
 		
 	#notice .list {
 		width: 100%;
-		margin: -50px 20px 10px 20px;
+		margin: 0px 20px 20px 20px;
 		font-size: 14px;
 		line-height: 30px;
 		box-shadow: 0 0 4px #333;
@@ -3166,13 +3174,11 @@
 
 		#notice .more {
 			width: 100%;
-			text-align: center;
 		}
 			
 		#notice .more a {
 			position: absolute;
 			left: calc(50% - 71px);
-			width: auto;
 			font-size: 12px;
 			display: block
 		}

@@ -3109,20 +3109,12 @@
 
 /* notice */
 	#notice {
-		background: #000;
-		border-color: #000;
-		height: auto;
-	}
-
-	#notice .inner{
-		background: #000;
-		border-color: #000;
-		padding-bottom: 75px;
+		background: #111;
 	}
 
 	#notice h2{
 		line-height: 2.5em;
-		margin-bottom: -30px
+		margin-top: -60px
 	}
 		
 	#notice .list {
@@ -3173,7 +3165,6 @@
 		}
 
 		#notice .more {
-			width: 100%;
 			margin-top: 20px;
 		}
 			

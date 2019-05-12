@@ -3149,6 +3149,10 @@
 			margin-right: 10px;
 		}
 
+		.notice p {
+			text-align: left;
+		}
+
 
 		.more {
 			position: relative;

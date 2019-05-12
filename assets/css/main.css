@@ -3108,72 +3108,74 @@
 		}
 
 /* notice */
-
-	.notice {
+	#notice {
+		background: #000;
+		border-color: #000;
+		height: 100%
+	}
+	#notice h2{
+		margin-top: 10px
+	}
+		
+	#notice .list {
 		width: 100%;
-		margin: 20px 10px;
+		margin: -50px 20px 10px 20px;
 		font-size: 14px;
 		line-height: 30px;
-		/* box-shadow: 0 0 4px #333; */
+		box-shadow: 0 0 4px #333;
 		height: 100%;
 		overflow: hidden;
 	}
 
-
-		.notice ul li {
+		#notice .list ul li {
 			list-style: none;
 			line-height: 30px;
 			display: block;
-			margin-left: 20px;
+			margin-left: 5%;
 		}
 
+		#notice .list li:hover {
+			background-color: #333
+		}
 
-		.notice a {
+		#notice .list a {
 			float: left;
 			display: inline-block;
 			width: 70%;
-			margin-left: 20px;
 			text-decoration: none;
 		}
 
 
-		.notice a:first-child {
+		#notice .list a:first-child {
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
 
 
-		.notice a span {
+		#notice .list a span {
 			color: #ccc;
 			font-size: 11px;
 			margin-right: 10px;
 		}
 
-		.notice p {
+		#notice .list p {
 			text-align: left;
+			margin-left: 20px;
 		}
 
-		.more {
+		#notice .more {
 			width: 100%;
 			text-align: center;
 		}
 			
-		.more a {
+		#notice .more a {
 			position: absolute;
-			left: calc(50% - 75px);
+			left: calc(50% - 71px);
 			width: auto;
 			font-size: 12px;
 			display: block
 		}
-
-
-	.notice-text {
-		position: absolute;
-		top: 23px;
-		left: 33px;
-		color: #aaa;
-	}
 
 /* Footer */
 

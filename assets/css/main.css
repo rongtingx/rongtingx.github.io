@@ -3110,6 +3110,8 @@
 /* notice */
 	#notice {
 		background: #111;
+		text-align: center;
+		position: relative;
 	}
 
 	#notice .inner h2{
@@ -3119,7 +3121,6 @@
 		
 	#notice .list {
 		width: 100%;
-		margin: 0px 20px 0px 20px;
 		font-size: 14px;
 		line-height: 30px;
 		box-shadow: 0 0 6px #333;
@@ -3132,7 +3133,6 @@
 			list-style: none;
 			line-height: 30px;
 			display: block;
-			margin-left: 5%;
 		}
 
 		#notice .list li:hover {
@@ -3162,11 +3162,7 @@
 
 		#notice .list p {
 			text-align: left;
-			margin-left: 20px;
-		}
-
-		#notice .more {
-			margin-top: 20px;
+			margin-left: 0px;
 		}
 			
 		#notice .more a {

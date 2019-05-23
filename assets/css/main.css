@@ -3309,13 +3309,12 @@
 	}
 		
 	#notice .list {
-		width: 500px;
 		font-size: 14px;
 		line-height: 30px;
-		box-shadow: 0 0 6px #333;
 		height: 100%;
-		width: auto;
+		width: 80%;
 		overflow: hidden;
+		border: 1px solid #FFF
 	}
 
 		#notice .list ul li {
@@ -3371,8 +3370,8 @@
         }
 
             #notice .flex div {
-                border-right: 2px solid rgba(255, 255, 255, 0.2);
-                padding: 0 8em;
+                border-right: 0px solid rgba(255, 255, 255, 0);
+                padding: 0 0em;
             }
 
                 #notice .flex div:last-child {
@@ -3485,6 +3484,7 @@
                         padding: 0;
                         border: none;
                         margin-bottom: 1em;
+						text-align: center;
                     }
 
         }

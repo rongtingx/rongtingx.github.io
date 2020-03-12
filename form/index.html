@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+
+    <title>這是一個測試用的蘭陽週預購表單吧</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js">
+    </script>
+    <script>
+       $(function() {
+         $.get("https://spreadsheets.google.com/feeds/list/115PPsgx0--jvrpV-JIekfH5IR-JbKCNuCDXbYODslVk/1/public/values?alt=json", function(data) {
+           var d = data.feed.entry;
+           var items = [];
+           for(var i in d) {
+             var item = {};
+             item.merchant = d[i].gsx$merchant.$t;
+             item.product = d[i].gsx$product.$t;
+             item.price = d[i].gsx$price.$t;
+             item.link = d[i].gsx$link.$t;
+             item.pic = d[i].gsx$pic.$t;
+             items.push(item);
+           }
+           //console.table(items);
+
+             addSection(items);
+
+         });
+       });
+
+
+         function clicked(item) {
+
+             var parentElement = item.parentElement.getAttribute("id");
+
+             var count = document.getElementById(parentElement).childNodes[1];
+             var dec = document.getElementById(parentElement).childNodes[1-1];
+             var inc = document.getElementById(parentElement).childNodes[1+1];
+             var remove = document.getElementById(parentElement).childNodes[1+2];
+
+             //onclick
+             inc.onclick = function() {
+                 count.value = parseInt(count.value) + 1;
+             };
+             dec.onclick = function() {
+                 if (parseInt(count.value)>=1){
+                     count.value = parseInt(count.value) - 1;
+                 }
+             };
+             remove.onclick = function() {
+                 count.value = 0;
+             };
+
+        };
+
+        function addProducts(index, inputMerchant, inputProduct, inputPrice, inputLink, inputPic)
+        {
+             var container = document.createElement("div");
+             container.className= "container";
+             container.id = "container-".concat(inputMerchant).concat("-").concat(inputProduct);
+
+             var pic = document.createElement("div");
+             pic.className= "pic";
+
+             var img = document.createElement("img");
+             img.className= "img";
+             img.src = inputPic;
+             
+             var goods = document.createElement("div");
+             goods.className= "goods";
+             
+             var link = document.createElement("a");
+             link.href = inputLink;
+             if (inputLink != "#"){
+              link.target = "_blank";
+             }
+             link.textContent = inputProduct;
+
+             var price = document.createElement("div");
+             price.className= "price";
+             price.textContent="$".concat(inputPrice);
+             price.id= "price-".concat(inputMerchant).concat("-").concat(inputProduct);
+             
+             var quantity = document.createElement("div");
+             quantity.className= "quantity";
+             quantity.id= "quantity-".concat(inputMerchant).concat("-").concat(inputProduct);
+
+             var dec = document.createElement("input");
+             dec.className= "dec";
+             dec.type= "button";
+             dec.value = "－"
+
+             var inc = document.createElement("input");
+             inc.className= "inc";
+             inc.type= "button";
+             inc.value = "＋"
+
+             var remove = document.createElement("input");
+             remove.className= "remove";
+             remove.type= "button";
+             remove.value = "del"
+
+             var count = document.createElement("input");
+             count.className= "count";
+             count.type= "text";
+             count.size= "1";
+             count.value = "0";
+             count.name = inputMerchant.concat("-").concat(inputProduct);
+
+             var priceValue = document.createElement("input");
+             priceValue.type= "hidden";
+             priceValue.value = parseInt(inputPrice)
+             priceValue.name = inputMerchant.concat("-").concat(inputProduct);
+
+             dec.id = "dec";
+             inc.id = "inc";
+             count.id = "count";
+             priceValue.id = "priceValue";
+
+             dec.setAttribute("onclick", "clicked(this);");
+             inc.setAttribute("onclick", "clicked(this);");
+             remove.setAttribute("onclick", "clicked(this);");
+
+             //put thing
+             quantity.appendChild(dec);
+             quantity.appendChild(count);
+             quantity.appendChild(inc);
+             quantity.appendChild(remove);
+             quantity.appendChild(priceValue);
+
+             pic.appendChild(img);
+
+             goods.appendChild(link);
+
+             container.appendChild(pic);
+             container.appendChild(goods);
+             container.appendChild(price);
+             container.appendChild(quantity);
+
+            //document.getElementById("form").appendChild(container);
+
+            return container;
+         }
+
+
+         function addSection(items) {
+            var sectionFragment = document.createDocumentFragment();
+            var fragment = document.createDocumentFragment();
+            var section = document.createElement("section");
+
+            for (var i = 0; i < items.length; i++) {
+
+                 var product = addProducts(i, items[i].merchant, items[i].product, items[i].price, items[i].link, items[i].pic);
+                 sectionFragment.appendChild(product);
+
+                 if (i == items.length - 1){
+                      section.id = "section-".concat(items[i].merchant);
+
+                      var pTitle = document.createElement("p");
+                      pTitle.className = "title";
+                      pTitle.textContent = items[i].merchant;
+
+                      section.appendChild(pTitle);
+                      section.appendChild(sectionFragment);
+                      fragment.appendChild(section);
+                      var sectionFragment = document.createDocumentFragment();
+                      var section = document.createElement("section");
+                      break;
+                 }
+
+                 if ((items[i].merchant != items[i+1].merchant) && (i < items.length-1)){
+                      section.id = "section-".concat(items[i].merchant);
+
+                      var pTitle = document.createElement("p");
+                      pTitle.className = "title";
+                      pTitle.textContent = items[i].merchant;
+
+                      section.appendChild(pTitle);
+                      section.appendChild(sectionFragment);
+                      fragment.appendChild(section);
+                      var sectionFragment = document.createDocumentFragment();
+                      var section = document.createElement("section");
+                 }
+
+             }
+
+            document.getElementById("form").appendChild(fragment);
+
+         }
+
+
+         /*
+         function leftpad(num, length) {
+             if((num + "").length >= length) {
+                 return num;
+             }
+             return leftpad("0" + num, length)
+         }
+
+         function rightpad(num, length) {
+             if((num + "").length >= length) {
+                 return num;
+             }
+             return rightpad(num + "0", length)
+         }
+         */
+
+    </script>
+    <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+              background-color: #EEE;
+              margin: 2em;
+            }
+
+            p {
+              margin-block-start: 0;
+              margin-block-end: 0;
+              margin-inline-start: 0;
+              margin-inline-end: 0;
+            }
+
+            section {
+                 display: flex;
+                 flex-wrap: wrap;
+                 width: 100%;
+                 flex-direction: row;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                grid-row-gap: 0.5em;
+
+            }
+
+            .row {
+                display: grid;
+                grid-template-rows: 3em;
+                grid-template-columns: repeat(6, 1fr);
+                align-items: center;
+            }
+
+            .info {
+              text-align: right;
+              margin-right: 10px; 
+            }
+
+            .infoInput {
+              text-align: left;
+                border: 1px #999 solid;
+              padding: 0.5em; 
+                font-size: 1.2em;
+                 border-radius: 0.2em;
+                 grid-column: 2 / 4;
+            }
+            .radio{
+                 grid-column: 2 / 7;
+                align-items: center;
+            }
+
+            span {
+              font-size: 2em;
+            }
+
+            .title {
+              width: 100%;
+              padding: 10px;
+              border-top: 1px #999 solid;
+              border-bottom: 1px #999 solid;
+              font-size: 2em;
+              margin-top: 0.8em;
+              margin-bottom: 0.5em;
+            }
+            input[type="radio"] {
+              display: inline;
+                height: 2em;
+                width: 2em;
+            }
+
+            img {
+              width: 100%;
+              height: 100%;
+            }
+
+            input {
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                flex-direction: row;
+            }
+            input[type="button"] {
+                border: 1px #999 solid;
+                line-height: 100%;
+            }
+            .dec {
+                border-radius: 1em 0 0 1em;
+                font-size: 1.5em;
+                width: 40px;
+            }
+            .inc {
+                border-radius: 0 1em 1em 0;
+                font-size: 1.5em;
+                width: 40px;
+            }
+            .remove {
+                 margin-left: 5px;
+                 border-radius: 0.2em;
+                 width: 30px;
+            }
+            .count {
+                height: 100%;
+                border: 1px #999 solid;
+                font-size: 1.2em;
+            }
+            .quantity {
+                height: 2em;
+                display: flex;
+                margin: 10px;
+            }
+            .container {
+                display: flex;
+                justify-content: center;
+                align-items: flex-end;
+                width: 14em;
+                flex-wrap: wrap;
+                margin-bottom: 20px;
+                border-left: 1px #999 solid;
+                border-right: 1px #999 solid;
+              }
+            .pic {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                margin-top: 10px;
+                margin-left: 10px;
+                margin-right: 10px;
+                background-color: #999;
+                width: 100%;
+                height: 150px;
+            }
+            .goods {
+                margin: 10px;
+                margin-bottom: 0;
+                width: 100%;
+                text-align: center;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+            .price {
+                margin: 10px;
+                margin-bottom: 0;
+                width: 100%;
+                text-align: center;
+                overflow: hidden;
+                font-size: 1.2em;
+            }
+            a {
+             text-decoration: none;
+             font-size: 0.9em;
+            }
+    </style>
+</head>
+
+<body>
+    <h1>這是一個測試用的蘭陽週預購表單吧</h1>
+    Hiiiii
+    <form action="#" id="form" method="post" name="form">
+        <section id="info">
+            <p class="title">基本資料</p>
+
+
+            <div class="grid">
+                <div class="row">
+                    <p class="info">尊姓大名</p>
+                    <input class="infoInput" name="name" type="text">
+                </div>
+
+
+                <div class="row">
+                    <p class="info">學號</p>
+                    <input class="infoInput" name="studentId" type="text">
+                </div>
+
+
+                <div class="row">
+                    <p class="info">系級</p>
+                    <input class="infoInput" name="department" type="text">
+                </div>
+
+
+                <div class="row">
+                    <p class="info">預計<br>
+                    取貨日期</p>
+
+
+                    <div class="radio">
+                        <input name="date" type="radio" value="2020-5-6"><span>5月6日（三）</span> <input name="date" type="radio" value="2020-5-7"><span>5月7日（四）</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--商品區-->
+    </form>
+</body>
+</html>

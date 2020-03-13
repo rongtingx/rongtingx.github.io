@@ -23,16 +23,24 @@
            }
            //console.table(items);
 
-             addSection(items);
-
+             //---submit---
              var submit = document.createElement("input");
-             //submit.type = "submit";
-             submit.type= "button";
+             submit.type = "submit";
+             //submit.type= "button";
              submit.id = "submit";
-             submit.value= "送出";
+             submit.value= "送出".concat("（按下後不可更改訂單）").concat("!!測試中-之後移到最下面!!");
              submit.setAttribute("onclick", "submit(this);");
 
              document.getElementById("form").appendChild(submit);
+             //---submit---
+
+             addSection(items);
+
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
             $(function submit() {
               $('#submit').on('click', function() {
@@ -52,19 +60,69 @@
                   gt += total;
 
                   if (q > 0) {
-                    output += "「"+ productName + " ($" +p +")」購買"+ q + "件，小計" + total+ "元</br>";
+                    output += "「"+ productName + " ($" +p +")」購買"+ q + "件，小計" + total+ "元\n";
                   }
                   
                 }
                 output += "總計" + gt + "元";
 
+                //radio
+                var time = function() {
+                                var selected;
+                                $('[name="date"]').each(function() {
+                                    if($(this).prop('checked') === true) selected = $(this).val();
+                                });
+                                return selected;
+                            };
+
                 //輸出購買結果
-                alert(output);
-                var ttt = document.createElement("div");
-                ttt.textContent = output;
-                document.getElementById("form").parentNode.appendChild(ttt);
+                alert('【結帳】\n'+output);
+                alert('按確定後即送出表單');
+
+                $.ajax({
+                    type: "post",
+                    data: {
+                        "method": "write",
+                        "name": $('#name').val()|| '未填寫',
+                        "studentID": $('#studentID').val()|| '未填寫',
+                        "department": $('#department').val()|| '未填寫',
+                        "phoneNumber": $('#phoneNumber').val()|| '未填寫',
+                        "email": $('#email').val()|| '未填寫',
+                        "time": time(),
+                        "gt": gt,
+                        "jsonRaw": output
+                    },
+                    url: "https://script.google.com/macros/s/AKfycbw-DnUUzyCPoS8F6QKOz12o9S8_pwamMN0cpWjxPE38f3wyWRAj/exec", // 填入網路應用程式網址
+                    success: function (e) {
+                        alert(e);
+                    }
+                    });
               });
             })
+
+            $(function getCost() {
+                var gt = 0;
+
+                for (var i = 0; i < items.length; i++) {
+
+                  //getID
+                  productName = items[i].merchant.concat("-").concat(items[i].product);
+                  selQuantity = '#quantity-'.concat(productName);
+                  selValue = '#value-'.concat(productName);
+
+                  var p = $(selValue).val();
+                  var q = $(selQuantity).val();
+                  var total = p*q;
+                  gt += total;
+
+                  return gt;
+              }
+            });
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
          });
        });
@@ -322,6 +380,7 @@
             button {
                 border: 1px #999 solid;
                 line-height: 100%;
+                text-align: center;
             }
             input[type="button"] {
                 border: 1px #999 solid;
@@ -400,7 +459,7 @@
 <body>
     <h1>這是一個測試用的蘭陽週預購表單吧</h1>
     Hiiiii
-    <form action="#" id="form" method="post" name="form">
+    <form action="done.html" id="form" method="post" name="form">
         <section id="info">
             <p class="title">基本資料</p>
 
@@ -408,26 +467,32 @@
             <div class="grid">
                 <div class="row">
                     <p class="info">尊姓大名</p>
-                    <input class="infoInput" name="name" type="text">
+                    <input class="infoInput" name="name" id="name" type="text">
                 </div>
-
 
                 <div class="row">
                     <p class="info">學號</p>
-                    <input class="infoInput" name="studentId" type="text">
+                    <input class="infoInput" name="studentID" id="studentID" type="text">
                 </div>
-
 
                 <div class="row">
                     <p class="info">系級</p>
-                    <input class="infoInput" name="department" type="text">
+                    <input class="infoInput" name="department" id="department" type="text">
                 </div>
 
+                <div class="row">
+                    <p class="info">聯絡手機</p>
+                    <input class="infoInput" name="phoneNumber" id="phoneNumber" type="text">
+                </div>
+
+                <div class="row">
+                    <p class="info">聯絡電郵</p>
+                    <input class="infoInput" name="email" id="email" type="text">
+                </div>
 
                 <div class="row">
                     <p class="info">預計<br>
                     取貨日期</p>
-
 
                     <div class="radio">
                         <input name="date" type="radio" value="2020-5-6"><span>5月6日（三）</span> <input name="date" type="radio" value="2020-5-7"><span>5月7日（四）</span>

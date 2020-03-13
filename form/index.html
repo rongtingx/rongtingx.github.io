@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
 
     <title>這是一個測試用的蘭陽週預購表單吧</title>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js">
     </script>
     <script>
        $(function() {
@@ -25,9 +25,49 @@
 
              addSection(items);
 
+             var submit = document.createElement("input");
+             //submit.type = "submit";
+             submit.type= "button";
+             submit.id = "submit";
+             submit.value= "送出";
+             submit.setAttribute("onclick", "submit(this);");
+
+             document.getElementById("form").appendChild(submit);
+
+            $(function submit() {
+              $('#submit').on('click', function() {
+                var output = "";
+                var gt = 0;
+
+                for (var i = 0; i < items.length; i++) {
+
+                  //getID
+                  productName = items[i].merchant.concat("-").concat(items[i].product);
+                  selQuantity = '#quantity-'.concat(productName);
+                  selValue = '#value-'.concat(productName);
+
+                  var p = $(selValue).val();
+                  var q = $(selQuantity).val();
+                  var total = p*q;
+                  gt += total;
+
+                  if (q > 0) {
+                    output += "「"+ productName + " ($" +p +")」購買"+ q + "件，小計" + total+ "元</br>";
+                  }
+                  
+                }
+                output += "總計" + gt + "元";
+
+                //輸出購買結果
+                alert(output);
+                var ttt = document.createElement("div");
+                ttt.textContent = output;
+                document.getElementById("form").parentNode.appendChild(ttt);
+              });
+            })
+
          });
        });
-
 
          function clicked(item) {
 
@@ -79,54 +119,53 @@
              var price = document.createElement("div");
              price.className= "price";
              price.textContent="$".concat(inputPrice);
-             price.id= "price-".concat(inputMerchant).concat("-").concat(inputProduct);
              
-             var quantity = document.createElement("div");
-             quantity.className= "quantity";
-             quantity.id= "quantity-".concat(inputMerchant).concat("-").concat(inputProduct);
+             var order = document.createElement("div");
+             order.className= "order";
+             order.id= "order-".concat(inputMerchant).concat("-").concat(inputProduct);
 
-             var dec = document.createElement("input");
+             var dec = document.createElement("button");
              dec.className= "dec";
              dec.type= "button";
-             dec.value = "－"
+             dec.textContent = "－"
 
-             var inc = document.createElement("input");
+             var inc = document.createElement("button");
              inc.className= "inc";
              inc.type= "button";
-             inc.value = "＋"
+             inc.textContent = "＋"
 
-             var remove = document.createElement("input");
+             var remove = document.createElement("button");
              remove.className= "remove";
              remove.type= "button";
-             remove.value = "del"
+             remove.textContent = "del"
 
              var count = document.createElement("input");
              count.className= "count";
              count.type= "text";
              count.size= "1";
              count.value = "0";
-             count.name = inputMerchant.concat("-").concat(inputProduct);
+             count.name = "quantity-".concat(inputMerchant).concat("-").concat(inputProduct);
 
              var priceValue = document.createElement("input");
              priceValue.type= "hidden";
              priceValue.value = parseInt(inputPrice)
-             priceValue.name = inputMerchant.concat("-").concat(inputProduct);
+             priceValue.name = "value-".concat(inputMerchant).concat("-").concat(inputProduct);
 
              dec.id = "dec";
              inc.id = "inc";
-             count.id = "count";
-             priceValue.id = "priceValue";
+             count.id = count.name;
+             priceValue.id = priceValue.name;
 
              dec.setAttribute("onclick", "clicked(this);");
              inc.setAttribute("onclick", "clicked(this);");
              remove.setAttribute("onclick", "clicked(this);");
 
              //put thing
-             quantity.appendChild(dec);
-             quantity.appendChild(count);
-             quantity.appendChild(inc);
-             quantity.appendChild(remove);
-             quantity.appendChild(priceValue);
+             order.appendChild(dec);
+             order.appendChild(count);
+             order.appendChild(inc);
+             order.appendChild(remove);
+             order.appendChild(priceValue);
 
              pic.appendChild(img);
 
@@ -135,7 +174,7 @@
              container.appendChild(pic);
              container.appendChild(goods);
              container.appendChild(price);
-             container.appendChild(quantity);
+             container.appendChild(order);
 
             //document.getElementById("form").appendChild(container);
 
@@ -187,23 +226,6 @@
             document.getElementById("form").appendChild(fragment);
 
          }
-
-
-         /*
-         function leftpad(num, length) {
-             if((num + "").length >= length) {
-                 return num;
-             }
-             return leftpad("0" + num, length)
-         }
-
-         function rightpad(num, length) {
-             if((num + "").length >= length) {
-                 return num;
-             }
-             return rightpad(num + "0", length)
-         }
-         */
 
     </script>
     <style>
@@ -297,6 +319,10 @@
                 text-align: center;
                 flex-direction: row;
             }
+            button {
+                border: 1px #999 solid;
+                line-height: 100%;
+            }
             input[type="button"] {
                 border: 1px #999 solid;
                 line-height: 100%;
@@ -321,7 +347,7 @@
                 border: 1px #999 solid;
                 font-size: 1.2em;
             }
-            .quantity {
+            .order {
                 height: 2em;
                 display: flex;
                 margin: 10px;

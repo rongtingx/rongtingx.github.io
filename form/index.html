@@ -1,322 +1,504 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
+    <head>
+        <meta charset="UTF-8">
+        <title>測試用-蘭陽週預購表單</title>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+        <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore.js"></script>-->
 
-    <title>這是一個測試用的蘭陽週預購表單吧</title>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js">
-    </script>
-    <script>
-       $(function() {
-         $.get("https://spreadsheets.google.com/feeds/list/115PPsgx0--jvrpV-JIekfH5IR-JbKCNuCDXbYODslVk/1/public/values?alt=json", function(data) {
-           var d = data.feed.entry;
-           var items = [];
-           for(var i in d) {
-             var item = {};
-             item.merchant = d[i].gsx$merchant.$t;
-             item.product = d[i].gsx$product.$t;
-             item.price = d[i].gsx$price.$t;
-             item.link = d[i].gsx$link.$t;
-             item.pic = d[i].gsx$pic.$t;
-             items.push(item);
-           }
-           //console.table(items);
+        <script>
 
-             //---submit---
-             var submit = document.createElement("input");
-             submit.type = "submit";
-             //submit.type= "button";
-             submit.id = "submit";
-             submit.value= "送出".concat("（按下後不可更改訂單）").concat("!!測試中-之後移到最下面!!");
-             submit.setAttribute("onclick", "submit(this);");
-
-             document.getElementById("form").appendChild(submit);
-             //---submit---
-
-             addSection(items);
-
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-
-            $(function submit() {
-              $('#submit').on('click', function() {
-                var output = "";
-                var gt = 0;
-
-                for (var i = 0; i < items.length; i++) {
-
-                  //getID
-                  productName = items[i].merchant.concat("-").concat(items[i].product);
-                  selQuantity = '#quantity-'.concat(productName);
-                  selValue = '#value-'.concat(productName);
-
-                  var p = $(selValue).val();
-                  var q = $(selQuantity).val();
-                  var total = p*q;
-                  gt += total;
-
-                  if (q > 0) {
-                    output += "「"+ productName + " ($" +p +")」購買"+ q + "件，小計" + total+ "元\n";
-                  }
-                  
+            $(function() {
+                //define the func load chosen.jquery
+                function selectLoad(){
+                    $('.chosen-select').chosen({
+                      search_contains: true,
+                      width: '100%'
+                    });
                 }
-                output += "總計" + gt + "元";
 
-                //radio
-                var time = function() {
+                //load the drop-down list
+                $.get("https://spreadsheets.google.com/feeds/list/13Sd4GBenMwijWjADGO_loLWk8sXf5_BACam5mGzd878/1/public/values?alt=json", function(data) {
+                    var d = data.feed.entry;
+                    var deps = [];
+                    for (var i in d) {
+                        var dep = {};
+                        dep.index = d[i].gsx$index.$t;
+                        dep.department = d[i].gsx$department.$t;
+                        dep.disabled = d[i].gsx$disabled.$t;
+                        deps.push(dep);
+                    }
+                    //console.table(deps);
+                    var depFragment = document.createDocumentFragment();
+                    for (var j = 0 ; j < deps.length ; j++) {
+                        var depOpt = document.createElement("option");
+                        depOpt.value = deps[j].index.concat("-").concat(deps[j].department);
+                        depOpt.textContent = deps[j].department.concat(" (").concat(deps[j].index).concat(")");
+                        depOpt.disabled = deps[j].disabled;
+                        depFragment.appendChild(depOpt);
+                    }
+                    document.getElementById("department").appendChild(depFragment);
+                    //load chosen.jquery when the drop-down list were done
+                    selectLoad();
+
+                });
+            });
+
+
+            $(function() {
+                $.get("https://spreadsheets.google.com/feeds/list/115PPsgx0--jvrpV-JIekfH5IR-JbKCNuCDXbYODslVk/1/public/values?alt=json", function(data) {
+                    var d = data.feed.entry;
+                    var items = [];
+                    for (var i in d) {
+                        var item = {};
+                        item.merchant = d[i].gsx$merchant.$t;
+                        item.product = d[i].gsx$product.$t;
+                        item.price = d[i].gsx$price.$t;
+                        item.link = d[i].gsx$link.$t;
+                        item.pic = d[i].gsx$pic.$t;
+                        items.push(item);
+                    }
+                    //console.table(items);
+
+                /*
+                //validation
+                $(function() {
+                    var constraints = {
+                        "name": {
+                            presence: {
+                                message: "是必填的欄位"
+                            },
+                        },
+                        "studentID": {
+                            presence: {
+                                message: "是必填的欄位"
+                            },
+                        },
+                        "department": {
+                            presence: {
+                                message: "是必填的欄位"
+                            },
+                        },
+                        "phoneNumber": {
+                            presence: {
+                                message: "是必填的欄位"
+                            },
+                        },
+                        "email": {
+                            presence: {
+                                message: "是必填的欄位"
+                            },
+                            email: true // email 格式
+                        },
+                        //"date": {
+                        //    presence: {
+                        //        message: "是必填的欄位"
+                        //    },
+                        //},
+                        "count": {
+                            presence: {
+                                message: "是必填的欄位"
+                            },
+                            numericality: {
+                                onlyInteger: true, // 只能是整數
+                                greaterThanOrEqualTo: 0, // 只能大於等於零
+                                message: "數量錯誤"
+                            },
+                        },
+                    };
+
+                    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                      // 監聽 input 值改變的狀況
+                      var inputs = document.querySelectorAll("input, textarea, select")
+                      for (var i = 0; i < inputs.length; ++i) {
+                        inputs.item(i).addEventListener("change", function(ev) {
+                          var errors = validate(form, constraints) || {};
+                          showErrorsForInput(this, errors[this.name])
+                        });
+                      }
+
+                      // 沒有錯誤就顯示成功傳送
+                      function handleFormSubmit(form, input) {
+                        var errors = validate(form, constraints);// validate the form aainst the constraints
+                        showErrors(form, errors || {}); // then we update the form to reflect the results
+                        if (!errors) {
+                          showSuccess();
+                        }
+                      }
+
+                      // Updates the inputs with the validation errors
+                      function showErrors(form, errors) {
+                        // We loop through all the inputs and show the errors for that input
+                        _.each(form.querySelectorAll("input[name], select[name]"), function(input) {
+                          // Since the errors can be null if no errors were found we need to handle
+                          // that
+                          showErrorsForInput(input, errors && errors[input.name]);
+                        });
+                      }
+
+                      // Shows the errors for a specific input
+                      function showErrorsForInput(input, errors) {
+                        // This is the root of the input
+                        var formGroup = closestParent(input.parentNode, "row")
+                          // Find where the error messages will be insert into
+                          , messages = formGroup.querySelector(".messages");
+                        // First we remove any old messages and resets the classes
+                        resetFormGroup(formGroup);
+                        // If we have errors
+                        if (errors) {
+                          // we first mark the group has having errors
+                          formGroup.classList.add("has-error");
+                          // then we append all the errors
+                          _.each(errors, function(error) {
+                            addError(messages, error);
+                          });
+                        } else {
+                          // otherwise we simply mark it as success
+                          formGroup.classList.add("has-success");
+                        }
+                      }
+
+                      // Recusively finds the closest parent that has the specified class
+                      function closestParent(child, className) {
+                        if (!child || child == document) {
+                          return null;
+                        }
+                        if (child.classList.contains(className)) {
+                          return child;
+                        } else {
+                          return closestParent(child.parentNode, className);
+                        }
+                      }
+
+                      function resetFormGroup(formGroup) {
+                        // Remove the success and error classes
+                        formGroup.classList.remove("has-error");
+                        formGroup.classList.remove("has-success");
+                        // and remove any old messages
+                        _.each(formGroup.querySelectorAll(".help-block.error"), function(el) {
+                          el.parentNode.removeChild(el);
+                        });
+                      }
+
+                      // Adds the specified error with the following markup
+                      // <p class="help-block error">[message]</p>
+                      function addError(messages, error) {
+                        var block = document.createElement("p");
+                        block.classList.add("help-block");
+                        block.classList.add("error");
+                        block.innerText = error;
+                        console.log(block);
+                        messages.appendChild(block);
+                      }
+                      function showSuccess() {
+                        alert("Success!"); // We made it \:D/
+                      }
+
+
+                      //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                  })
+*/
+
+
+                    //---submit---
+                    var submit = document.createElement("input");
+                    submit.type = "submit";
+                    //submit.type= "button";
+                    submit.id = "submit";
+                    submit.value = "送出".concat("（按下後不可更改訂單）").concat("!!測試中-之後移到最下面!!");
+                    submit.setAttribute("onclick", "submit(this);");
+                    document.getElementById("form").appendChild(submit);
+                    //---submit---
+                    addSection(items);
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                    $(function submit() {
+                        $('#submit').on('click', function() {
+
+                            //infos
+                            var name = $('[name="name"]').val() || '未填寫';
+                            var studentID = $('[name="studentID"]').val() || '未填寫';
+                            var department = $('[name="department"]').val() || '未填寫';
+                            var grade = $('[name="grade"]').val() || '未填寫';
+                            var phoneNumber = $('[name="phoneNumber"]').val() || '未填寫';
+                            var email = $('[name="email"]').val() || '未填寫';
+                            var time = function() {
                                 var selected;
                                 $('[name="date"]').each(function() {
-                                    if($(this).prop('checked') === true) selected = $(this).val();
+                                    if ($(this).prop('checked') === true)
+                                        selected = $(this).val();
                                 });
                                 return selected;
                             };
 
-                //輸出購買結果
-                alert('【結帳】\n'+output);
-                alert('按確定後即送出表單');
+                            //output
+                            var output = "";
+                            
+                            var jsonObj = [];
+                            var orderDict = {};
 
-                $.ajax({
-                    type: "post",
-                    data: {
-                        "method": "write",
-                        "name": $('#name').val()|| '未填寫',
-                        "studentID": $('#studentID').val()|| '未填寫',
-                        "department": $('#department').val()|| '未填寫',
-                        "phoneNumber": $('#phoneNumber').val()|| '未填寫',
-                        "email": $('#email').val()|| '未填寫',
-                        "time": time(),
-                        "gt": gt,
-                        "jsonRaw": output
-                    },
-                    url: "https://script.google.com/macros/s/AKfycbw-DnUUzyCPoS8F6QKOz12o9S8_pwamMN0cpWjxPE38f3wyWRAj/exec", // 填入網路應用程式網址
-                    success: function (e) {
-                        alert(e);
-                    }
-                    });
-              });
-            })
+                            var gt = 0;
+                            for (var i = 0; i < items.length; i++) {
+                                //getID
+                                productName = items[i].merchant.concat("-").concat(items[i].product);
+                                selQuantity = '#quantity-'.concat(productName);
+                                selValue = '#value-'.concat(productName);
+                                var p = $(selValue).val();
+                                var q = $(selQuantity).val();
 
-            $(function getCost() {
-                var gt = 0;
+                                orderDict[productName] = q;
 
-                for (var i = 0; i < items.length; i++) {
+                                var total = p * q;
+                                gt += total;
+                                if (q > 0 || q<0) {
+                                    output += "「" + productName + " ($" + p + ")」購買" + q + "件，小計" + total + "元\n";
+                                }
+                            }
 
-                  //getID
-                  productName = items[i].merchant.concat("-").concat(items[i].product);
-                  selQuantity = '#quantity-'.concat(productName);
-                  selValue = '#value-'.concat(productName);
+                            var dict = {"name": name, "studentID": studentID, "department": department, "grade": grade, "phoneNumber": phoneNumber, "email": email, "time": time(), "gt": gt, "quantity": orderDict};
 
-                  var p = $(selValue).val();
-                  var q = $(selQuantity).val();
-                  var total = p*q;
-                  gt += total;
+                            jsonObj.push(dict);
+                            var myJSON = JSON.stringify(jsonObj);
 
-                  return gt;
-              }
+                            output += "總計" + gt + "元\n";
+
+
+                            //輸出購買結果
+                            alert('【結帳】\n' + output);
+                            alert('按確定後即送出表單');
+
+                            $.ajax({
+                                type: "post",
+                                data: {
+                                    "method": "write",
+                                    "name": name,
+                                    "studentID": studentID,
+                                    "department": department,
+                                    "grade": grade,
+                                    "phoneNumber": phoneNumber,
+                                    "email": email,
+                                    "time": time(),
+                                    "gt": gt,
+                                    "jsonRaw": myJSON
+                                },
+                                url: "https://script.google.com/macros/s/AKfycbw-DnUUzyCPoS8F6QKOz12o9S8_pwamMN0cpWjxPE38f3wyWRAj/exec",
+                                // 填入網路應用程式網址
+                                success: function(e) {
+                                    alert(e);
+                                }
+                            });
+                        });
+                    })
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                    //-----------------------------------------------------------------
+                });
             });
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
 
-         });
-       });
+            function clicked(item) {
+                var parentElement = item.parentElement.getAttribute("id");
+                var count = document.getElementById(parentElement).childNodes[1];
+                var dec = document.getElementById(parentElement).childNodes[1 - 1];
+                var inc = document.getElementById(parentElement).childNodes[1 + 1];
+                var remove = document.getElementById(parentElement).childNodes[1 + 2];
+                //onclick
+                inc.onclick = function() {
+                    count.value = parseInt(count.value) + 1;
+                }
+                ;
+                dec.onclick = function() {
+                    if (parseInt(count.value) >= 1) {
+                        count.value = parseInt(count.value) - 1;
+                    }
+                }
+                ;
+                remove.onclick = function() {
+                    count.value = 0;
+                }
+                ;
+            }
+            ;
+            function addProducts(index, inputMerchant, inputProduct, inputPrice, inputLink, inputPic) {
+                var container = document.createElement("div");
+                container.className = "container";
+                container.id = "container-".concat(inputMerchant).concat("-").concat(inputProduct);
+                var pic = document.createElement("div");
+                pic.className = "pic";
+                var img = document.createElement("img");
+                img.className = "img";
+                img.src = inputPic;
+                var goods = document.createElement("div");
+                goods.className = "goods";
+                var link = document.createElement("a");
+                link.href = inputLink;
+                if (inputLink != "#") {
+                    link.target = "_blank";
+                }
+                link.textContent = inputProduct;
+                var price = document.createElement("div");
+                price.className = "price";
+                price.textContent = "$".concat(inputPrice);
+                var order = document.createElement("div");
+                order.className = "order";
+                order.id = "order-".concat(inputMerchant).concat("-").concat(inputProduct);
+                var dec = document.createElement("button");
+                dec.className = "dec";
+                dec.type = "button";
+                dec.textContent = "－"
+                var inc = document.createElement("button");
+                inc.className = "inc";
+                inc.type = "button";
+                inc.textContent = "＋"
+                var remove = document.createElement("button");
+                remove.className = "remove";
+                remove.type = "button";
+                remove.textContent = "del"
+                var count = document.createElement("input");
+                count.className = "count";
+                count.type = "text";
+                count.size = "1";
+                count.value = "0";
+                count.id = "quantity-".concat(inputMerchant).concat("-").concat(inputProduct);
+                var priceValue = document.createElement("input");
+                priceValue.type = "hidden";
+                priceValue.value = parseInt(inputPrice)
+                priceValue.id = "value-".concat(inputMerchant).concat("-").concat(inputProduct);
+                dec.id = "dec";
+                inc.id = "inc";
+                count.name = "count";
+                priceValue.name = "priceValue";
+                dec.setAttribute("onclick", "clicked(this);");
+                inc.setAttribute("onclick", "clicked(this);");
+                remove.setAttribute("onclick", "clicked(this);");
+                //put thing
+                order.appendChild(dec);
+                order.appendChild(count);
+                order.appendChild(inc);
+                order.appendChild(remove);
+                order.appendChild(priceValue);
+                pic.appendChild(img);
+                goods.appendChild(link);
+                container.appendChild(pic);
+                container.appendChild(goods);
+                container.appendChild(price);
+                container.appendChild(order);
+                //document.getElementById("form").appendChild(container);
+                return container;
+            }
 
-         function clicked(item) {
-
-             var parentElement = item.parentElement.getAttribute("id");
-
-             var count = document.getElementById(parentElement).childNodes[1];
-             var dec = document.getElementById(parentElement).childNodes[1-1];
-             var inc = document.getElementById(parentElement).childNodes[1+1];
-             var remove = document.getElementById(parentElement).childNodes[1+2];
-
-             //onclick
-             inc.onclick = function() {
-                 count.value = parseInt(count.value) + 1;
-             };
-             dec.onclick = function() {
-                 if (parseInt(count.value)>=1){
-                     count.value = parseInt(count.value) - 1;
-                 }
-             };
-             remove.onclick = function() {
-                 count.value = 0;
-             };
-
-        };
-
-        function addProducts(index, inputMerchant, inputProduct, inputPrice, inputLink, inputPic)
-        {
-             var container = document.createElement("div");
-             container.className= "container";
-             container.id = "container-".concat(inputMerchant).concat("-").concat(inputProduct);
-
-             var pic = document.createElement("div");
-             pic.className= "pic";
-
-             var img = document.createElement("img");
-             img.className= "img";
-             img.src = inputPic;
-             
-             var goods = document.createElement("div");
-             goods.className= "goods";
-             
-             var link = document.createElement("a");
-             link.href = inputLink;
-             if (inputLink != "#"){
-              link.target = "_blank";
-             }
-             link.textContent = inputProduct;
-
-             var price = document.createElement("div");
-             price.className= "price";
-             price.textContent="$".concat(inputPrice);
-             
-             var order = document.createElement("div");
-             order.className= "order";
-             order.id= "order-".concat(inputMerchant).concat("-").concat(inputProduct);
-
-             var dec = document.createElement("button");
-             dec.className= "dec";
-             dec.type= "button";
-             dec.textContent = "－"
-
-             var inc = document.createElement("button");
-             inc.className= "inc";
-             inc.type= "button";
-             inc.textContent = "＋"
-
-             var remove = document.createElement("button");
-             remove.className= "remove";
-             remove.type= "button";
-             remove.textContent = "del"
-
-             var count = document.createElement("input");
-             count.className= "count";
-             count.type= "text";
-             count.size= "1";
-             count.value = "0";
-             count.name = "quantity-".concat(inputMerchant).concat("-").concat(inputProduct);
-
-             var priceValue = document.createElement("input");
-             priceValue.type= "hidden";
-             priceValue.value = parseInt(inputPrice)
-             priceValue.name = "value-".concat(inputMerchant).concat("-").concat(inputProduct);
-
-             dec.id = "dec";
-             inc.id = "inc";
-             count.id = count.name;
-             priceValue.id = priceValue.name;
-
-             dec.setAttribute("onclick", "clicked(this);");
-             inc.setAttribute("onclick", "clicked(this);");
-             remove.setAttribute("onclick", "clicked(this);");
-
-             //put thing
-             order.appendChild(dec);
-             order.appendChild(count);
-             order.appendChild(inc);
-             order.appendChild(remove);
-             order.appendChild(priceValue);
-
-             pic.appendChild(img);
-
-             goods.appendChild(link);
-
-             container.appendChild(pic);
-             container.appendChild(goods);
-             container.appendChild(price);
-             container.appendChild(order);
-
-            //document.getElementById("form").appendChild(container);
-
-            return container;
-         }
-
-
-         function addSection(items) {
-            var sectionFragment = document.createDocumentFragment();
-            var fragment = document.createDocumentFragment();
-            var section = document.createElement("section");
-
-            for (var i = 0; i < items.length; i++) {
-
-                 var product = addProducts(i, items[i].merchant, items[i].product, items[i].price, items[i].link, items[i].pic);
-                 sectionFragment.appendChild(product);
-
-                 if (i == items.length - 1){
-                      section.id = "section-".concat(items[i].merchant);
-
-                      var pTitle = document.createElement("p");
-                      pTitle.className = "title";
-                      pTitle.textContent = items[i].merchant;
-
-                      section.appendChild(pTitle);
-                      section.appendChild(sectionFragment);
-                      fragment.appendChild(section);
-                      var sectionFragment = document.createDocumentFragment();
-                      var section = document.createElement("section");
-                      break;
-                 }
-
-                 if ((items[i].merchant != items[i+1].merchant) && (i < items.length-1)){
-                      section.id = "section-".concat(items[i].merchant);
-
-                      var pTitle = document.createElement("p");
-                      pTitle.className = "title";
-                      pTitle.textContent = items[i].merchant;
-
-                      section.appendChild(pTitle);
-                      section.appendChild(sectionFragment);
-                      fragment.appendChild(section);
-                      var sectionFragment = document.createDocumentFragment();
-                      var section = document.createElement("section");
-                 }
-
-             }
-
-            document.getElementById("form").appendChild(fragment);
-
-         }
-
-    </script>
-    <style>
+            function addSection(items) {
+                var sectionFragment = document.createDocumentFragment();
+                var fragment = document.createDocumentFragment();
+                var section = document.createElement("section");
+                for (var i = 0; i < items.length; i++) {
+                    var product = addProducts(i, items[i].merchant, items[i].product, items[i].price, items[i].link, items[i].pic);
+                    sectionFragment.appendChild(product);
+                    if (i == items.length - 1) {
+                        section.id = "section-".concat(items[i].merchant);
+                        var pTitle = document.createElement("p");
+                        pTitle.className = "title";
+                        pTitle.textContent = items[i].merchant;
+                        section.appendChild(pTitle);
+                        section.appendChild(sectionFragment);
+                        fragment.appendChild(section);
+                        var sectionFragment = document.createDocumentFragment();
+                        var section = document.createElement("section");
+                        break;
+                    }
+                    if ((items[i].merchant != items[i + 1].merchant) && (i < items.length - 1)) {
+                        section.id = "section-".concat(items[i].merchant);
+                        var pTitle = document.createElement("p");
+                        pTitle.className = "title";
+                        pTitle.textContent = items[i].merchant;
+                        section.appendChild(pTitle);
+                        section.appendChild(sectionFragment);
+                        fragment.appendChild(section);
+                        var sectionFragment = document.createDocumentFragment();
+                        var section = document.createElement("section");
+                    }
+                }
+                document.getElementById("form").appendChild(fragment);
+            }
+        </script>
+        <style>
             * {
                 box-sizing: border-box;
             }
 
             body {
-              background-color: #EEE;
-              margin: 2em;
+                background-color: #EEE;
+                margin: 2em;
             }
 
             p {
-              margin-block-start: 0;
-              margin-block-end: 0;
-              margin-inline-start: 0;
-              margin-inline-end: 0;
+                margin-block-start: 0;
+                margin-block-end: 0;
+                margin-inline-start: 0;
+                margin-inline-end: 0;
             }
 
             section {
-                 display: flex;
-                 flex-wrap: wrap;
-                 width: 100%;
-                 flex-direction: row;
+                display: flex;
+                flex-wrap: wrap;
+                width: 100%;
+                flex-direction: row;
                 justify-content: center;
                 align-items: center;
+            }
+
+            .radio>label {
+                font-size: 2em;
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+
+            a {
+                text-decoration: none;
+                font-size: 0.9em;
+            }
+
+            input {
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: row;
+            }
+
+            input[type="button"] {
+                border: 1px #999 solid;
+                line-height: 100%;
+            }
+
+            input[type="radio"] {
+                display: inline;
+                height: 2em;
+                width: 2em;
+            }
+
+            button {
+                border: 1px #999 solid;
+                line-height: 100%;
+                text-align: center;
             }
 
             .grid {
                 display: grid;
                 grid-template-columns: 1fr;
                 grid-row-gap: 0.5em;
-
             }
 
             .row {
@@ -326,91 +508,66 @@
                 align-items: center;
             }
 
-            .info {
-              text-align: right;
-              margin-right: 10px; 
+            label {
+                text-align: right;
+                margin-right: 10px;
             }
 
-            .infoInput {
-              text-align: left;
+            .infoIn {
+                text-align: left;
                 border: 1px #999 solid;
-              padding: 0.5em; 
+                padding: 0.5em;
                 font-size: 1.2em;
-                 border-radius: 0.2em;
-                 grid-column: 2 / 4;
-            }
-            .radio{
-                 grid-column: 2 / 7;
-                align-items: center;
+                border-radius: 0.2em;
+                grid-column: 2 / 5;
             }
 
-            span {
-              font-size: 2em;
+            .radio {
+                grid-column: 2 / 7;
+                align-items: center;
             }
 
             .title {
-              width: 100%;
-              padding: 10px;
-              border-top: 1px #999 solid;
-              border-bottom: 1px #999 solid;
-              font-size: 2em;
-              margin-top: 0.8em;
-              margin-bottom: 0.5em;
-            }
-            input[type="radio"] {
-              display: inline;
-                height: 2em;
-                width: 2em;
+                width: 100%;
+                padding: 10px;
+                border-top: 1px #999 solid;
+                border-bottom: 1px #999 solid;
+                font-size: 2em;
+                margin-top: 0.8em;
+                margin-bottom: 0.5em;
             }
 
-            img {
-              width: 100%;
-              height: 100%;
-            }
-
-            input {
-                -webkit-box-sizing: border-box;
-                -moz-box-sizing: border-box;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                flex-direction: row;
-            }
-            button {
-                border: 1px #999 solid;
-                line-height: 100%;
-                text-align: center;
-            }
-            input[type="button"] {
-                border: 1px #999 solid;
-                line-height: 100%;
-            }
             .dec {
                 border-radius: 1em 0 0 1em;
                 font-size: 1.5em;
                 width: 40px;
             }
+
             .inc {
                 border-radius: 0 1em 1em 0;
                 font-size: 1.5em;
                 width: 40px;
             }
+
             .remove {
-                 margin-left: 5px;
-                 border-radius: 0.2em;
-                 width: 30px;
+                margin-left: 5px;
+                border-radius: 0.2em;
+                width: 30px;
             }
+
             .count {
                 height: 100%;
                 border: 1px #999 solid;
                 font-size: 1.2em;
+                text-align: center;
             }
+
             .order {
                 height: 2em;
                 display: flex;
                 margin: 10px;
             }
+
             .container {
                 display: flex;
                 justify-content: center;
@@ -420,7 +577,8 @@
                 margin-bottom: 20px;
                 border-left: 1px #999 solid;
                 border-right: 1px #999 solid;
-              }
+            }
+
             .pic {
                 display: flex;
                 justify-content: center;
@@ -432,6 +590,7 @@
                 width: 100%;
                 height: 150px;
             }
+
             .goods {
                 margin: 10px;
                 margin-bottom: 0;
@@ -441,6 +600,7 @@
                 text-overflow: ellipsis;
                 overflow: hidden;
             }
+
             .price {
                 margin: 10px;
                 margin-bottom: 0;
@@ -449,58 +609,234 @@
                 overflow: hidden;
                 font-size: 1.2em;
             }
-            a {
-             text-decoration: none;
-             font-size: 0.9em;
+
+            /*CSS drop-down list*/
+            /* @group Base */
+
+            .chosen-container {
+                grid-column: 2 / 5;
+                position: relative;
+                display: inline-block;
+                vertical-align: middle;
+                font-size: 1.2em; /*整個欄位內的font-size*/
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
             }
-    </style>
-</head>
 
-<body>
-    <h1>這是一個測試用的蘭陽週預購表單吧</h1>
-    Hiiiii
-    <form action="done.html" id="form" method="post" name="form">
-        <section id="info">
-            <p class="title">基本資料</p>
+            .chosen-container * {
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+            }
 
+            .chosen-container .chosen-drop {
+                position: absolute;
+                top: 100%;
+                z-index: 1000;
+                width: 100%;
+                border: 1px solid #aaa; /*下拉選單邊框*/
+                border-top: 0;
+                background: #ccc; /*下拉選單色彩*/
+                -webkit-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15); /*下拉選單陰影*/
+                box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15); /*下拉選單陰影*/
+                clip: rect(0, 0, 0, 0);
+                -webkit-clip-path: inset(100% 100%);
+                clip-path: inset(100% 100%);
+            }
 
-            <div class="grid">
-                <div class="row">
-                    <p class="info">尊姓大名</p>
-                    <input class="infoInput" name="name" id="name" type="text">
-                </div>
+            .chosen-container.chosen-with-drop .chosen-drop {
+                clip: auto;
+                -webkit-clip-path: none;
+                clip-path: none;
+            }
 
-                <div class="row">
-                    <p class="info">學號</p>
-                    <input class="infoInput" name="studentID" id="studentID" type="text">
-                </div>
+            .chosen-container a {
+                cursor: pointer;
+            }
 
-                <div class="row">
-                    <p class="info">系級</p>
-                    <input class="infoInput" name="department" id="department" type="text">
-                </div>
+            /* @end */
+            /* @group Single Chosen */
+            .chosen-container-single .chosen-single { /*選擇欄位*/
+                position: relative;
+                display: block;
+                overflow: hidden;
+                padding: 0 0 0 8px;
+                height: 100%; /*!!!!!欄位高度!!!!!!*/
+                border: 1px solid #aaa; /*!!!!!欄位邊框!!!!!!*/
+                border-radius: 5px;
+                background-color: #fff;
+                padding: 0.5em;
+                background-clip: padding-box;
+                color: #333;
+                text-decoration: none;
+                white-space: nowrap;
+                line-height: 24px; /*選擇框內字體高度*/
+                }
 
-                <div class="row">
-                    <p class="info">聯絡手機</p>
-                    <input class="infoInput" name="phoneNumber" id="phoneNumber" type="text">
-                </div>
+            .chosen-container-single .chosen-default {
+                color: #777; /*選擇框內(placeholder)字體顏色*/
+            }
 
-                <div class="row">
-                    <p class="info">聯絡電郵</p>
-                    <input class="infoInput" name="email" id="email" type="text">
-                </div>
+            .chosen-container-single .chosen-single span {
+                display: block;
+                overflow: hidden;
+                margin-right: 26px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
 
-                <div class="row">
-                    <p class="info">預計<br>
-                    取貨日期</p>
+            .chosen-container-single .chosen-single div {
+                position: absolute;
+                top: 0;
+                right: 0;
+                display: block;
+                height: 100%;
+            }
 
-                    <div class="radio">
-                        <input name="date" type="radio" value="2020-5-6"><span>5月6日（三）</span> <input name="date" type="radio" value="2020-5-7"><span>5月7日（四）</span>
+            .chosen-container-single .chosen-single div b {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+
+            .chosen-container-single .chosen-search {
+                position: relative;
+                z-index: 1010;
+                margin: 0;
+                padding: 3px 4px;
+                white-space: nowrap;
+            }
+
+            .chosen-container-single .chosen-search input[type="text"] { /*搜尋框*/
+                margin: 1px 0;
+                padding: 4px 20px 4px 5px;
+                width: 100%;
+                height: auto;
+                outline: 0;
+                border: 1px solid #aaa;
+                font-size: 1em;
+                line-height: normal;
+                border-radius: 3px;
+            }
+
+            .chosen-container-single .chosen-drop {
+                margin-top: -1px;
+                border-radius: 0 0 4px 4px;
+                background-clip: padding-box;
+            }
+
+            /* @group Results */
+            .chosen-container .chosen-results {
+                color: #333; /*選項文字顏色*/
+                position: relative;
+                overflow-x: hidden;
+                overflow-y: auto;
+                margin: 0 4px 4px 0;
+                padding: 0 0 0 4px;
+                max-height: 10em; /*下拉式選單最大高度*/
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .chosen-container .chosen-results li {
+                display: none;
+                margin: 0;
+                padding: 5px 6px;
+                list-style: none;
+                line-height: 15px; /*選項行高*/
+                word-wrap: break-word; /*選項是否分行*/
+                -webkit-touch-callout: none;
+            }
+
+            .chosen-container .chosen-results li.active-result { /*有效項目*/
+                display: list-item;
+                cursor: pointer;
+            }
+
+            .chosen-container .chosen-results li.disabled-result { /*禁用項目*/
+                display: list-item;
+                color: #bbb;
+                cursor: default;
+            }
+
+            .chosen-container .chosen-results li.highlighted { /*hovering的項目*/
+                background-color: #666;
+                color: #fff;
+            }
+
+            .chosen-container .chosen-results li.no-results { /*搜尋無結果*/
+                color: #FFF; /*no-results color*/
+                display: list-item;
+                background: #EB7A77; /*no-results background*/
+            }
+
+            .chosen-container .chosen-results li em { /*匹配字眼*/
+                font-style: normal;
+                //text-decoration: underline;
+                font-weight: 1000;
+            }
+            /*CSS drop-down list END*/
+        </style>
+    </head>
+    <body>
+        <h1>測試用-蘭陽週預購表單</h1>
+        <span>我只是個介紹文字</span>
+        <form action="done.html" id="form" method="post" name="form">
+            <section id="info">
+                <p class="title">買家基本資料</p>
+                <div class="grid">
+                    <div class="row">
+                        <label for="name">姓名</label>
+                        <input autofocus="" class="infoIn" name="name" type="text" id="name" placeholder="你的名字">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="row">
+                        <label for="studentID">學號</label>
+                        <input class="infoIn" name="studentID" type="text" id="studentID" placeholder="你的學號，例如">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="row">
+                        <label for="department">系級</label>
+                        <select data-placeholder="選擇系所" name="department" id="department" tabindex="-1" class="chosen-select">
+                            <option value=""></option>
+                            <!--系所區-->
+                        </select>
+                        <select data-placeholder="選擇年級" name="grade" id="grade" tabindex="-1" class="chosen-select">
+                            <option value=""></option>
+                            <option value="1-一年級">一年級</option>
+                            <option value="2-二年級">二年級</option>
+                            <option value="3-三年級">三年級</option>
+                            <option value="4-四年級">四年級</option>
+                            <option value="5-五年級">五年級</option>
+                            <option value="6-六年級">六年級</option>
+                            <option value="7-七年級">七年級</option>
+                        </select>
+                        <div class="messages"></div>
+                    </div>
+                    <div class="row">
+                        <label for="phoneNumber">聯絡手機</label>
+                        <input class="infoIn" name="phoneNumber" type="text" id="phoneNumber" placeholder="手機號碼，例如">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="row">
+                        <label for="email">聯絡 E-mail</label>
+                        <input class="infoIn" name="email" type="text" id="email" placeholder="E-mail，例如">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="row">
+                        <label>
+                            預計<br>取貨日期
+                        </label>
+                        <div class="radio">
+                            <input name="date" type="radio" value="2020-5-6" id="d0506" required>
+                            <label for="d0506">5月6日（三）</label>
+                            <input name="date" type="radio" value="2020-5-7" id="d0507">
+                            <label for="d0507">5月7日（四）</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <!--商品區-->
-    </form>
-</body>
+            </section>
+            <!--商品區-->
+        </form>
+    </body>
 </html>

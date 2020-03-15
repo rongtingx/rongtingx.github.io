@@ -4,19 +4,30 @@
         <meta charset="UTF-8">
         <title>測試用-蘭陽週預購表單</title>
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+
+        <!--jquery-->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+        <!--帶搜尋欄選單插件-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
-        <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore.js"></script>-->
+
+        <!--表單驗證插件-->
+        <script src="https://validatejs.org/validate.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+        <!--時間處理插件-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 
         <script>
-
+            /*
+             * create the the drop-down list
+             */
             $(function() {
                 //define the func load chosen.jquery
-                function selectLoad(){
+                function selectLoad() {
                     $('.chosen-select').chosen({
-                      search_contains: true,
-                      width: '100%'
+                        search_contains: true,
+                        width: '100%'
                     });
                 }
 
@@ -33,7 +44,7 @@
                     }
                     //console.table(deps);
                     var depFragment = document.createDocumentFragment();
-                    for (var j = 0 ; j < deps.length ; j++) {
+                    for (var j = 0; j < deps.length; j++) {
                         var depOpt = document.createElement("option");
                         depOpt.value = deps[j].index.concat("-").concat(deps[j].department);
                         depOpt.textContent = deps[j].department.concat(" (").concat(deps[j].index).concat(")");
@@ -48,7 +59,18 @@
             });
 
 
+            //create submit button, product list, items set and define the submit action
             $(function() {
+                /*
+                 * create submit button
+                 */
+                var submit = document.createElement("button");
+                submit.type = "submit";
+                submit.id = "submit";
+                submit.textContent = "送出".concat("（按下後不可更改訂單）").concat("!!測試中-之後移到最下面!!");
+                submit.value = submit.textContent;
+
+                //create product list and items set
                 $.get("https://spreadsheets.google.com/feeds/list/115PPsgx0--jvrpV-JIekfH5IR-JbKCNuCDXbYODslVk/1/public/values?alt=json", function(data) {
                     var d = data.feed.entry;
                     var items = [];
@@ -63,166 +85,230 @@
                     }
                     //console.table(items);
 
-                /*
-                //validation
-                $(function() {
+                    //add the element
+                    document.getElementById("form").appendChild(submit);
+                    addSection(items);
+
+                    $("input").keydown(function(ev) {
+                        if (ev.which == 13) {
+                            ev.preventDefault();
+                        }
+                    });
+
+                    /*
+                    * validate.js
+                    * 表單驗證區
+                    */
+
+                    // These are the constraints used to validate the form
+                    // 未使用或不欲驗證之欄位請務必從下列項目中註解化或移除
                     var constraints = {
-                        "name": {
+                        name: {
                             presence: {
-                                message: "是必填的欄位"
+                                message: "不能留空！\n難道你是無名氏逆？",
+                            },
+                            format: {
+                                pattern: "^([0-9A-Za-z ,]|[\u4E00-\u9FFF．]|[^\x00-\xFF]])+$",
+                                message: "的輸入格式無效！\n你的名字沒這麼奇怪吧？（如果這確實是你的真名，請立刻和我們聯絡）",
+                            }
+                        },
+                        studentID: {
+                            presence: {
+                                message: "不能留空！",
+                            },
+                            format: {
+                                pattern: "(^10[0-8][0-9]{6}$|^999999999$)",
+                                message: "的輸入格式無效！\n（嘗試填寫此欄卻失敗者，請輸入9個9並立刻和我們聯絡，訂單方會成立）",
+                            }
+                        },
+                        department: {
+                            presence: {
+                                message: "不能留空！\n（無適當選項可選者，請選擇XXX並立刻和我們聯絡，訂單方會成立）",
                             },
                         },
-                        "studentID": {
+                        grade: {
                             presence: {
-                                message: "是必填的欄位"
+                                message: "不能留空！\n（無適當選項可選者，請立刻和我們聯絡）",
                             },
                         },
-                        "department": {
+                        phoneNumber: {
                             presence: {
-                                message: "是必填的欄位"
+                                message: "不能留空！\n我們需要和你聯絡及確認訂單！",
+                            },
+                            format: {
+                                pattern: "^09[0-9]{8}$",
+                                message: "欄位請輸入臺灣的手機門號，無需加入符號",
+                            }
+                        },
+                        email: {
+                            presence: {
+                                message: "不能留空！\n我們需要和你聯絡及確認訂單！",
+                            },
+                            email: {
+                                message: "的輸入格式無效！",
                             },
                         },
-                        "phoneNumber": {
+                        date: {
                             presence: {
-                                message: "是必填的欄位"
-                            },
-                        },
-                        "email": {
-                            presence: {
-                                message: "是必填的欄位"
-                            },
-                            email: true // email 格式
-                        },
-                        //"date": {
-                        //    presence: {
-                        //        message: "是必填的欄位"
-                        //    },
-                        //},
-                        "count": {
-                            presence: {
-                                message: "是必填的欄位"
-                            },
-                            numericality: {
-                                onlyInteger: true, // 只能是整數
-                                greaterThanOrEqualTo: 0, // 只能大於等於零
-                                message: "數量錯誤"
+                                message: "不能留空！難道你不來取貨嗎？",
                             },
                         },
                     };
 
-                    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                    for (var i = 0; i < items.length; i++) {
+                        productName = items[i].merchant.concat("-").concat(items[i].product);
+                        constraints[productName] = {
+                            presence: {
+                                message: "的數量不能留空！",
+                            },
+                            numericality: {
+                                onlyInteger: true,
+                                greaterThanOrEqualTo: 0,
+                                message: "的訂購數量\n只能是大於0的整數！",
+                            }
+                        }
+                    }
 
-                      // 監聽 input 值改變的狀況
-                      var inputs = document.querySelectorAll("input, textarea, select")
-                      for (var i = 0; i < inputs.length; ++i) {
-                        inputs.item(i).addEventListener("change", function(ev) {
-                          var errors = validate(form, constraints) || {};
-                          showErrorsForInput(this, errors[this.name])
+
+                    (function() {
+                        // Hook up the form so we can prevent it from being posted
+                        var formIdName = "#form";
+                        var form = document.querySelector(formIdName);
+
+                        form.addEventListener("submit", function(ev) {
+                            ev.preventDefault();
+                            handleFormSubmit(form);
                         });
-                      }
 
-                      // 沒有錯誤就顯示成功傳送
-                      function handleFormSubmit(form, input) {
-                        var errors = validate(form, constraints);// validate the form aainst the constraints
-                        showErrors(form, errors || {}); // then we update the form to reflect the results
-                        if (!errors) {
-                          showSuccess();
+                        // Hook up the inputs to validate on the fly
+                        var inputs = document.querySelectorAll("input, textarea, select, .chosen-select")
+                        for (var i = 0; i < inputs.length; ++i) {
+                            inputs.item(i).addEventListener("change", function(ev) {
+                                var errors = validate(form, constraints) || {};
+                                showIsErrorsForInput(this, errors[this.name])
+                            });
+                            inputs.item(i).addEventListener("input", function(ev) {
+                                var errors = validate(form, constraints) || {};
+                                showIsErrorsForInput(this, errors[this.name])
+                            });
+                            inputs.item(i).addEventListener("blur", function(ev) {
+                                var errors = validate(form, constraints) || {};
+                                showIsErrorsForInput(this, errors[this.name])
+                            });
+                            inputs.item(i).addEventListener("click", function(ev) {
+                                var errors = validate(form, constraints) || {};
+                                showIsErrorsForInput(this, errors[this.name])
+                            });
+                            $(".chosen-select").change(function(ev) {
+                                var errors = validate(form, constraints) || {};
+                                showIsErrorsForInput(this, errors[this.name])
+                            });
                         }
-                      }
 
-                      // Updates the inputs with the validation errors
-                      function showErrors(form, errors) {
-                        // We loop through all the inputs and show the errors for that input
-                        _.each(form.querySelectorAll("input[name], select[name]"), function(input) {
-                          // Since the errors can be null if no errors were found we need to handle
-                          // that
-                          showErrorsForInput(input, errors && errors[input.name]);
-                        });
-                      }
+                        function handleFormSubmit(form, input) {
+                            // validate the form against the constraints
+                            var errors = validate(form, constraints);
+                            // then we update the form to reflect the results
+                            showIsErrors(form, errors || {});
+                            
+                            var successMessage = "表單已完成。";
+                            var errorMessage = "表單內容有誤，請檢視錯誤訊息後重新輸入！";
 
-                      // Shows the errors for a specific input
-                      function showErrorsForInput(input, errors) {
-                        // This is the root of the input
-                        var formGroup = closestParent(input.parentNode, "row")
-                          // Find where the error messages will be insert into
-                          , messages = formGroup.querySelector(".messages");
-                        // First we remove any old messages and resets the classes
-                        resetFormGroup(formGroup);
-                        // If we have errors
-                        if (errors) {
-                          // we first mark the group has having errors
-                          formGroup.classList.add("has-error");
-                          // then we append all the errors
-                          _.each(errors, function(error) {
-                            addError(messages, error);
-                          });
-                        } else {
-                          // otherwise we simply mark it as success
-                          formGroup.classList.add("has-success");
+                            if (!errors) {
+                                doSuccess(successMessage);
+                            } else {
+                                doError(errorMessage);
+                            }
                         }
-                      }
 
-                      // Recusively finds the closest parent that has the specified class
-                      function closestParent(child, className) {
-                        if (!child || child == document) {
-                          return null;
+                        // Updates the inputs with the validation errors
+                        function showIsErrors(form, errors) {
+                            // We loop through all the inputs and show the errors for that input
+                            _.each(form.querySelectorAll("input[name], select[name]"), function(input) {
+                                // Since the errors can be null if no errors were found we need to handle
+                                // that
+                                showIsErrorsForInput(input, errors && errors[input.name]);
+                            });
                         }
-                        if (child.classList.contains(className)) {
-                          return child;
-                        } else {
-                          return closestParent(child.parentNode, className);
+
+                        // Shows the errors for a specific input
+                        function showIsErrorsForInput(input, errors) {
+
+                            var messagesClassName = ".messages";
+
+                            // This is the root of the input
+                            if (input.parentNode.className == "order") {
+                                var formGroup = input.parentNode.parentNode;
+                            } else if (input.parentNode.className == "radio") {
+                                var formGroup = input.parentNode.parentNode;
+                            } else {
+                                var formGroup = input.parentNode;
+                            }
+                            
+                            var messages = formGroup.querySelector(messagesClassName);
+                            // First we remove any old messages and resets the classes
+                            resetFormGroup(formGroup);
+                            // If we have errors
+                            if (errors) {
+                                // we first mark the group has having errors
+                                formGroup.classList.add("has-error");
+                                // then we append all the errors
+                                _.each(errors, function(error) {
+                                    addError(messages, error);
+                                });
+                            } else {
+                                // otherwise we simply mark it as success
+                                if (formGroup != form) {
+                                    formGroup.classList.add("has-success");
+                                }
+                            }
+
+                            
                         }
-                      }
 
-                      function resetFormGroup(formGroup) {
-                        // Remove the success and error classes
-                        formGroup.classList.remove("has-error");
-                        formGroup.classList.remove("has-success");
-                        // and remove any old messages
-                        _.each(formGroup.querySelectorAll(".help-block.error"), function(el) {
-                          el.parentNode.removeChild(el);
-                        });
-                      }
+                        // Recusively finds the closest parent that has the specified class
+                        function closestParent(child, className) {
+                            if (!child || child == document) {
+                                return null;
+                            }
+                            if (child.classList.contains(className)) {
+                                return child;
+                            } else {
+                                return closestParent(child.parentNode, className);
+                            }
+                        }
 
-                      // Adds the specified error with the following markup
-                      // <p class="help-block error">[message]</p>
-                      function addError(messages, error) {
-                        var block = document.createElement("p");
-                        block.classList.add("help-block");
-                        block.classList.add("error");
-                        block.innerText = error;
-                        console.log(block);
-                        messages.appendChild(block);
-                      }
-                      function showSuccess() {
-                        alert("Success!"); // We made it \:D/
-                      }
+                        function resetFormGroup(formGroup) {
+                            // Remove the success and error classes
+                            formGroup.classList.remove("has-error");
+                            formGroup.classList.remove("has-success");
+                            // and remove any old messages
+                            _.each(formGroup.querySelectorAll(".help-block.error"), function(el) {
+                                el.parentNode.removeChild(el);
+                            });
+                        }
 
+                        // Adds the specified error with the following markup
+                        // <p class="help-block error">[message]</p>
+                        function addError(messages, error) {
+                            var block = document.createElement("p");
+                            block.classList.add("help-block");
+                            block.classList.add("error");
+                            block.innerText = error;
+                            messages.appendChild(block);
+                        }
 
-                      //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                  })
-*/
+                        function doError(message) {
+                            //表單驗證失敗
+                            alert(message);
+                        }
 
-
-                    //---submit---
-                    var submit = document.createElement("input");
-                    submit.type = "submit";
-                    //submit.type= "button";
-                    submit.id = "submit";
-                    submit.value = "送出".concat("（按下後不可更改訂單）").concat("!!測試中-之後移到最下面!!");
-                    submit.setAttribute("onclick", "submit(this);");
-                    document.getElementById("form").appendChild(submit);
-                    //---submit---
-                    addSection(items);
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
-                    $(function submit() {
-                        $('#submit').on('click', function() {
-
-                            //infos
+                        function doSuccess(message) {
+                            //表單驗證成功
+                            /*
+                            * contents of submitting
+                            */
+                            //define infos
                             var name = $('[name="name"]').val() || '未填寫';
                             var studentID = $('[name="studentID"]').val() || '未填寫';
                             var department = $('[name="department"]').val() || '未填寫';
@@ -238,13 +324,14 @@
                                 return selected;
                             };
 
-                            //output
+                            //init output
                             var output = "";
-                            
+
+                            //init the json construction
                             var jsonObj = [];
                             var orderDict = {};
 
-                            var gt = 0;
+                            var total = 0;
                             for (var i = 0; i < items.length; i++) {
                                 //getID
                                 productName = items[i].merchant.concat("-").concat(items[i].product);
@@ -253,27 +340,51 @@
                                 var p = $(selValue).val();
                                 var q = $(selQuantity).val();
 
-                                orderDict[productName] = q;
+                                //calculate the subtotal and total
+                                var subtotal = p * q;
+                                total += subtotal;
 
-                                var total = p * q;
-                                gt += total;
-                                if (q > 0 || q<0) {
-                                    output += "「" + productName + " ($" + p + ")」購買" + q + "件，小計" + total + "元\n";
+                                //add the bought product into the output
+                                if (q > 0 || q < 0) {
+                                    output += "「" + productName + " ($" + p + ")」購買" + q + "件，小計" + subtotal + "元\n";
                                 }
+
+                                //put the product name to the dict in json
+                                orderDict[productName] = q;
                             }
 
-                            var dict = {"name": name, "studentID": studentID, "department": department, "grade": grade, "phoneNumber": phoneNumber, "email": email, "time": time(), "gt": gt, "quantity": orderDict};
 
-                            jsonObj.push(dict);
-                            var myJSON = JSON.stringify(jsonObj);
+                            /*
+                            * 驗證總金額是否為0
+                            */
+                            if (total <= 0) {
+                                doError("你似乎沒購買任何商品！");
+                                return;
+                            }
 
-                            output += "總計" + gt + "元\n";
-
-
-                            //輸出購買結果
+                            //show alert
+                            output += "總計" + total + "元\n";
                             alert('【結帳】\n' + output);
                             alert('按確定後即送出表單');
 
+                            //create the json string
+                            var dict = {
+                                "name": name,
+                                "studentID": studentID,
+                                "department": department,
+                                "grade": grade,
+                                "phoneNumber": phoneNumber,
+                                "email": email,
+                                "time": time(),
+                                "total": total,
+                                "quantity": orderDict
+                            };
+                            jsonObj.push(dict);
+                            var myJSON = JSON.stringify(jsonObj);
+
+                            /*
+                            do ajax for submitting
+                            */
                             $.ajax({
                                 type: "post",
                                 data: {
@@ -285,7 +396,7 @@
                                     "phoneNumber": phoneNumber,
                                     "email": email,
                                     "time": time(),
-                                    "gt": gt,
+                                    "total": total,
                                     "jsonRaw": myJSON
                                 },
                                 url: "https://script.google.com/macros/s/AKfycbw-DnUUzyCPoS8F6QKOz12o9S8_pwamMN0cpWjxPE38f3wyWRAj/exec",
@@ -294,16 +405,25 @@
                                     alert(e);
                                 }
                             });
-                        });
-                    })
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
-                    //-----------------------------------------------------------------
+                            /*
+                            ajax end
+                            */
+                            /*
+                            * contents of submitting
+                            */
+                        }
+                    }
+                    )();
+                    //最後的括號是必要且不可刪除的
+                    /*
+                    * validate.js end
+                    * 表單驗證區結束
+                    */
                 });
+                //create product list and items set - END
             });
-
+            
+            //when the count input was clicked
             function clicked(item) {
                 var parentElement = item.parentElement.getAttribute("id");
                 var count = document.getElementById(parentElement).childNodes[1];
@@ -326,7 +446,7 @@
                 }
                 ;
             }
-            ;
+            //product list
             function addProducts(index, inputMerchant, inputProduct, inputPrice, inputLink, inputPic) {
                 var container = document.createElement("div");
                 container.className = "container";
@@ -361,7 +481,7 @@
                 var remove = document.createElement("button");
                 remove.className = "remove";
                 remove.type = "button";
-                remove.textContent = "del"
+                //remove.textContent = ;
                 var count = document.createElement("input");
                 count.className = "count";
                 count.type = "text";
@@ -374,11 +494,15 @@
                 priceValue.id = "value-".concat(inputMerchant).concat("-").concat(inputProduct);
                 dec.id = "dec";
                 inc.id = "inc";
-                count.name = "count";
+                count.name = inputMerchant.concat("-").concat(inputProduct);
                 priceValue.name = "priceValue";
                 dec.setAttribute("onclick", "clicked(this);");
                 inc.setAttribute("onclick", "clicked(this);");
                 remove.setAttribute("onclick", "clicked(this);");
+
+                var messages = document.createElement("div");
+                messages.className = "messages";
+
                 //put thing
                 order.appendChild(dec);
                 order.appendChild(count);
@@ -391,10 +515,11 @@
                 container.appendChild(goods);
                 container.appendChild(price);
                 container.appendChild(order);
+                container.appendChild(messages);
                 //document.getElementById("form").appendChild(container);
                 return container;
             }
-
+            //Section of Merchant of product list
             function addSection(items) {
                 var sectionFragment = document.createDocumentFragment();
                 var fragment = document.createDocumentFragment();
@@ -429,6 +554,7 @@
                 document.getElementById("form").appendChild(fragment);
             }
         </script>
+
         <style>
             * {
                 box-sizing: border-box;
@@ -541,18 +667,27 @@
                 border-radius: 1em 0 0 1em;
                 font-size: 1.5em;
                 width: 40px;
+                font-size: 0.8em;
             }
 
             .inc {
                 border-radius: 0 1em 1em 0;
                 font-size: 1.5em;
                 width: 40px;
+                font-size: 0.8em;
             }
 
             .remove {
                 margin-left: 5px;
+                padding-left: -5px;
                 border-radius: 0.2em;
                 width: 30px;
+                text-align: center;
+                font-size: 0.8em;
+            }
+
+            .remove::before {
+                content: "🗑️";
             }
 
             .count {
@@ -612,13 +747,13 @@
 
             /*CSS drop-down list*/
             /* @group Base */
-
             .chosen-container {
                 grid-column: 2 / 5;
                 position: relative;
                 display: inline-block;
                 vertical-align: middle;
-                font-size: 1.2em; /*整個欄位內的font-size*/
+                font-size: 1.2em;
+                /*整個欄位內的font-size*/
                 -webkit-user-select: none;
                 -moz-user-select: none;
                 -ms-user-select: none;
@@ -635,11 +770,15 @@
                 top: 100%;
                 z-index: 1000;
                 width: 100%;
-                border: 1px solid #aaa; /*下拉選單邊框*/
+                border: 1px solid #aaa;
+                /*下拉選單邊框*/
                 border-top: 0;
-                background: #ccc; /*下拉選單色彩*/
-                -webkit-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15); /*下拉選單陰影*/
-                box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15); /*下拉選單陰影*/
+                background: #ccc;
+                /*下拉選單色彩*/
+                -webkit-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+                /*下拉選單陰影*/
+                box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+                /*下拉選單陰影*/
                 clip: rect(0, 0, 0, 0);
                 -webkit-clip-path: inset(100% 100%);
                 clip-path: inset(100% 100%);
@@ -657,13 +796,16 @@
 
             /* @end */
             /* @group Single Chosen */
-            .chosen-container-single .chosen-single { /*選擇欄位*/
+            .chosen-container-single .chosen-single {
+                /*選擇欄位*/
                 position: relative;
                 display: block;
                 overflow: hidden;
                 padding: 0 0 0 8px;
-                height: 100%; /*!!!!!欄位高度!!!!!!*/
-                border: 1px solid #aaa; /*!!!!!欄位邊框!!!!!!*/
+                height: 100%;
+                /*!!!!!欄位高度!!!!!!*/
+                border: 1px solid #aaa;
+                /*!!!!!欄位邊框!!!!!!*/
                 border-radius: 5px;
                 background-color: #fff;
                 padding: 0.5em;
@@ -671,11 +813,13 @@
                 color: #333;
                 text-decoration: none;
                 white-space: nowrap;
-                line-height: 24px; /*選擇框內字體高度*/
-                }
+                line-height: 24px;
+                /*選擇框內字體高度*/
+            }
 
             .chosen-container-single .chosen-default {
-                color: #777; /*選擇框內(placeholder)字體顏色*/
+                color: #777;
+                /*選擇框內(placeholder)字體顏色*/
             }
 
             .chosen-container-single .chosen-single span {
@@ -708,7 +852,8 @@
                 white-space: nowrap;
             }
 
-            .chosen-container-single .chosen-search input[type="text"] { /*搜尋框*/
+            .chosen-container-single .chosen-search input[type="text"] {
+                /*搜尋框*/
                 margin: 1px 0;
                 padding: 4px 20px 4px 5px;
                 width: 100%;
@@ -728,13 +873,15 @@
 
             /* @group Results */
             .chosen-container .chosen-results {
-                color: #333; /*選項文字顏色*/
+                color: #333;
+                /*選項文字顏色*/
                 position: relative;
                 overflow-x: hidden;
                 overflow-y: auto;
                 margin: 0 4px 4px 0;
                 padding: 0 0 0 4px;
-                max-height: 10em; /*下拉式選單最大高度*/
+                max-height: 10em;
+                /*下拉式選單最大高度*/
                 -webkit-overflow-scrolling: touch;
             }
 
@@ -743,45 +890,83 @@
                 margin: 0;
                 padding: 5px 6px;
                 list-style: none;
-                line-height: 15px; /*選項行高*/
-                word-wrap: break-word; /*選項是否分行*/
+                line-height: 15px;
+                /*選項行高*/
+                word-wrap: break-word;
+                /*選項是否分行*/
                 -webkit-touch-callout: none;
             }
 
-            .chosen-container .chosen-results li.active-result { /*有效項目*/
+            .chosen-container .chosen-results li.active-result {
+                /*有效項目*/
                 display: list-item;
                 cursor: pointer;
             }
 
-            .chosen-container .chosen-results li.disabled-result { /*禁用項目*/
+            .chosen-container .chosen-results li.disabled-result {
+                /*禁用項目*/
                 display: list-item;
                 color: #bbb;
                 cursor: default;
             }
 
-            .chosen-container .chosen-results li.highlighted { /*hovering的項目*/
+            .chosen-container .chosen-results li.highlighted {
+                /*hovering的項目*/
                 background-color: #666;
                 color: #fff;
             }
 
-            .chosen-container .chosen-results li.no-results { /*搜尋無結果*/
-                color: #FFF; /*no-results color*/
+            .chosen-container .chosen-results li.no-results {
+                /*搜尋無結果*/
+                color: #FFF;
+                /*no-results color*/
                 display: list-item;
-                background: #EB7A77; /*no-results background*/
+                background: #EB7A77;
+                /*no-results background*/
             }
 
-            .chosen-container .chosen-results li em { /*匹配字眼*/
+            .chosen-container .chosen-results li em {
+                /*匹配字眼*/
                 font-style: normal;
                 //text-decoration: underline;
                 font-weight: 1000;
             }
             /*CSS drop-down list END*/
+
+            /*validate*/
+            .container .messages {
+                display: flex;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .row .messages {
+                grid-column: 5 / 7;
+            }
+
+            .row .radio + .messages {
+                grid-column: 2 / 7;
+                margin-bottom: 5px;
+            }
+
+            .help-block.error { /*錯誤提示文字*/
+                margin-left: 5px;
+                color: #F00;
+                font-size: 0.8em;
+            }
+            .has-success { /*正確欄位*/
+                background-color: #CFC;
+            }
+            .has-error { /*錯誤欄位*/
+                background-color: #FCC;
+            }
         </style>
+
     </head>
     <body>
         <h1>測試用-蘭陽週預購表單</h1>
         <span>我只是個介紹文字</span>
-        <form action="done.html" id="form" method="post" name="form">
+        <form action="done.html" id="form" method="post" name="form" novalidate>
             <section id="info">
                 <p class="title">買家基本資料</p>
                 <div class="grid">
@@ -801,6 +986,9 @@
                             <option value=""></option>
                             <!--系所區-->
                         </select>
+                        <div class="messages"></div>
+                    </div>
+                    <div class="row">
                         <select data-placeholder="選擇年級" name="grade" id="grade" tabindex="-1" class="chosen-select">
                             <option value=""></option>
                             <option value="1-一年級">一年級</option>
@@ -824,15 +1012,14 @@
                         <div class="messages"></div>
                     </div>
                     <div class="row">
-                        <label>
-                            預計<br>取貨日期
-                        </label>
+                        <label>預計<br>取貨日期</label>
                         <div class="radio">
-                            <input name="date" type="radio" value="2020-5-6" id="d0506" required>
+                            <input name="date" type="radio" value="2020-5-6" id="d0506">
                             <label for="d0506">5月6日（三）</label>
                             <input name="date" type="radio" value="2020-5-7" id="d0507">
                             <label for="d0507">5月7日（四）</label>
                         </div>
+                        <div class="messages"></div>
                     </div>
                 </div>
             </section>

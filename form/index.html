@@ -4,20 +4,16 @@
         <meta charset="UTF-8">
         <title>測試用-蘭陽週預購表單</title>
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
         <!--jquery-->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
         <!--帶搜尋欄選單插件-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
-
         <!--表單驗證插件-->
         <script src="https://validatejs.org/validate.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-
         <!--時間處理插件-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-
         <script>
             /*
              * create the the drop-down list
@@ -27,7 +23,9 @@
                 function selectLoad() {
                     $('.chosen-select').chosen({
                         search_contains: true,
-                        width: '100%'
+                        width: '100%',
+                        no_results_text: "找不到",
+                        disable_search_threshold: 10,
                     });
                 }
 
@@ -57,7 +55,6 @@
 
                 });
             });
-
 
             //create submit button, product list, items set and define the submit action
             $(function() {
@@ -169,7 +166,6 @@
                         }
                     }
 
-
                     (function() {
                         // Hook up the form so we can prevent it from being posted
                         var formIdName = "#form";
@@ -210,7 +206,7 @@
                             var errors = validate(form, constraints);
                             // then we update the form to reflect the results
                             showIsErrors(form, errors || {});
-                            
+
                             var successMessage = "表單已完成。";
                             var errorMessage = "表單內容有誤，請檢視錯誤訊息後重新輸入！";
 
@@ -244,7 +240,7 @@
                             } else {
                                 var formGroup = input.parentNode;
                             }
-                            
+
                             var messages = formGroup.querySelector(messagesClassName);
                             // First we remove any old messages and resets the classes
                             resetFormGroup(formGroup);
@@ -263,7 +259,6 @@
                                 }
                             }
 
-                            
                         }
 
                         // Recusively finds the closest parent that has the specified class
@@ -359,7 +354,6 @@
                                 orderDict[productName] = q;
                             }
 
-
                             /*
                             * 驗證總金額是否為0
                             */
@@ -439,7 +433,7 @@
                 });
                 //create product list and items set - END
             });
-            
+
             //when the count input was clicked
             function clicked(item) {
                 var parentElement = item.parentElement.getAttribute("id");
@@ -489,33 +483,37 @@
                 order.id = "order-".concat(inputMerchant).concat("-").concat(inputProduct);
                 var dec = document.createElement("button");
                 dec.className = "dec";
+                dec.classList.add("click-able");
                 dec.type = "button";
-                dec.textContent = "－"
+                dec.innerHTML = '<i class="fas fa-minus"></i>';
+                dec.id = "dec";
                 var inc = document.createElement("button");
                 inc.className = "inc";
+                inc.classList.add("click-able");
                 inc.type = "button";
-                inc.textContent = "＋"
+                inc.innerHTML = '<i class="fas fa-plus"></i>';
+                inc.id = "inc";
                 var remove = document.createElement("button");
                 remove.className = "remove";
+                remove.classList.add("click-able");
                 remove.type = "button";
-                //remove.textContent = ;
+                remove.innerHTML = '<i class="far fa-trash-alt"></i>';
                 var count = document.createElement("input");
                 count.className = "count";
                 count.type = "text";
                 count.size = "1";
                 count.value = "0";
                 count.id = "quantity-".concat(inputMerchant).concat("-").concat(inputProduct);
+                count.name = inputMerchant.concat("-").concat(inputProduct);
                 var priceValue = document.createElement("input");
                 priceValue.type = "hidden";
                 priceValue.value = parseInt(inputPrice)
                 priceValue.id = "value-".concat(inputMerchant).concat("-").concat(inputProduct);
-                dec.id = "dec";
-                inc.id = "inc";
-                count.name = inputMerchant.concat("-").concat(inputProduct);
                 priceValue.name = "priceValue";
-                dec.setAttribute("onclick", "clicked(this);");
-                inc.setAttribute("onclick", "clicked(this);");
-                remove.setAttribute("onclick", "clicked(this);");
+                //onclick
+                dec.setAttribute("onfocus", "clicked(this);");
+                inc.setAttribute("onfocus", "clicked(this);");
+                remove.setAttribute("onfocus", "clicked(this);");
 
                 var messages = document.createElement("div");
                 messages.className = "messages";
@@ -571,7 +569,6 @@
                 document.getElementById("form").appendChild(fragment);
             }
         </script>
-
         <style>
             * {
                 box-sizing: border-box;
@@ -680,18 +677,21 @@
                 margin-bottom: 0.5em;
             }
 
+            .dec, .inc, .remove, .count {
+                text-align: center;
+            }
+
+            .dec, .inc {
+                width: 40px;
+                font-size: 0.9em;
+            }
+
             .dec {
                 border-radius: 1em 0 0 1em;
-                font-size: 1.5em;
-                width: 40px;
-                font-size: 0.8em;
             }
 
             .inc {
                 border-radius: 0 1em 1em 0;
-                font-size: 1.5em;
-                width: 40px;
-                font-size: 0.8em;
             }
 
             .remove {
@@ -699,19 +699,13 @@
                 padding-left: -5px;
                 border-radius: 0.2em;
                 width: 30px;
-                text-align: center;
-                font-size: 0.8em;
-            }
-
-            .remove::before {
-                content: "🗑️";
+                background-color: #F99;
             }
 
             .count {
                 height: 100%;
                 border: 1px #999 solid;
                 font-size: 1.2em;
-                text-align: center;
             }
 
             .order {
@@ -882,6 +876,10 @@
                 border-radius: 3px;
             }
 
+            .chosen-search input[readonly] {
+                display: none;
+            }
+
             .chosen-container-single .chosen-drop {
                 margin-top: -1px;
                 border-radius: 0 0 4px 4px;
@@ -897,7 +895,7 @@
                 overflow-y: auto;
                 margin: 0 4px 4px 0;
                 padding: 0 0 0 4px;
-                max-height: 10em;
+                max-height: 12em;
                 /*下拉式選單最大高度*/
                 -webkit-overflow-scrolling: touch;
             }
@@ -907,7 +905,7 @@
                 margin: 0;
                 padding: 5px 6px;
                 list-style: none;
-                line-height: 15px;
+                line-height: 1em;
                 /*選項行高*/
                 word-wrap: break-word;
                 /*選項是否分行*/
@@ -948,8 +946,8 @@
                 //text-decoration: underline;
                 font-weight: 1000;
             }
-            /*CSS drop-down list END*/
 
+            /*CSS drop-down list END*/
             /*validate*/
             .container .messages {
                 display: flex;
@@ -966,19 +964,23 @@
                 margin-bottom: 5px;
             }
 
-            .help-block.error { /*錯誤提示文字*/
+            .help-block.error {
+                /*錯誤提示文字*/
                 margin-left: 5px;
                 color: #F00;
                 font-size: 0.8em;
             }
-            .has-success { /*正確欄位*/
+
+            .has-success {
+                /*正確欄位*/
                 background-color: #CFC;
             }
-            .has-error { /*錯誤欄位*/
+
+            .has-error {
+                /*錯誤欄位*/
                 background-color: #FCC;
             }
         </style>
-
     </head>
     <body>
         <h1>測試用-蘭陽週預購表單</h1>
@@ -1029,7 +1031,9 @@
                         <div class="messages"></div>
                     </div>
                     <div class="row">
-                        <label>預計<br>取貨日期</label>
+                        <label>
+                            預計<br>取貨日期
+                        </label>
                         <div class="radio">
                             <input name="date" type="radio" value="2020-5-6" id="d0506">
                             <label for="d0506">5月6日（三）</label>

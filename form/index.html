@@ -67,7 +67,7 @@
                 var submit = document.createElement("button");
                 submit.type = "submit";
                 submit.id = "submit";
-                submit.textContent = "送出".concat("（按下後不可更改訂單）").concat("!!測試中-之後移到最下面!!");
+                submit.textContent = "送出".concat("!!測試中-之後移到最下面!!");
                 submit.value = submit.textContent;
 
                 //create product list and items set
@@ -309,6 +309,9 @@
                             * contents of submitting
                             */
                             //define infos
+                            if (!confirm("確定要結帳？")) {
+                                return;
+                            }
                             var name = $('[name="name"]').val() || '未填寫';
                             var studentID = $('[name="studentID"]').val() || '未填寫';
                             var department = $('[name="department"]').val() || '未填寫';
@@ -321,6 +324,9 @@
                                     if ($(this).prop('checked') === true)
                                         selected = $(this).val();
                                 });
+                                if (!selected) {
+                                    selected = '未填寫';
+                                }
                                 return selected;
                             };
 
@@ -365,10 +371,17 @@
                             //show alert
                             output += "總計" + total + "元\n";
                             alert('【結帳】\n' + output);
-                            alert('按確定後即送出表單');
+                            if (!confirm("按下確定送出訂單")) {
+                                return;
+                            }
+
+                            //client data
+                            var now = moment(moment().valueOf()).format('YYYY-MM-DD HH:mm:ss');
+                            var href = window.location.href;
 
                             //create the json string
                             var dict = {
+                                "timestamp": now,
                                 "name": name,
                                 "studentID": studentID,
                                 "department": department,
@@ -377,7 +390,8 @@
                                 "email": email,
                                 "time": time(),
                                 "total": total,
-                                "quantity": orderDict
+                                "quantity": orderDict,
+                                "href": href,
                             };
                             jsonObj.push(dict);
                             var myJSON = JSON.stringify(jsonObj);
@@ -389,6 +403,7 @@
                                 type: "post",
                                 data: {
                                     "method": "write",
+                                    "timestamp": now,
                                     "name": name,
                                     "studentID": studentID,
                                     "department": department,
@@ -397,7 +412,8 @@
                                     "email": email,
                                     "time": time(),
                                     "total": total,
-                                    "jsonRaw": myJSON
+                                    "href": href,
+                                    "jsonRaw": myJSON,
                                 },
                                 url: "https://script.google.com/macros/s/AKfycbw-DnUUzyCPoS8F6QKOz12o9S8_pwamMN0cpWjxPE38f3wyWRAj/exec",
                                 // 填入網路應用程式網址
@@ -411,6 +427,7 @@
                             /*
                             * contents of submitting
                             */
+                            alert("訂單已送出！");
                         }
                     }
                     )();

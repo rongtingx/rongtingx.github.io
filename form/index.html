@@ -15,59 +15,26 @@
         <!--時間處理插件-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
         <script>
-            /*
-             * create the the drop-down list
-             */
+            // create the the drop-down list
             $(function() {
-                //define the func load chosen.jquery
-                function selectLoad() {
-                    $('.chosen-select').chosen({
-                        search_contains: true,
-                        width: '100%',
-                        no_results_text: "找不到",
-                        disable_search_threshold: 10,
-                    });
-                }
-
-                //load the drop-down list
+				//load the drop-down list
                 $.get("https://spreadsheets.google.com/feeds/list/13Sd4GBenMwijWjADGO_loLWk8sXf5_BACam5mGzd878/1/public/values?alt=json", function(data) {
                     var d = data.feed.entry;
-                    var deps = [];
+                    var depList = [];
                     for (var i in d) {
                         var dep = {};
-                        dep.index = d[i].gsx$index.$t;
-                        dep.department = d[i].gsx$department.$t;
-                        dep.disabled = d[i].gsx$disabled.$t;
-                        deps.push(dep);
+							dep.index = d[i].gsx$index.$t;
+							dep.department = d[i].gsx$department.$t;
+							dep.disabled = d[i].gsx$disabled.$t;
+							depList.push(dep);
                     }
-                    //console.table(deps);
-                    var depFragment = document.createDocumentFragment();
-                    for (var j = 0; j < deps.length; j++) {
-                        var depOpt = document.createElement("option");
-                        depOpt.value = deps[j].index.concat("-").concat(deps[j].department);
-                        depOpt.textContent = deps[j].department.concat(" (").concat(deps[j].index).concat(")");
-                        depOpt.disabled = deps[j].disabled;
-                        depFragment.appendChild(depOpt);
-                    }
-                    document.getElementById("department").appendChild(depFragment);
-                    //load chosen.jquery when the drop-down list were done
-                    selectLoad();
-
+                    //console.table(depList);
+					setDepFragment(depList);
+					//load chosen.jquery when the drop-down list were done
+					loadSelectChosen();
                 });
-            });
-
-            //create submit button, product list, items set and define the submit action
-            $(function() {
-                /*
-                 * create submit button
-                 */
-                var submit = document.createElement("button");
-                submit.type = "submit";
-                submit.id = "submit";
-                submit.textContent = "送出".concat("!!測試中-之後移到最下面!!");
-                submit.value = submit.textContent;
-
-                //create product list and items set
+				
+				//create product list and items set
                 $.get("https://spreadsheets.google.com/feeds/list/115PPsgx0--jvrpV-JIekfH5IR-JbKCNuCDXbYODslVk/1/public/values?alt=json", function(data) {
                     var d = data.feed.entry;
                     var items = [];
@@ -83,496 +50,569 @@
                     //console.table(items);
 
                     //add the element
-                    document.getElementById("form").appendChild(submit);
-                    addSection(items);
-
-                    $("input").keydown(function(ev) {
-                        if (ev.which == 13) {
-                            ev.preventDefault();
-                        }
-                    });
-
-                    /*
-                    * validate.js
-                    * 表單驗證區
-                    */
-
-                    // These are the constraints used to validate the form
-                    // 未使用或不欲驗證之欄位請務必從下列項目中註解化或移除
-                    var constraints = {
-                        name: {
-                            presence: {
-                                message: "不能留空！\n難道你是無名氏逆？",
-                            },
-                            format: {
-                                pattern: "^([0-9A-Za-z ,]|[\u4E00-\u9FFF．]|[^\x00-\xFF]])+$",
-                                message: "的輸入格式無效！\n你的名字沒這麼奇怪吧？（如果這確實是你的真名，請立刻和我們聯絡）",
-                            }
-                        },
-                        studentID: {
-                            presence: {
-                                message: "不能留空！",
-                            },
-                            format: {
-                                pattern: "(^10[0-8][0-9]{6}$|^999999999$)",
-                                message: "的輸入格式無效！\n（嘗試填寫此欄卻失敗者，請輸入9個9並立刻和我們聯絡，訂單方會成立）",
-                            }
-                        },
-                        department: {
-                            presence: {
-                                message: "不能留空！\n（無適當選項可選者，請選擇XXX並立刻和我們聯絡，訂單方會成立）",
-                            },
-                        },
-                        grade: {
-                            presence: {
-                                message: "不能留空！\n（無適當選項可選者，請立刻和我們聯絡）",
-                            },
-                        },
-                        phoneNumber: {
-                            presence: {
-                                message: "不能留空！\n我們需要和你聯絡及確認訂單！",
-                            },
-                            format: {
-                                pattern: "^09[0-9]{8}$",
-                                message: "欄位請輸入臺灣的手機門號，無需加入符號",
-                            }
-                        },
-                        email: {
-                            presence: {
-                                message: "不能留空！\n我們需要和你聯絡及確認訂單！",
-                            },
-                            email: {
-                                message: "的輸入格式無效！",
-                            },
-                        },
-                        date: {
-                            presence: {
-                                message: "不能留空！難道你不來取貨嗎？",
-                            },
-                        },
-                    };
-
-                    for (var i = 0; i < items.length; i++) {
-                        productName = items[i].merchant.concat("-").concat(items[i].product);
-                        constraints[productName] = {
-                            presence: {
-                                message: "的數量不能留空！",
-                            },
-                            numericality: {
-                                onlyInteger: true,
-                                greaterThanOrEqualTo: 0,
-                                message: "的訂購數量\n只能是大於0的整數！",
-                            }
-                        }
-                    }
-
-                    (function() {
-                        // Hook up the form so we can prevent it from being posted
-                        var formIdName = "#form";
-                        var form = document.querySelector(formIdName);
-
-                        form.addEventListener("submit", function(ev) {
-                            ev.preventDefault();
-                            handleFormSubmit(form);
-                        });
-
-                        // Hook up the inputs to validate on the fly
-                        var inputs = document.querySelectorAll("input, textarea, select, .chosen-select")
-                        for (var i = 0; i < inputs.length; ++i) {
-                            inputs.item(i).addEventListener("change", function(ev) {
-                                var errors = validate(form, constraints) || {};
-                                showIsErrorsForInput(this, errors[this.name])
-                            });
-                            inputs.item(i).addEventListener("input", function(ev) {
-                                var errors = validate(form, constraints) || {};
-                                showIsErrorsForInput(this, errors[this.name])
-                            });
-                            inputs.item(i).addEventListener("blur", function(ev) {
-                                var errors = validate(form, constraints) || {};
-                                showIsErrorsForInput(this, errors[this.name])
-                            });
-                            inputs.item(i).addEventListener("click", function(ev) {
-                                var errors = validate(form, constraints) || {};
-                                showIsErrorsForInput(this, errors[this.name])
-                            });
-                            $(".chosen-select").change(function(ev) {
-                                var errors = validate(form, constraints) || {};
-                                showIsErrorsForInput(this, errors[this.name])
-                            });
-                        }
-
-                        function handleFormSubmit(form, input) {
-                            // validate the form against the constraints
-                            var errors = validate(form, constraints);
-                            // then we update the form to reflect the results
-                            showIsErrors(form, errors || {});
-
-                            var successMessage = "表單已完成。";
-                            var errorMessage = "表單內容有誤，請檢視錯誤訊息後重新輸入！";
-
-                            if (!errors) {
-                                doSuccess(successMessage);
-                            } else {
-                                doError(errorMessage);
-                            }
-                        }
-
-                        // Updates the inputs with the validation errors
-                        function showIsErrors(form, errors) {
-                            // We loop through all the inputs and show the errors for that input
-                            _.each(form.querySelectorAll("input[name], select[name]"), function(input) {
-                                // Since the errors can be null if no errors were found we need to handle
-                                // that
-                                showIsErrorsForInput(input, errors && errors[input.name]);
-                            });
-                        }
-
-                        // Shows the errors for a specific input
-                        function showIsErrorsForInput(input, errors) {
-
-                            var messagesClassName = ".messages";
-
-                            // This is the root of the input
-                            if (input.parentNode.className == "order") {
-                                var formGroup = input.parentNode.parentNode;
-                            } else if (input.parentNode.className == "radio") {
-                                var formGroup = input.parentNode.parentNode;
-                            } else {
-                                var formGroup = input.parentNode;
-                            }
-
-                            var messages = formGroup.querySelector(messagesClassName);
-                            // First we remove any old messages and resets the classes
-                            resetFormGroup(formGroup);
-                            // If we have errors
-                            if (errors) {
-                                // we first mark the group has having errors
-                                formGroup.classList.add("has-error");
-                                // then we append all the errors
-                                _.each(errors, function(error) {
-                                    addError(messages, error);
-                                });
-                            } else {
-                                // otherwise we simply mark it as success
-                                if (formGroup != form) {
-                                    formGroup.classList.add("has-success");
-                                }
-                            }
-
-                        }
-
-                        // Recusively finds the closest parent that has the specified class
-                        function closestParent(child, className) {
-                            if (!child || child == document) {
-                                return null;
-                            }
-                            if (child.classList.contains(className)) {
-                                return child;
-                            } else {
-                                return closestParent(child.parentNode, className);
-                            }
-                        }
-
-                        function resetFormGroup(formGroup) {
-                            // Remove the success and error classes
-                            formGroup.classList.remove("has-error");
-                            formGroup.classList.remove("has-success");
-                            // and remove any old messages
-                            _.each(formGroup.querySelectorAll(".help-block.error"), function(el) {
-                                el.parentNode.removeChild(el);
-                            });
-                        }
-
-                        // Adds the specified error with the following markup
-                        // <p class="help-block error">[message]</p>
-                        function addError(messages, error) {
-                            var block = document.createElement("p");
-                            block.classList.add("help-block");
-                            block.classList.add("error");
-                            block.innerText = error;
-                            messages.appendChild(block);
-                        }
-
-                        function doError(message) {
-                            //表單驗證失敗
-                            alert(message);
-                        }
-
-                        function doSuccess(message) {
-                            //表單驗證成功
-                            /*
-                            * contents of submitting
-                            */
-                            //define infos
-                            if (!confirm("確定要結帳？")) {
-                                return;
-                            }
-                            var name = $('[name="name"]').val() || '未填寫';
-                            var studentID = $('[name="studentID"]').val() || '未填寫';
-                            var department = $('[name="department"]').val() || '未填寫';
-                            var grade = $('[name="grade"]').val() || '未填寫';
-                            var phoneNumber = $('[name="phoneNumber"]').val() || '未填寫';
-                            var email = $('[name="email"]').val() || '未填寫';
-                            var time = function() {
-                                var selected;
-                                $('[name="date"]').each(function() {
-                                    if ($(this).prop('checked') === true)
-                                        selected = $(this).val();
-                                });
-                                if (!selected) {
-                                    selected = '未填寫';
-                                }
-                                return selected;
-                            };
-
-                            //init output
-                            var output = "";
-
-                            //init the json construction
-                            var jsonObj = [];
-                            var orderDict = {};
-
-                            var total = 0;
-                            for (var i = 0; i < items.length; i++) {
-                                //getID
-                                productName = items[i].merchant.concat("-").concat(items[i].product);
-                                selQuantity = '#quantity-'.concat(productName);
-                                selValue = '#value-'.concat(productName);
-                                var p = $(selValue).val();
-                                var q = $(selQuantity).val();
-
-                                //calculate the subtotal and total
-                                var subtotal = p * q;
-                                total += subtotal;
-
-                                //add the bought product into the output
-                                if (q > 0 || q < 0) {
-                                    output += "「" + productName + " ($" + p + ")」購買" + q + "件，小計" + subtotal + "元\n";
-                                }
-
-                                //put the product name to the dict in json
-                                orderDict[productName] = q;
-                            }
-
-                            /*
-                            * 驗證總金額是否為0
-                            */
-                            if (total <= 0) {
-                                doError("你似乎沒購買任何商品！");
-                                return;
-                            }
-
-                            //show alert
-                            output += "總計" + total + "元\n";
-                            alert('【結帳】\n' + output);
-                            if (!confirm("按下確定送出訂單")) {
-                                return;
-                            }
-
-                            //client data
-                            var now = moment(moment().valueOf()).format('YYYY-MM-DD HH:mm:ss');
-                            var href = window.location.href;
-
-                            //create the json string
-                            var dict = {
-                                "timestamp": now,
-                                "name": name,
-                                "studentID": studentID,
-                                "department": department,
-                                "grade": grade,
-                                "phoneNumber": phoneNumber,
-                                "email": email,
-                                "time": time(),
-                                "total": total,
-                                "quantity": orderDict,
-                                "href": href,
-                            };
-                            jsonObj.push(dict);
-                            var myJSON = JSON.stringify(jsonObj);
-
-                            /*
-                            do ajax for submitting
-                            */
-                            $.ajax({
-                                type: "post",
-                                data: {
-                                    "method": "write",
-                                    "timestamp": now,
-                                    "name": name,
-                                    "studentID": studentID,
-                                    "department": department,
-                                    "grade": grade,
-                                    "phoneNumber": phoneNumber,
-                                    "email": email,
-                                    "time": time(),
-                                    "total": total,
-                                    "href": href,
-                                    "jsonRaw": myJSON,
-                                },
-                                url: "https://script.google.com/macros/s/AKfycbw-DnUUzyCPoS8F6QKOz12o9S8_pwamMN0cpWjxPE38f3wyWRAj/exec",
-                                // 填入網路應用程式網址
-                                success: function(e) {
-                                    alert(e);
-                                }
-                            });
-                            /*
-                            ajax end
-                            */
-                            /*
-                            * contents of submitting
-                            */
-                            alert("訂單已送出！");
-                        }
-                    }
-                    )();
-                    //最後的括號是必要且不可刪除的
-                    /*
-                    * validate.js end
-                    * 表單驗證區結束
-                    */
+                    document.getElementById("form").appendChild(createSubmitButton());
+                    addProductsList(items);
+					vaild(items);
+					
+					//Listener
+                    preventSubmit();
+                    clicked();
                 });
-                //create product list and items set - END
             });
+			
+			//set dep drop-down list
+			function setDepFragment(depList) {
+					var setDepFragment = document.createDocumentFragment();
+					for (var i = 0; i < depList.length; i++) {
+						var depOpt = document.createElement("option");
+							depOpt.value = depList[i].index.concat("-").concat(depList[i].department);
+							depOpt.textContent = depList[i].department.concat(" (").concat(depList[i].index).concat(")");
+							depOpt.disabled = depList[i].disabled;
+							setDepFragment.appendChild(depOpt);
+					}
+					document.getElementById("department").appendChild(setDepFragment);
+				}
+				
+			//define the func load chosen.jquery
+			function loadSelectChosen() {
+				$('.chosen-select').chosen({
+					search_contains: true,
+					width: '100%',
+					no_results_text: "找不到",
+					disable_search_threshold: 10,
+				});
+			}
 
-            //when the count input was clicked
+            //create submit button
+			function createSubmitButton() {
+				var submit = document.createElement("button");
+					submit.type = "submit";
+					submit.id = "submit";
+					submit.textContent = "送出".concat("!!測試中-之後移到最下面!!");
+					submit.value = submit.textContent;
+				return submit;
+			}
+			
+			// prevent Default Submit in enter key
+			function preventSubmit() {
+				$("input").keydown(function(ev) {
+					if (ev.which == 13) {
+						ev.preventDefault();
+					}
+				});
+				$(".click-able").click(function(ev) {
+					ev.preventDefault();
+				});
+			}
+			
+			//action for submit the form
+			function submitForm(items) {
+				// 表單驗證成功
+				// contents of submitting
+				var orderDict = status();
+
+				// 驗證總金額是否為0
+				if (orderDict['total'] <= 0) {
+					alert("你似乎沒購買任何商品！");
+					return;
+				} else {
+					if (!confirm("確定要結帳？")) {
+						return;
+					}
+				}
+
+				// show checkout alert
+				alert('【結帳 Checkout】\n' + orderDict['outputText']);
+				
+				// confirm to post order
+				if (!confirm("按下確定送出訂單")) {
+					return;
+				}
+				
+				// prepare the post data
+				var name = $('[name="name"]').val() || '未填寫';
+				var studentID = $('[name="studentID"]').val() || '未填寫';
+				var department = $('[name="department"]').val() || '未填寫';
+				var grade = $('[name="grade"]').val() || '未填寫';
+				var phoneNumber = $('[name="phoneNumber"]').val() || '未填寫';
+				var email = $('[name="email"]').val() || '未填寫';
+				var time = function() {
+					var selected;
+					$('[name="date"]').each(function() {
+						if ($(this).prop('checked') === true)
+							selected = $(this).val();
+					});
+					if (!selected) {
+						selected = '未填寫';
+					}
+					return selected;
+				}
+				// client info
+				var now = moment(moment().valueOf()).format('YYYY-MM-DD HH:mm:ss');
+				var href = window.location.href;
+
+				//create the json construction
+				var dict = {
+					"timestamp": now,
+					"name": name,
+					"studentID": studentID,
+					"department": department,
+					"grade": grade,
+					"phoneNumber": phoneNumber,
+					"email": email,
+					"time": time(),
+					"total": total,
+					"quantity": orderDict,
+					"href": href,
+				};
+				
+				var postData = dict;
+				postData['method'] = "write";
+				
+				var jsonObj = [];
+				jsonObj.push(dict);
+				postData['jsonRaw'] = JSON.stringify(jsonObj);
+				
+				// do ajax submit
+				$.ajax({
+					type: "post",
+					data: postData,
+					url: "https://script.google.com/macros/s/AKfycbw-DnUUzyCPoS8F6QKOz12o9S8_pwamMN0cpWjxPE38f3wyWRAj/exec",
+					// 填入網路應用程式網址
+					success: function(e) {
+						alert(e);
+					}
+				});
+				
+				//finished
+				alert("訂單已送出！");
+			}
+			
+			//表單驗證資訊
+			function setValidateConstraints(items) {
+				// These are the constraints used to validate the form
+				// 未使用或不欲驗證之欄位請務必從下列項目中註解化或移除
+				var constraints = {
+					name: {
+						presence: {
+							message: "不能留空！\n難道你是無名氏逆？",
+						},
+						format: {
+							pattern: "^([0-9A-Za-z ,]|[\u4E00-\u9FFF．]|[^\x00-\xFF]])+$",
+							message: "的輸入格式無效！\n你的名字沒這麼奇怪吧？（如果這確實是你的真名，請立刻和我們聯絡）",
+						}
+					},
+					studentID: {
+						presence: {
+							message: "不能留空！",
+						},
+						format: {
+							pattern: "(^10[0-8][0-9]{6}$|^999999999$)",
+							message: "的輸入格式無效！\n（嘗試填寫此欄卻失敗者，請輸入9個9並立刻和我們聯絡，訂單方會成立）",
+						}
+					},
+					department: {
+						presence: {
+							message: "不能留空！\n（無適當選項可選者，請選擇XXX並立刻和我們聯絡，訂單方會成立）",
+						},
+					},
+					grade: {
+						presence: {
+							message: "不能留空！\n（無適當選項可選者，請立刻和我們聯絡）",
+						},
+					},
+					phoneNumber: {
+						presence: {
+							message: "不能留空！\n我們需要和你聯絡及確認訂單！",
+						},
+						format: {
+							pattern: "^09[0-9]{8}$",
+							message: "欄位請輸入臺灣的手機門號，無需加入符號",
+						}
+					},
+					email: {
+						presence: {
+							message: "不能留空！\n我們需要和你聯絡及確認訂單！",
+						},
+						email: {
+							message: "的輸入格式無效！",
+						},
+					},
+					date: {
+						presence: {
+							message: "不能留空！難道你不來取貨嗎？",
+						},
+					},
+				};
+
+				for (var i = 0; i < items.length; i++) {
+					productName = "quantity-".concat(items[i].merchant).concat("-").concat(items[i].product);
+					constraints[productName] = {
+						presence: {
+							message: "的數量不能留空！",
+						},
+						numericality: {
+							onlyInteger: true,
+							greaterThanOrEqualTo: 0,
+							message: "的訂購數量\n只能是大於0的整數！",
+						}
+					}
+				}
+				
+				//停用驗證
+				//constraints = {};
+				
+				return constraints;
+			}
+			
+			//表單驗證區
+			function vaild(items) {
+				(function() {
+					// Hook up the form so we can prevent it from being posted
+					var formIdName = "#form";
+					var form = document.querySelector(formIdName);
+
+					form.addEventListener("submit", function(ev) {
+						ev.preventDefault();
+						handleFormSubmit(form);
+					});
+
+					// Hook up the inputs to validate on the fly
+					var inputs = document.querySelectorAll("input, textarea, select, .chosen-select")
+					for (var i = 0; i < inputs.length; ++i) {
+						inputs.item(i).addEventListener("change", function(ev) {
+							var errors = validate(form, setValidateConstraints(items)) || {};
+							showIsErrorsForInput(this, errors[this.name]);
+							status();
+						});
+						inputs.item(i).addEventListener("input", function(ev) {
+							var errors = validate(form, setValidateConstraints(items)) || {};
+							showIsErrorsForInput(this, errors[this.name]);
+							status();
+						});
+						inputs.item(i).addEventListener("blur", function(ev) {
+							var errors = validate(form, setValidateConstraints(items)) || {};
+							showIsErrorsForInput(this, errors[this.name]);
+							status();
+						});
+						inputs.item(i).addEventListener("click", function(ev) {
+							var errors = validate(form, setValidateConstraints(items)) || {};
+							showIsErrorsForInput(this, errors[this.name]);
+							status();
+						});
+						$(".chosen-select").change(function(ev) {
+							var errors = validate(form, setValidateConstraints(items)) || {};
+							showIsErrorsForInput(this, errors[this.name]);
+						});
+					}
+
+					function handleFormSubmit(form, input) {
+						// validate the form against the constraints
+						var errors = validate(form, setValidateConstraints(items));
+						// then we update the form to reflect the results
+						showIsErrors(form, errors || {});
+
+						var successMessage = "表單已完成。";
+						var errorMessage = "表單內容有誤，請檢視錯誤訊息後重新輸入！";
+
+						if (!errors) {
+							doSuccess(successMessage);
+						} else {
+							doError(errorMessage);
+						}
+					}
+
+					// Updates the inputs with the validation errors
+					function showIsErrors(form, errors) {
+						// We loop through all the inputs and show the errors for that input
+						_.each(form.querySelectorAll("input[name], select[name]"), function(input) {
+							// Since the errors can be null if no errors were found we need to handle
+							// that
+							showIsErrorsForInput(input, errors && errors[input.name]);
+						});
+					}
+
+					// Shows the errors for a specific input
+					function showIsErrorsForInput(input, errors) {
+
+						var messagesClassName = ".messages";
+
+						// This is the root of the input
+						if (input.parentNode.className == "order") {
+							var formGroup = input.parentNode.parentNode;
+						} else if (input.parentNode.className == "radio") {
+							var formGroup = input.parentNode.parentNode;
+						} else {
+							var formGroup = input.parentNode;
+						}
+
+						var messages = formGroup.querySelector(messagesClassName);
+						// First we remove any old messages and resets the classes
+						resetFormGroup(formGroup);
+						// If we have errors
+						if (errors) {
+							// we first mark the group has having errors
+							formGroup.classList.add("has-error");
+							// then we append all the errors
+							_.each(errors, function(error) {
+								addError(messages, error);
+							});
+						} else {
+							// otherwise we simply mark it as success
+							if (formGroup != form) {
+								formGroup.classList.add("has-success");
+							}
+						}
+
+					}
+
+					// Recusively finds the closest parent that has the specified class
+					function closestParent(child, className) {
+						if (!child || child == document) {
+							return null;
+						}
+						if (child.classList.contains(className)) {
+							return child;
+						} else {
+							return closestParent(child.parentNode, className);
+						}
+					}
+
+					function resetFormGroup(formGroup) {
+						// Remove the success and error classes
+						formGroup.classList.remove("has-error");
+						formGroup.classList.remove("has-success");
+						// and remove any old messages
+						_.each(formGroup.querySelectorAll(".help-block.error"), function(el) {
+							el.parentNode.removeChild(el);
+						});
+					}
+
+					// Adds the specified error with the following markup
+					// <p class="help-block error">[message]</p>
+					function addError(messages, error) {
+						var block = document.createElement("p");
+						block.classList.add("help-block");
+						block.classList.add("error");
+						block.innerText = error;
+						messages.appendChild(block);
+					}
+
+					function doError(message) {
+						//表單驗證失敗
+						alert(message);
+					}
+
+					function doSuccess(message) {
+						submitForm(items);
+					}
+				}
+				)();
+				//最後的括號是必要且不可刪除的
+				/*
+				* validate.js end
+				* 表單驗證區結束
+				*/
+			}
+			
+            //即時消費情形
+			function status() {
+					var orders = document.querySelectorAll(".order")
+					var total = 0;
+					
+					var output = "";
+					var orderDict = {};
+					
+					for (var i = 0; i < orders.length; i++) {
+						
+						var productName = orders[i].id;
+						var price = orders[i].childNodes[4].value;
+						var quantity = orders[i].childNodes[1].value;
+						var subtotal = price * quantity;
+						total += subtotal;
+						
+						//message
+						if (subtotal > 0) {
+							output += "「" + productName + " ($" + price + ")」購買" + quantity + "件，小計" + subtotal + "元\n";
+							
+						}
+						
+						//json
+						orderDict[productName] = {'price': price, 'quantity': quantity, 'subtotal': subtotal};
+					}
+					
+					//message
+					output += "總計" + total + "元\n";
+					
+					//json
+					orderDict['total'] = total;
+					orderDict['outputText'] = output;
+					console.table(orderDict);
+					
+					var cart = document.querySelector("#cart");
+					cart.textContent = "";
+					
+					//shopping cart
+					var table = document.createElement("table");
+					table.innerHTML = '<tr><td>商品</td><td>價格</td><td>數量</td><td>小計</td></tr>';
+					
+					var index = 0;
+					for (var order in orderDict) {
+						if (index >= Object.keys(orderDict).length - 2) {
+							if (index == Object.keys(orderDict).length - 2) {
+								console.log(orderDict[order]);
+							} else {
+								console.log(orderDict[order]);
+							}
+						} else {
+							/*console.log(order);
+							console.log(orderDict[order]['price']);
+							console.log(orderDict[order]['quantity']);
+							console.log(orderDict[order]['subtotal']);*/
+							
+							if (orderDict[order]['subtotal']>0){
+								var tr = document.createElement("tr");
+								tr.innerHTML += '<td>'+ order +'</td>';
+								tr.innerHTML += '<td>$'+ orderDict[order]['price'] +'</td>';
+								tr.innerHTML += '<td>'+ orderDict[order]['quantity'] +'</td>';
+								tr.innerHTML += '<td>'+ orderDict[order]['subtotal'] +'</td>';
+								table.appendChild(tr);
+							}
+						}
+						
+						index++;
+					}
+					
+					cart.appendChild(table);
+					
+					return orderDict;
+				}
+			
+			//when the count input was clicked
             function clicked(item) {
-                var parentElement = item.parentElement.getAttribute("id");
-                var count = document.getElementById(parentElement).childNodes[1];
-                var dec = document.getElementById(parentElement).childNodes[1 - 1];
-                var inc = document.getElementById(parentElement).childNodes[1 + 1];
-                var remove = document.getElementById(parentElement).childNodes[1 + 2];
-                //onclick
-                inc.onclick = function() {
-                    count.value = parseInt(count.value) + 1;
-                }
-                ;
-                dec.onclick = function() {
-                    if (parseInt(count.value) >= 1) {
-                        count.value = parseInt(count.value) - 1;
-                    }
-                }
-                ;
-                remove.onclick = function() {
-                    count.value = 0;
-                }
-                ;
+                $(".click-able").focus(function(ev) {
+					clickAction(this);
+				});
+                $(".click-able").click(function(ev) {
+					clickAction(this);
+				});
+				
+				function clickAction(item) {
+					var parentElement = item.parentElement.getAttribute("id");
+					var quantity = document.getElementById(parentElement).childNodes[1];
+					var dec = document.getElementById(parentElement).childNodes[1 - 1];
+					var inc = document.getElementById(parentElement).childNodes[1 + 1];
+					var remove = document.getElementById(parentElement).childNodes[1 + 2];
+					//onclick
+					inc.onclick = function() {
+						quantity.value = parseInt(quantity.value) + 1;
+						status();
+					}
+					dec.onclick = function() {
+						if (parseInt(quantity.value) >= 1) {
+							quantity.value = parseInt(quantity.value) - 1;
+						}
+						status();
+					}
+					remove.onclick = function() {
+						quantity.value = 0;
+						status();
+					}
+					
+				}
+				
             }
-            //product list
-            function addProducts(index, inputMerchant, inputProduct, inputPrice, inputLink, inputPic) {
-                var container = document.createElement("div");
+                       
+			//Section of Merchant of product list
+            function addProductsList(items) {
+                var productsList = document.createDocumentFragment();
+				//resetFragment
+				var productsFragment = document.createDocumentFragment();
+				for (var i = 0; i < items.length; i++) {
+					//addEachProduct
+					productsFragment.appendChild(addEachProduct(items, i));
+					if (i != items.length - 1) {
+						if (items[i].merchant == items[i + 1].merchant) {
+							continue;
+						}
+					}
+					//addTitle
+					var section = document.createElement("section");
+						section.id = "section-".concat(items[i].merchant);
+						section.innerHTML = '<p class="title">'.concat(items[i].merchant).concat('</p>');
+					//append
+					section.appendChild(productsFragment);
+					productsList.appendChild(section);
+					//resetFragment
+					var productsFragment = document.createDocumentFragment();
+				}
+                document.getElementById("form").appendChild(productsList);
+            }
+        
+			//product list
+            function addEachProduct(items, index) {
+			
+				var inputMerchant = items[index].merchant ;
+				var inputPic      = items[index].pic      ;
+				var inputProduct  = items[index].product  ;
+				var inputLink     = items[index].link     ;
+				var inputPrice    = items[index].price    ;
+				
+				var productWholeName = inputMerchant.concat("-").concat(inputProduct);
+				
+                //container
+				var container = document.createElement("div");
                 container.className = "container";
                 container.id = "container-".concat(inputMerchant).concat("-").concat(inputProduct);
-                var pic = document.createElement("div");
-                pic.className = "pic";
-                var img = document.createElement("img");
-                img.className = "img";
-                img.src = inputPic;
-                var goods = document.createElement("div");
-                goods.className = "goods";
-                var link = document.createElement("a");
-                link.href = inputLink;
-                if (inputLink != "#") {
-                    link.target = "_blank";
-                }
-                link.textContent = inputProduct;
-                var price = document.createElement("div");
-                price.className = "price";
-                price.textContent = "$".concat(inputPrice);
-                var order = document.createElement("div");
+                
+					//pic
+					container.innerHTML += '<div class="pic"><img src="' + inputPic + '"></div>'
+					
+					//products name with link
+					container.innerHTML += '<div class="goods"><a href="' + inputLink + '" target="' + (inputLink != "#" ? '_blank' : '') +'">'+ inputProduct +'</div>'
+					
+					//products price
+					container.innerHTML += '<div class="price"><span class="priceText">' + inputPrice + '</span></div>'
+                
+				//products quantity
+				var order = document.createElement("div");
                 order.className = "order";
-                order.id = "order-".concat(inputMerchant).concat("-").concat(inputProduct);
-                var dec = document.createElement("button");
-                dec.className = "dec";
-                dec.classList.add("click-able");
-                dec.type = "button";
-                dec.innerHTML = '<i class="fas fa-minus"></i>';
-                dec.id = "dec";
-                var inc = document.createElement("button");
-                inc.className = "inc";
-                inc.classList.add("click-able");
-                inc.type = "button";
-                inc.innerHTML = '<i class="fas fa-plus"></i>';
-                inc.id = "inc";
-                var remove = document.createElement("button");
-                remove.className = "remove";
-                remove.classList.add("click-able");
-                remove.type = "button";
-                remove.innerHTML = '<i class="far fa-trash-alt"></i>';
-                var count = document.createElement("input");
-                count.className = "count";
-                count.type = "text";
-                count.size = "1";
-                count.value = "0";
-                count.id = "quantity-".concat(inputMerchant).concat("-").concat(inputProduct);
-                count.name = inputMerchant.concat("-").concat(inputProduct);
-                var priceValue = document.createElement("input");
-                priceValue.type = "hidden";
-                priceValue.value = parseInt(inputPrice)
-                priceValue.id = "value-".concat(inputMerchant).concat("-").concat(inputProduct);
-                priceValue.name = "priceValue";
-                //onclick
-                dec.setAttribute("onfocus", "clicked(this);");
-                inc.setAttribute("onfocus", "clicked(this);");
-                remove.setAttribute("onfocus", "clicked(this);");
-
-                var messages = document.createElement("div");
-                messages.className = "messages";
-
-                //put thing
-                order.appendChild(dec);
-                order.appendChild(count);
-                order.appendChild(inc);
-                order.appendChild(remove);
-                order.appendChild(priceValue);
-                pic.appendChild(img);
-                goods.appendChild(link);
-                container.appendChild(pic);
-                container.appendChild(goods);
-                container.appendChild(price);
+                order.id = productWholeName;
+				
+					//dec btn
+					order.innerHTML += '<button class="click-able dec"><i class="fas fa-minus"></i></button>';
+					
+					//quantity input
+					order.innerHTML += '<input class="quantity" type="text" size="1" name="quantity-'+ productWholeName +'" value="0">';
+					
+					//inc btn
+					order.innerHTML += '<button class="click-able inc"><i class="fas fa-plus"></i></button>';
+					
+					//remove btn
+					order.innerHTML += '<button class="click-able remove"><i class="fas fa-trash-alt"></i></button>';
+					
+					//quantity input
+					order.innerHTML += '<input class="priceValue" type="hidden" name="price-'+ productWholeName +'" value="'+ inputPrice +'">';
+				
                 container.appendChild(order);
-                container.appendChild(messages);
-                //document.getElementById("form").appendChild(container);
+				
+                container.innerHTML += '<div class="messages"></div>'
+				
                 return container;
             }
-            //Section of Merchant of product list
-            function addSection(items) {
-                var sectionFragment = document.createDocumentFragment();
-                var fragment = document.createDocumentFragment();
-                var section = document.createElement("section");
-                for (var i = 0; i < items.length; i++) {
-                    var product = addProducts(i, items[i].merchant, items[i].product, items[i].price, items[i].link, items[i].pic);
-                    sectionFragment.appendChild(product);
-                    if (i == items.length - 1) {
-                        section.id = "section-".concat(items[i].merchant);
-                        var pTitle = document.createElement("p");
-                        pTitle.className = "title";
-                        pTitle.textContent = items[i].merchant;
-                        section.appendChild(pTitle);
-                        section.appendChild(sectionFragment);
-                        fragment.appendChild(section);
-                        var sectionFragment = document.createDocumentFragment();
-                        var section = document.createElement("section");
-                        break;
-                    }
-                    if ((items[i].merchant != items[i + 1].merchant) && (i < items.length - 1)) {
-                        section.id = "section-".concat(items[i].merchant);
-                        var pTitle = document.createElement("p");
-                        pTitle.className = "title";
-                        pTitle.textContent = items[i].merchant;
-                        section.appendChild(pTitle);
-                        section.appendChild(sectionFragment);
-                        fragment.appendChild(section);
-                        var sectionFragment = document.createDocumentFragment();
-                        var section = document.createElement("section");
-                    }
-                }
-                document.getElementById("form").appendChild(fragment);
-            }
-        </script>
+		</script>
         <style>
             * {
                 box-sizing: border-box;
             }
+			
+			table {
+				border: 1px solid #000;
+				border-collapse: collapse;
+			}
+			tr, td {
+				border: 1px solid #000;
+			}
 
             body {
                 background-color: #EEE;
@@ -677,7 +717,7 @@
                 margin-bottom: 0.5em;
             }
 
-            .dec, .inc, .remove, .count {
+            .dec, .inc, .remove, .quantity {
                 text-align: center;
             }
 
@@ -702,7 +742,7 @@
                 background-color: #F99;
             }
 
-            .count {
+            .quantity {
                 height: 100%;
                 border: 1px #999 solid;
                 font-size: 1.2em;
@@ -755,6 +795,14 @@
                 overflow: hidden;
                 font-size: 1.2em;
             }
+			
+			span.priceText::before {
+				content: '$';
+			}
+			
+			select.chosen-select {
+				grid-column: 2 / 5;
+			}
 
             /*CSS drop-down list*/
             /* @group Base */
@@ -985,13 +1033,13 @@
     <body>
         <h1>測試用-蘭陽週預購表單</h1>
         <span>我只是個介紹文字</span>
-        <form action="done.html" id="form" method="post" name="form" novalidate>
+        <form action="" id="form" method="post" name="form" novalidate>
             <section id="info">
                 <p class="title">買家基本資料</p>
                 <div class="grid">
                     <div class="row">
                         <label for="name">姓名</label>
-                        <input autofocus="" class="infoIn" name="name" type="text" id="name" placeholder="你的名字">
+                        <input class="infoIn" name="name" type="text" id="name" placeholder="你的名字" autofocus="">
                         <div class="messages"></div>
                     </div>
                     <div class="row">
@@ -1001,14 +1049,15 @@
                     </div>
                     <div class="row">
                         <label for="department">系級</label>
-                        <select data-placeholder="選擇系所" name="department" id="department" tabindex="-1" class="chosen-select">
+                        <select class="chosen-select" name="department" id="department" tabindex="-1" data-placeholder="選擇系所">
                             <option value=""></option>
                             <!--系所區-->
                         </select>
                         <div class="messages"></div>
                     </div>
                     <div class="row">
-                        <select data-placeholder="選擇年級" name="grade" id="grade" tabindex="-1" class="chosen-select">
+                        <label for="grade"></label>
+						<select class="chosen-select" name="grade" id="grade" tabindex="-1" data-placeholder="選擇年級">
                             <option value=""></option>
                             <option value="1-一年級">一年級</option>
                             <option value="2-二年級">二年級</option>
@@ -1035,15 +1084,14 @@
                             預計<br>取貨日期
                         </label>
                         <div class="radio">
-                            <input name="date" type="radio" value="2020-5-6" id="d0506">
-                            <label for="d0506">5月6日（三）</label>
-                            <input name="date" type="radio" value="2020-5-7" id="d0507">
-                            <label for="d0507">5月7日（四）</label>
+                            <input name="date" type="radio" value="2020-5-6" id="d0506"><label for="d0506">5月6日（三）</label>
+                            <input name="date" type="radio" value="2020-5-7" id="d0507"><label for="d0507">5月7日（四）</label>
                         </div>
                         <div class="messages"></div>
                     </div>
                 </div>
-            </section>
+			</section>
+			<section id="cart"></section>
             <!--商品區-->
         </form>
     </body>

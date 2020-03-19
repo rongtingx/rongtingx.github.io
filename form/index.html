@@ -448,43 +448,36 @@
 					//json
 					orderDict['total'] = total;
 					orderDict['outputText'] = output;
-					console.table(orderDict);
 					
-					var cart = document.querySelector("#cart");
-					cart.textContent = "";
+					var table = document.querySelector("table#cart");
+                        table.innerHTML = '<tr><th>商品</th><th>價格</th><th>數量</th><th>小計</th></tr>';
 					
 					//shopping cart
-					var table = document.createElement("table");
-					table.innerHTML = '<tr><td>商品</td><td>價格</td><td>數量</td><td>小計</td></tr>';
 					
 					var index = 0;
 					for (var order in orderDict) {
 						if (index >= Object.keys(orderDict).length - 2) {
 							if (index == Object.keys(orderDict).length - 2) {
-								console.log(orderDict[order]);
+                                table.innerHTML += '<tr><td>總計</td><td></td><td></td><td>$'+ toCurrency(orderDict['total']) +'</td></tr>';
 							} else {
-								console.log(orderDict[order]);
+								//console.log(orderDict[order]);
 							}
 						} else {
-							/*console.log(order);
-							console.log(orderDict[order]['price']);
-							console.log(orderDict[order]['quantity']);
-							console.log(orderDict[order]['subtotal']);*/
-							
 							if (orderDict[order]['subtotal']>0){
 								var tr = document.createElement("tr");
 								tr.innerHTML += '<td>'+ order +'</td>';
-								tr.innerHTML += '<td>$'+ orderDict[order]['price'] +'</td>';
+								tr.innerHTML += '<td>$'+ toCurrency(orderDict[order]['price']) +'</td>';
 								tr.innerHTML += '<td>'+ orderDict[order]['quantity'] +'</td>';
-								tr.innerHTML += '<td>'+ orderDict[order]['subtotal'] +'</td>';
+								tr.innerHTML += '<td>$'+ toCurrency(orderDict[order]['subtotal']) +'</td>';
 								table.appendChild(tr);
 							}
 						}
 						
 						index++;
 					}
-					
-					cart.appendChild(table);
+
+                    var totalText = document.querySelector("#totalText");
+                        totalText.textContent = '您目前消費金額：$'+ toCurrency(orderDict['total']) +'';
 					
 					return orderDict;
 				}
@@ -573,7 +566,7 @@
 					container.innerHTML += '<div class="goods"><a href="' + inputLink + '" target="' + (inputLink != "#" ? '_blank' : '') +'">'+ inputProduct +'</div>'
 					
 					//products price
-					container.innerHTML += '<div class="price"><span class="priceText">' + inputPrice + '</span></div>'
+					container.innerHTML += '<div class="price"><span class="priceText">' + toCurrency(inputPrice) + '</span></div>'
                 
 				//products quantity
 				var order = document.createElement("div");
@@ -581,13 +574,13 @@
                 order.id = productWholeName;
 				
 					//dec btn
-					order.innerHTML += '<button class="click-able dec"><i class="fas fa-minus"></i></button>';
+					order.innerHTML += '<button class="click-able dec" onclick="clicked(this);"><i class="fas fa-minus"></i></button>';
 					
 					//quantity input
-					order.innerHTML += '<input class="quantity" type="text" size="1" name="quantity-'+ productWholeName +'" value="0">';
+					order.innerHTML += '<input class="quantity" type="number" size="1" name="quantity-'+ productWholeName +'" value="0" min="0">';
 					
 					//inc btn
-					order.innerHTML += '<button class="click-able inc"><i class="fas fa-plus"></i></button>';
+					order.innerHTML += '<button class="click-able inc" onclick="clicked(this);"><i class="fas fa-plus"></i></button>';
 					
 					//remove btn
 					order.innerHTML += '<button class="click-able remove"><i class="fas fa-trash-alt"></i></button>';
@@ -601,6 +594,12 @@
 				
                 return container;
             }
+
+            function toCurrency(num){
+                var parts = num.toString().split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                return parts.join('.');
+            }
 		</script>
         <style>
             * {
@@ -608,12 +607,39 @@
             }
 			
 			table {
-				border: 1px solid #000;
+                width: 80%;
+                margin-top: 1em;
+                margin-bottom: 3em;
 				border-collapse: collapse;
 			}
-			tr, td {
-				border: 1px solid #000;
-			}
+
+            tr {
+                height: 3em;
+                line-height: 3em;
+            }
+
+            tr:nth-child(even) {
+                background-color: #DDD;
+            }
+
+            tr:nth-child(odd) {
+                background-color: #FFF;
+            }
+
+            th {
+                background-color: #333;
+                color: #FFF;
+            }
+
+            tr:hover {
+                background-color: #FFC;
+                font-weight: 700;
+            }
+
+            td {
+                width: 25%;
+                text-align: center;
+            }
 
             body {
                 background-color: #EEE;
@@ -670,6 +696,16 @@
                 width: 2em;
             }
 
+            input[type="number"] {
+                width: 5em;
+            }
+
+            input[type=number]::-webkit-inner-spin-button, 
+            input[type=number]::-webkit-outer-spin-button{
+                -moz-appearance: textfield;
+                -webkit-appearance: none;
+                margin: 0;
+            }
             button {
                 border: 1px #999 solid;
                 line-height: 100%;
@@ -804,6 +840,13 @@
 			select.chosen-select {
 				grid-column: 2 / 5;
 			}
+
+            #totalText {
+                margin-left: 1em;
+                font-size: 0.5em;
+                font-weight: 700;
+                color: #F66;
+            }
 
             /*CSS drop-down list*/
             /* @group Base */
@@ -1092,7 +1135,18 @@
                     </div>
                 </div>
 			</section>
-			<section id="cart"></section>
+			<section id="cart">
+                <p class="title">購物車<span id="totalText"></span></p>
+                <table id="cart">
+                    <tr>
+                        <th>商品</th>
+                        <th>價格</th>
+                        <th>數量</th>
+                        <th>小計</th>
+                    </tr>
+                    <!--cart-->
+                </table>
+            </section>
             <!--商品區-->
         </form>
     </body>

@@ -60,7 +60,7 @@
                     $(".click-able").click(function(ev) {
                         clicked(this);
                     });
-                    
+
                     status();
                 });
             });
@@ -261,7 +261,7 @@
 							onlyInteger: true,
 							greaterThanOrEqualTo: 0,
 							message: "的訂購數量\n只能是大於0的整數！",
-						}
+						},
 					}
 				}
 				
@@ -284,7 +284,7 @@
 					});
 
 					// Hook up the inputs to validate on the fly
-					var inputs = document.querySelectorAll("input, textarea, select, .chosen-select")
+					var inputs = document.querySelectorAll("input, textarea, select, .dec, .inc, .remove")
 					for (var i = 0; i < inputs.length; ++i) {
 						inputs.item(i).addEventListener("change", function(ev) {
 							var errors = validate(form, setValidateConstraints(items)) || {};
@@ -312,7 +312,7 @@
 						});
 					}
 
-					function handleFormSubmit(form, input) {
+					function handleFormSubmit(form) {
 						// validate the form against the constraints
 						var errors = validate(form, setValidateConstraints(items));
 						// then we update the form to reflect the results
@@ -332,9 +332,9 @@
 					function showIsErrors(form, errors) {
 						// We loop through all the inputs and show the errors for that input
 						_.each(form.querySelectorAll("input[name], select[name]"), function(input) {
-							// Since the errors can be null if no errors were found we need to handle
-							// that
-							showIsErrorsForInput(input, errors && errors[input.name]);
+							// Since the errors can be null if no errors were found we need to handle that
+                            var e = errors && errors[input.name];
+							showIsErrorsForInput(input, e);
 						});
 					}
 
@@ -355,6 +355,7 @@
 						var messages = formGroup.querySelector(messagesClassName);
 						// First we remove any old messages and resets the classes
 						resetFormGroup(formGroup);
+
 						// If we have errors
 						if (errors) {
 							// we first mark the group has having errors
@@ -366,7 +367,7 @@
 						} else {
 							// otherwise we simply mark it as success
 							if (formGroup != form) {
-								formGroup.classList.add("has-success");
+                                formGroup.classList.add("has-success");
 							}
 						}
 
@@ -432,8 +433,8 @@
 					for (var i = 0; i < orders.length; i++) {
 						
 						var productName = orders[i].id;
-						var price = orders[i].childNodes[4].value;
-						var quantity = orders[i].childNodes[1].value;
+						var price = orders[i].childNodes[0].value;
+						var quantity = orders[i].childNodes[2].value;
 						var subtotal = price * quantity;
 						total += subtotal;
 						
@@ -489,10 +490,12 @@
 			
 			//when the count input was clicked
             function clicked(item) {
-				var quantity = item.parentElement.childNodes[1];
+				var quantity = item.parentElement.childNodes[2];
 				//onclick
                 if (item.classList[1]=="inc") {
 					if (parseInt(quantity.value) < 0) {
+                        quantity.value = 1;
+                    } else if (quantity.value == "") {
                         quantity.value = 1;
                     } else {
                         quantity.value = parseInt(quantity.value) + 1;
@@ -502,11 +505,17 @@
                 if (item.classList[1]=="dec") {
 					if (parseInt(quantity.value) >= 1) {
 						quantity.value = parseInt(quantity.value) - 1;
-					}
+					} else if (quantity.value == "") {
+                        quantity.value = 0;
+                    }
 					status();
 				}
                 if (item.classList[1]=="remove") {
-					quantity.value = 0;
+                    if (quantity.value == "") {
+                        quantity.value = 0;
+                    } else {
+                        quantity.value = 0;
+                    }
 					status();
 				}
 				
@@ -567,6 +576,8 @@
 				var order = document.createElement("div");
                 order.className = "order";
                 order.id = productWholeName;
+                    //quantity input
+                    order.innerHTML += '<input class="priceValue" type="hidden" name="price-'+ productWholeName +'" value="'+ inputPrice +'">';
 				
 					//dec btn
 					order.innerHTML += '<button class="click-able dec"><i class="fas fa-minus"></i></button>';
@@ -579,9 +590,6 @@
 					
 					//remove btn
 					order.innerHTML += '<button class="click-able remove"><i class="fas fa-trash-alt"></i></button>';
-					
-					//quantity input
-					order.innerHTML += '<input class="priceValue" type="hidden" name="price-'+ productWholeName +'" value="'+ inputPrice +'">';
 				
                 container.appendChild(order);
 				
@@ -596,6 +604,31 @@
                 return parts.join('.');
             }
 		</script>
+        <noscript>
+            <div class="noscript">
+                很抱歉，請開啟Javascript才能正常填寫並送出預購表單！<br>
+                政大蘭友會感謝您的支持與配合
+                <style type="text/css">
+                    body>*:not(.noscript) {
+                        display: none;
+                    }
+                    .noscript {
+                        position: fixed;
+                        top: 0px;
+                        left: 0px;
+                        z-index: 3000;
+                        height: 100%;
+                        width: 100%;
+                        background-color: #CC3333;
+                        color: #FFF;
+                        padding:3em;
+                        overflow: hidden;
+                        line-height: 2em;
+                        font-size: 1.2em;
+                    }
+                </style>
+            </div>
+        </noscript>
         <style>
             * {
                 box-sizing: border-box;

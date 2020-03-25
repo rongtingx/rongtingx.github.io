@@ -56,7 +56,12 @@
 					
 					//Listener
                     preventSubmit();
-                    clicked();
+                    
+                    $(".click-able").click(function(ev) {
+                        clicked(this);
+                    });
+                    
+                    status();
                 });
             });
 			
@@ -199,7 +204,7 @@
 							message: "不能留空！\n難道你是無名氏逆？",
 						},
 						format: {
-							pattern: "^([0-9A-Za-z ,]|[\u4E00-\u9FFF．]|[^\x00-\xFF]])+$",
+							pattern: "^([A-Za-z ,-]|[\u4E00-\u9FFF．]|[^\x00-\xFF]])+$",
 							message: "的輸入格式無效！\n你的名字沒這麼奇怪吧？（如果這確實是你的真名，請立刻和我們聯絡）",
 						}
 					},
@@ -484,35 +489,25 @@
 			
 			//when the count input was clicked
             function clicked(item) {
-                $(".click-able").focus(function(ev) {
-					clickAction(this);
-				});
-                $(".click-able").click(function(ev) {
-					clickAction(this);
-				});
-				
-				function clickAction(item) {
-					var parentElement = item.parentElement.getAttribute("id");
-					var quantity = document.getElementById(parentElement).childNodes[1];
-					var dec = document.getElementById(parentElement).childNodes[1 - 1];
-					var inc = document.getElementById(parentElement).childNodes[1 + 1];
-					var remove = document.getElementById(parentElement).childNodes[1 + 2];
-					//onclick
-					inc.onclick = function() {
-						quantity.value = parseInt(quantity.value) + 1;
-						status();
+				var quantity = item.parentElement.childNodes[1];
+				//onclick
+                if (item.classList[1]=="inc") {
+					if (parseInt(quantity.value) < 0) {
+                        quantity.value = 1;
+                    } else {
+                        quantity.value = parseInt(quantity.value) + 1;
+                    }
+					status();
+				}
+                if (item.classList[1]=="dec") {
+					if (parseInt(quantity.value) >= 1) {
+						quantity.value = parseInt(quantity.value) - 1;
 					}
-					dec.onclick = function() {
-						if (parseInt(quantity.value) >= 1) {
-							quantity.value = parseInt(quantity.value) - 1;
-						}
-						status();
-					}
-					remove.onclick = function() {
-						quantity.value = 0;
-						status();
-					}
-					
+					status();
+				}
+                if (item.classList[1]=="remove") {
+					quantity.value = 0;
+					status();
 				}
 				
             }
@@ -574,13 +569,13 @@
                 order.id = productWholeName;
 				
 					//dec btn
-					order.innerHTML += '<button class="click-able dec" onclick="clicked(this);"><i class="fas fa-minus"></i></button>';
+					order.innerHTML += '<button class="click-able dec"><i class="fas fa-minus"></i></button>';
 					
 					//quantity input
 					order.innerHTML += '<input class="quantity" type="number" size="1" name="quantity-'+ productWholeName +'" value="0" min="0">';
 					
 					//inc btn
-					order.innerHTML += '<button class="click-able inc" onclick="clicked(this);"><i class="fas fa-plus"></i></button>';
+					order.innerHTML += '<button class="click-able inc"><i class="fas fa-plus"></i></button>';
 					
 					//remove btn
 					order.innerHTML += '<button class="click-able remove"><i class="fas fa-trash-alt"></i></button>';
@@ -604,6 +599,10 @@
         <style>
             * {
                 box-sizing: border-box;
+            }
+
+            div.grid {
+                width: 100%;
             }
 			
 			table {

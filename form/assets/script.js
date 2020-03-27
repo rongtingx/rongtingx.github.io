@@ -127,7 +127,7 @@ function addCart() {
     
     section.appendChild(createSubmitButton());
 
-    document.getElementById("form").appendChild(section);
+    document.querySelector("form").appendChild(section);
 }
 
 //即時消費情形
@@ -193,8 +193,22 @@ function status() {
         index++;
     }
 
-    var totalText = document.querySelector("#totalText");
-    totalText.textContent = '您目前消費金額：$' + toCurrency(orderDict['total']) + '';
+    var totalText = '$' + toCurrency(orderDict['total']);
+
+    //document.querySelector("#totalText").innerHTML = '您目前消費金額：' + totalText;
+
+
+    var fixed = document.querySelector("#fixed");
+        fixed.textContent = totalText + '｜點我跳到結帳區';
+
+    var fixedContainer = document.querySelector(".fixed-container");
+    var bg = document.querySelector(".bg");
+
+    if (orderDict['total'] == 0) {
+        bg.style.backgroundColor = '#FCC';
+    } else {
+        bg.style.backgroundColor = '#CFC';
+    }
 
     return orderDict;
 }
@@ -217,9 +231,13 @@ function submitForm(items) {
 
     // show checkout alert
     alert('【結帳 Checkout】\n' + orderDict['outputText']);
+    
+
+    // prepare the post data
+    var email = $('[name="email"]').val() || '未填寫';
 
     // confirm to post order
-    if (!confirm("按下確定送出訂單")) {
+    if (!confirm("按下確定送出訂單\n確認信將會寄至：" + email)) {
         return;
     }
 
@@ -229,7 +247,6 @@ function submitForm(items) {
     var department = $('[name="department"]').val() || '未填寫';
     var grade = $('[name="grade"]').val() || '未填寫';
     var phoneNumber = $('[name="phoneNumber"]').val() || '未填寫';
-    var email = $('[name="email"]').val() || '未填寫';
     var time = function() {
         var selected;
         $('[name="date"]').each(function() {
@@ -282,6 +299,7 @@ function submitForm(items) {
     //finished
     alert("訂單已送出！確認信已寄至您的電子郵件信箱！");
 
+    $('[href="assets/style.css"]').removeAttr("href");
     var mailBody = sendMail(dict);
     var body = document.querySelector('body')
     body.innerHTML = mailBody;
@@ -289,15 +307,15 @@ function submitForm(items) {
 
 //寄信+跳轉
 function sendMail(dict) {
-    var mailBody = "";
+    var mailBody = '<div style="margin:1em; padding:1em; background-color: #FFD;">';
 
     mailBody += '<p>';
-    mailBody += dict['department'].substring(4) + dict['grade'].substring(2) + "<br />";
+    mailBody += dict['department'].substring(4) + dict['grade'].substring(2) + '<br />';
     mailBody += '<span style="color: #00F; font-weight: 1000; font-size: 1.5em;">' + dict['name'] + '</span>&nbsp;你好';
     mailBody += '</p>';
 
     mailBody += '<p style="border-top: 1px #000 solid; border-bottom: 1px #000 solid; line-height: 2em;">';
-    mailBody += "您在本次蘭陽週預購之商品訂單如下"
+    mailBody += '您在本次蘭陽週預購之商品訂單如下'
     mailBody += '</p>';
 
     //shopping cart
@@ -338,11 +356,11 @@ function sendMail(dict) {
     mailBody += '</p>';
 
     mailBody += '<p style="font-size: 0.75em;">';
-    mailBody += "以上資訊為本表單系統自動填入<br />";
-    mailBody += "訂單概以後台紀錄為準<br />";
-    mailBody += "若同學有發現錯誤歡迎回信或私訊粉專告知<br />";
-    mailBody += "⚠️當天若有同學忘記取貨，會有友會人員電話通知<br />";
-    mailBody += "⚠️欲變更或取消訂單請在預購截止前向我們聯絡，如有惡意棄單將公告於交流版<br />";
+    mailBody += '以上資訊為本表單系統自動填入<br />';
+    mailBody += '訂單概以後台紀錄為準<br />';
+    mailBody += '若同學有發現錯誤歡迎回信或私訊粉專告知<br />';
+    mailBody += '⚠️當天若有同學忘記取貨，會有友會人員電話通知<br />';
+    mailBody += '⚠️欲變更或取消訂單請在預購截止前向我們聯絡，如有惡意棄單將公告於交流版<br />';
     mailBody += '</p>';
 
     mailBody += '<p style="font-size: 1em;">';
@@ -363,8 +381,10 @@ function sendMail(dict) {
     mailBody += '</p>';
 
     mailBody += '<p style="font-size: 0.75em;">';
-    mailBody += "您的訂單已於&nbsp;" + dict['timestamp'] + "&nbsp;送出";
+    mailBody += '您的訂單已於&nbsp;' + dict['timestamp'] + '&nbsp;送出';
     mailBody += '</p>';
+
+    mailBody += '</div>';
 
     Email.send({
         Host: "smtp.gmail.com",

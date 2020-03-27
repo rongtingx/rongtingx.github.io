@@ -2,6 +2,55 @@
     box-sizing: border-box;
 }
 
+.fixed-container {
+    position: relative;
+    display: block;
+    position: fixed;
+    top: 2em;
+    right: 2em;
+    padding: 0.5em;
+    height: auto;
+    width: auto;
+    z-index: 0;
+}
+
+.fixed-container:hover {
+    opacity: 1;
+}
+
+.fixed {
+    position: relative;
+    padding: 0.5em;
+    z-index: 101;
+    display: block;
+    opacity: 0.9;
+    color: #000;
+    font-weight: 700;
+}
+
+.bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+    opacity: 0.5;
+}
+
+.fixed:hover {
+    font-weight: 1000;
+}
+
+.fixed:hover ~ .bg {
+    opacity: 1;
+}
+
+.bg:hover {
+    opacity: 1;
+}
+
 div.grid {
     width: 100%;
 }
@@ -246,7 +295,6 @@ select.chosen-select {
     margin-left: 1em;
     font-size: 0.5em;
     font-weight: 700;
-    color: #F66;
 }
 
 /*CSS drop-down list*/

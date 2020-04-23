@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+        <!--jquery-->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <!--時間處理插件-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<script>
+    function getList(dataset, datasetNumber, callback) {
+        $.get("https://spreadsheets.google.com/feeds/list/" + dataset + "/" + datasetNumber + "/public/values?alt=json").then(function(data) { callback(data); });
+    }
+
+    var mainList = [];
+    var productsObj = {};
+
+    getList('1TM8EMwou-jLGQIhnlHtE7_rX50GV2rCbiLTSfkicoo0', '1', function(data) {
+        getList('1TM8EMwou-jLGQIhnlHtE7_rX50GV2rCbiLTSfkicoo0', '2', function(productsObjData) {
+            
+            productsObj = JSON.parse(productsObjData.feed.entry[0].gsx$productsobj.$t);
+
+            var d = data.feed.entry;
+            for (var i in d) {
+                if (d[i].gsx$timestamp.$t === '/') {
+                    continue;
+                }
+                var row = {
+                    'timestamp': new Date(d[i].gsx$timestamp.$t),
+                    'orderNumber': d[i].gsx$ordernumber.$t,
+                    'department': d[i].gsx$department.$t,
+                    'grade': d[i].gsx$grade.$t,
+                    'time': d[i].gsx$time.$t,
+                    'total': parseInt(d[i].gsx$total.$t),
+                    'order': JSON.parse(d[i].gsx$order.$t),
+                }
+                mainList.push(row);
+            }
+
+
+
+            var body = document.querySelector('body');
+            var orderObj = {};
+
+            var pTable = document.createElement('table');
+                pTable.id = 'customers';
+            var pTbody = document.createElement('tbody');
+
+                pTbody.innerHTML += '<tr><td>' + '年' + '</td><td>' + '月' + '</td><td>' + '日' + '</td><td>' + '時' + '</td><td>' + '訂單編號' + '</td><td>' + '系所' + '</td><td>' + '年級' + '</td><td>' + '折扣碼' + '</td><td>' + 'Total' + '</td><td>' + 'Discount' + '</td><td>' + 'Subtotal' + '</td><td>' + 'Discount' + '</td><td>' + 'Cost' + '</td><td>' + 'Profit' + '</td></tr>';
+
+            var TPtotal = 0;
+            var TPdiscount = 0;
+            var TPsubtotal = 0;
+            var TPcost = 0;
+            var TPprofit = 0;
+
+            for (var i = 0; i < mainList.length; i++) {
+                var timestamp = mainList[i].timestamp;
+
+                var year = moment(timestamp).format('YYYY');
+                var month = moment(timestamp).format('MM');
+                var day = moment(timestamp).format('DD');
+                var hour = moment(timestamp).format('HH');
+
+                var orderNumber = mainList[i].orderNumber;
+                var department = mainList[i].department.substring(0, 3);
+                var grade = mainList[i].grade.substring(0, 1);
+                var time = mainList[i].time;
+                var total = mainList[i].total;
+                var order = mainList[i].order;
+
+                var discount = mainList[i].order.totalDiscount + mainList[i].order.merchantDiscount;
+                var coupon = mainList[i].order.coupon.substring(0, 3) || '無';
+
+                var Psubtotal = 0;
+                var Pcost = 0;
+                var Pprofit = 0;
+
+                for (var m in order) {
+                    if (typeof order[m] != 'object') {
+                        continue;
+                    }
+                    if (!(m in orderObj)) {
+                        orderObj[m] = {};
+                    }
+                    for (var p in order[m]) {
+                        if (typeof order[m][p] != 'object') {
+                            continue;
+                        }
+                        if (!(p in orderObj[m])) {
+                            orderObj[m][p] = order[m][p];
+                            delete orderObj[m][p].price;
+                            Psubtotal += order[m][p].subtotal;
+                            Pcost += order[m][p].quantity * productsObj[m][p].cost;
+                            continue;
+                        }
+                        orderObj[m][p].quantity += order[m][p].quantity;
+                        orderObj[m][p].subtotal += order[m][p].subtotal;
+                        Psubtotal += order[m][p].subtotal;
+                        Pcost += order[m][p].quantity * productsObj[m][p].cost;
+                    }
+                }
+
+                Pprofit = Psubtotal - Pcost - discount;
+
+                pTbody.innerHTML += '<tr><td>' + year + '</td><td>' + month + '</td><td>' + day + '</td><td>' + hour + '</td><td>' + orderNumber + '</td><td>' + department + '</td><td>' + grade + '</td><td>' + coupon + '</td><td>' + tC(total) + '</td><td>' + tC(discount) + '</td><td>' + tC(Psubtotal) + '</td><td>' + tC(discount) + '</td><td>' + tC(Pcost) + '</td><td>' + tC(Pprofit) + '</td></tr>';
+
+                TPtotal += total
+                TPdiscount += discount;
+                TPsubtotal += Psubtotal;
+                TPcost += Pcost;
+                TPprofit += Pprofit;
+
+            }
+
+            pTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + tC(TPtotal) + '</td><td>' + tC(TPdiscount) + '</td><td>' + tC(TPsubtotal) + '</td><td>' + tC(TPdiscount) + '</td><td>' + tC(TPcost) + '</td><td>' + tC(TPprofit) + '</td></tr>';
+
+            pTable.appendChild(pTbody);
+            body.appendChild(pTable);
+
+
+
+            var Tquantity = 0;
+            var Tsubtotal = 0;
+            var Tcost = 0;
+            var Tprofit = 0;
+            var table = document.createElement('table');
+                table.id = 'prodcuts';
+            for (var m in orderObj) {
+                var Mquantity = 0;
+                var Msubtotal = 0;
+                var Mcost = 0;
+                var Mprofit = 0;
+                var tbody = document.createElement('tbody');
+                    tbody.innerHTML += '<tr><td colspan=6>' + m + '</td></tr>';
+                for (var p in orderObj[m]) {
+                    var tr = document.createElement('tr');
+                        var merchant = m;
+                        tr.innerHTML += '<td>' + m + '</td>';
+                        var product = p;
+                        tr.innerHTML += '<td>' + p + '</td>';
+                        var quantity = orderObj[m][p].quantity;
+                        Mquantity += quantity;
+                        tr.innerHTML += '<td>' + quantity + '</td>';
+                        var subtotal = orderObj[m][p].subtotal;
+                        Msubtotal += subtotal;
+                        tr.innerHTML += '<td>' + tC(subtotal) + '</td>';
+                        var cost = orderObj[m][p].quantity * productsObj[m][p].cost;
+                        Mcost += cost;
+                        tr.innerHTML += '<td>' + tC(cost) + '</td>';
+                        var profit = subtotal - cost;
+                        Mprofit += profit;
+                        tr.innerHTML += '<td>' + tC(profit) + '</td>';
+                    tbody.appendChild(tr);
+                }
+                    var tr = document.createElement('tr');
+                        tr.innerHTML += '<td>' + m + '</td>';
+                        tr.innerHTML += '<td>' + 'discount' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + 'discount' + '</td>';
+                    tbody.appendChild(tr);
+                    var tr = document.createElement('tr');
+                        tr.innerHTML += '<td>' + m + '</td>';
+                        tr.innerHTML += '<td>' + 'total' + '</td>';
+                        tr.innerHTML += '<td>' + Mquantity + '</td>';
+                        tr.innerHTML += '<td>' + tC(Msubtotal) + '</td>';
+                        tr.innerHTML += '<td>' + tC(Mcost) + '</td>';
+                        tr.innerHTML += '<td>' + tC(Mprofit) + '</td>';
+                    tbody.appendChild(tr);
+                    Tquantity += Mquantity;
+                    Tsubtotal += Msubtotal;
+                    Tcost += Mcost;
+                    Tprofit += Mprofit;
+                table.appendChild(tbody);
+            }
+                var tbody = document.createElement('tbody');
+                    tbody.innerHTML += '<tr><td colspan=6>' + 'Total' + '</td></tr>';
+                    var tr = document.createElement('tr');
+                        tr.innerHTML += '<td>' + 'total' + '</td>';
+                        tr.innerHTML += '<td>' + 'discount' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + 'discount' + '</td>';
+                    tbody.appendChild(tr);
+                    var tr = document.createElement('tr');
+                        tr.innerHTML += '<td>' + 'total' + '</td>';
+                        tr.innerHTML += '<td>' + 'total' + '</td>';
+                        tr.innerHTML += '<td>' + Tquantity + '</td>';
+                        tr.innerHTML += '<td>' + tC(Tsubtotal) + '</td>';
+                        tr.innerHTML += '<td>' + tC(Tcost) + '</td>';
+                        tr.innerHTML += '<td>' + tC(Tprofit) + '</td>';
+                    tbody.appendChild(tr);
+                table.appendChild(tbody);
+            body.appendChild(table);
+
+            document.querySelector('#customers').classList.add('hide');
+            document.querySelector('#prodcuts').classList.add('hide');
+
+        });
+    });
+
+    function tC(num){
+        var parts = num.toString().split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return '$' + parts.join('.');
+    }
+
+    $(function() {
+        $('button[name="customers"]').on('click', function(ev){
+            document.querySelector('#customers').classList.remove('hide');
+            document.querySelector('#prodcuts').classList.add('hide');
+        })
+        $('button[name="prodcuts"]').on('click', function(ev){
+            document.querySelector('#customers').classList.add('hide');
+            document.querySelector('#prodcuts').classList.remove('hide');
+        })
+    });
+
+</script>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        font-size: 0.5em;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    tbody, tr {
+        width: 100%;
+    }
+    th, td {
+        text-align: center;
+        border: 1px #000 solid;
+    }
+    tr:hover {
+        background-color: #FF9;
+    }
+    td:hover {
+        background-color: #FF0;
+    }
+    .hide {
+        display: none;
+    }
+</style>
+<body>
+    <button type="button" name="customers">
+        顧客
+    </button>
+    <button type="button" name="prodcuts">
+        商品
+    </button>
+</body>
+</html>

@@ -27,7 +27,7 @@
                     continue;
                 }
                 var row = {
-                    'timestamp': new Date(d[i].gsx$timestamp.$t),
+                    'timestamp': new Date(d[i].gsx$timestamp.$t.replace(/-/g, '/')),
                     'orderNumber': d[i].gsx$ordernumber.$t,
                     'department': d[i].gsx$department.$t,
                     'grade': d[i].gsx$grade.$t,

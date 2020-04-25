@@ -42,12 +42,13 @@
 
             var body = document.querySelector('body');
             var orderObj = {};
+            var discountObj = {'total': {'discount': 0, 'count': 0}};
 
             var pTable = document.createElement('table');
                 pTable.id = 'customers';
             var pTbody = document.createElement('tbody');
 
-                pTbody.innerHTML += '<tr><td>' + '年' + '</td><td>' + '月' + '</td><td>' + '日' + '</td><td>' + '時' + '</td><td>' + '訂單編號' + '</td><td>' + '系所' + '</td><td>' + '年級' + '</td><td>' + '折扣碼' + '</td><td>' + 'Total' + '</td><td>' + 'Discount' + '</td><td>' + 'Subtotal' + '</td><td>' + 'Discount' + '</td><td>' + 'Cost' + '</td><td>' + 'Profit' + '</td></tr>';
+                pTbody.innerHTML += '<tr><th>' + '年' + '</th><th>' + '月' + '</th><th>' + '日' + '</th><th>' + '時' + '</th><th>' + '訂單編號' + '</th><th>' + '系所' + '</th><th>' + '年級' + '</th><th>' + '折扣碼' + '</th><th>' + 'Total' + '</th><th>' + 'Discount' + '</th><th>' + 'Subtotal' + '</th><th>' + 'Discount' + '</th><th>' + 'Cost' + '</th><th>' + 'Profit' + '</th></tr>';
 
             var TPtotal = 0;
             var TPdiscount = 0;
@@ -66,7 +67,8 @@
                 var orderNumber = mainList[i].orderNumber;
                 var department = mainList[i].department.substring(0, 3);
                 var grade = mainList[i].grade.substring(0, 1);
-                var time = mainList[i].time;
+                var time = new Date(mainList[i].time.split(' ')[0].replace(/-/g, '/'));
+                var timeDay = parseInt(moment(time).format('DD'));
                 var total = mainList[i].total;
                 var order = mainList[i].order;
 
@@ -77,12 +79,27 @@
                 var Pcost = 0;
                 var Pprofit = 0;
 
+                discountObj.total.discount += order.totalDiscount;
+                if (order.totalDiscount > 0) {
+                    discountObj.total.count ++;
+                }
+
                 for (var m in order) {
                     if (typeof order[m] != 'object') {
                         continue;
                     }
                     if (!(m in orderObj)) {
                         orderObj[m] = {};
+                    }
+                    if (!(m in discountObj)) {
+                        discountObj[m] = {};
+                        discountObj[m].discount = order[m].discount;
+                        discountObj[m].count = 0;
+                    } else {
+                        discountObj[m].discount += order[m].discount;
+                    }
+                    if (order[m].discount > 0) {
+                        discountObj[m].count ++;
                     }
                     for (var p in order[m]) {
                         if (typeof order[m][p] != 'object') {
@@ -93,12 +110,30 @@
                             delete orderObj[m][p].price;
                             Psubtotal += order[m][p].subtotal;
                             Pcost += order[m][p].quantity * productsObj[m][p].cost;
-                            continue;
+                            if (timeDay == 13) {
+                                orderObj[m][p].Q1 = order[m][p].quantity;
+                                orderObj[m][p].T1 = order[m][p].subtotal;
+                                orderObj[m][p].Q2 = 0;
+                                orderObj[m][p].T2 = 0;
+                            } else {
+                                orderObj[m][p].Q1 = 0;
+                                orderObj[m][p].T1 = 0;
+                                orderObj[m][p].Q2 = order[m][p].quantity;
+                                orderObj[m][p].T2 = order[m][p].subtotal;
+                            }
+                        } else {
+                            orderObj[m][p].quantity += order[m][p].quantity;
+                            orderObj[m][p].subtotal += order[m][p].subtotal;
+                            Psubtotal += order[m][p].subtotal;
+                            Pcost += order[m][p].quantity * productsObj[m][p].cost;
+                            if (timeDay == 13) {
+                                orderObj[m][p].Q1 += order[m][p].quantity;
+                                orderObj[m][p].T1 += order[m][p].subtotal;
+                            } else {
+                                orderObj[m][p].Q2 += order[m][p].quantity;
+                                orderObj[m][p].T2 += order[m][p].subtotal;
+                            }
                         }
-                        orderObj[m][p].quantity += order[m][p].quantity;
-                        orderObj[m][p].subtotal += order[m][p].subtotal;
-                        Psubtotal += order[m][p].subtotal;
-                        Pcost += order[m][p].quantity * productsObj[m][p].cost;
                     }
                 }
 
@@ -125,6 +160,12 @@
             var Tsubtotal = 0;
             var Tcost = 0;
             var Tprofit = 0;
+
+            var TQ1 = 0;
+            var TT1 = 0;
+            var TQ2 = 0;
+            var TT2 = 0;
+
             var table = document.createElement('table');
                 table.id = 'prodcuts';
             for (var m in orderObj) {
@@ -132,8 +173,28 @@
                 var Msubtotal = 0;
                 var Mcost = 0;
                 var Mprofit = 0;
+
+                var MQ1 = 0;
+                var MT1 = 0;
+                var MQ2 = 0;
+                var MT2 = 0;
+
                 var tbody = document.createElement('tbody');
-                    tbody.innerHTML += '<tr><td colspan=6>' + m + '</td></tr>';
+                    tbody.innerHTML += '<tr><th colspan=11>' + m + '</th></tr>';
+                    var tr = document.createElement('tr');
+                        tr.innerHTML += '<th>' + '廠商' + '</th>';
+                        tr.innerHTML += '<th>' + '品名' + '</th>';
+                        tr.innerHTML += '<th>' + '數量' + '</th>';
+                        tr.innerHTML += '<th>' + '金額' + '</th>';
+                        tr.innerHTML += '<th>' + '成本' + '</th>';
+                        tr.innerHTML += '<th>' + '利潤' + '</th>';
+                        tr.innerHTML += '<th>' + '品名' + '</th>';
+                        tr.innerHTML += '<th>' + '數量 (D1)' + '</th>';
+                        tr.innerHTML += '<th>' + '金額 (D1)' + '</th>';
+                        tr.innerHTML += '<th>' + '數量 (D2)' + '</th>';
+                        tr.innerHTML += '<th>' + '金額 (D2)' + '</th>';
+                    tbody.appendChild(tr);
+
                 for (var p in orderObj[m]) {
                     var tr = document.createElement('tr');
                         var merchant = m;
@@ -152,53 +213,113 @@
                         var profit = subtotal - cost;
                         Mprofit += profit;
                         tr.innerHTML += '<td>' + tC(profit) + '</td>';
+
+                        var product = p;
+                        tr.innerHTML += '<td>' + p + '</td>';
+                        var Q1 = orderObj[m][p].Q1;
+                        MQ1 += Q1;
+                        tr.innerHTML += '<td>' + Q1 + '</td>';
+                        var T1 = orderObj[m][p].T1;
+                        MT1 += T1;
+                        tr.innerHTML += '<td>' + tC(T1) + '</td>';
+                        var Q2 = orderObj[m][p].Q2;
+                        MQ2 += Q2;
+                        tr.innerHTML += '<td>' + Q2 + '</td>';
+                        var T2 = orderObj[m][p].T2;
+                        MT2 += T2;
+                        tr.innerHTML += '<td>' + tC(T2) + '</td>';
+
                     tbody.appendChild(tr);
                 }
                     var tr = document.createElement('tr');
+                        var Mdiscount = discountObj[m].discount;
+                        var MdiscountC = discountObj[m].count;
                         tr.innerHTML += '<td>' + m + '</td>';
-                        tr.innerHTML += '<td>' + 'discount' + '</td>';
+                        tr.innerHTML += '<td>' + 'Discount' + '</td>';
+                        tr.innerHTML += '<td>' + MdiscountC + '</td>';
+                        tr.innerHTML += '<td>' + tC(Mdiscount) + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + 'Discount' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + 'discount' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
                         tr.innerHTML += '<td>' + m + '</td>';
-                        tr.innerHTML += '<td>' + 'total' + '</td>';
+                        tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + Mquantity + '</td>';
                         tr.innerHTML += '<td>' + tC(Msubtotal) + '</td>';
                         tr.innerHTML += '<td>' + tC(Mcost) + '</td>';
                         tr.innerHTML += '<td>' + tC(Mprofit) + '</td>';
+                        tr.innerHTML += '<td>' + 'Total' + '</td>';
+                        tr.innerHTML += '<td>' + MQ1 + '</td>';
+                        tr.innerHTML += '<td>' + tC(MT1) + '</td>';
+                        tr.innerHTML += '<td>' + MQ2 + '</td>';
+                        tr.innerHTML += '<td>' + tC(MT2) + '</td>';
                     tbody.appendChild(tr);
                     Tquantity += Mquantity;
                     Tsubtotal += Msubtotal;
                     Tcost += Mcost;
                     Tprofit += Mprofit;
+                    TQ1 += MQ1;
+                    TT1 += MT1;
+                    TQ2 += MQ2;
+                    TT2 += MT2;
                 table.appendChild(tbody);
             }
                 var tbody = document.createElement('tbody');
-                    tbody.innerHTML += '<tr><td colspan=6>' + 'Total' + '</td></tr>';
+                    tbody.innerHTML += '<tr><th colspan=11>' + 'Total' + '</th></tr>';
                     var tr = document.createElement('tr');
-                        tr.innerHTML += '<td>' + 'total' + '</td>';
-                        tr.innerHTML += '<td>' + 'discount' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + 'discount' + '</td>';
+                        tr.innerHTML += '<th>' + '廠商' + '</th>';
+                        tr.innerHTML += '<th>' + '品名' + '</th>';
+                        tr.innerHTML += '<th>' + '數量' + '</th>';
+                        tr.innerHTML += '<th>' + '金額' + '</th>';
+                        tr.innerHTML += '<th>' + '成本' + '</th>';
+                        tr.innerHTML += '<th>' + '利潤' + '</th>';
+                        tr.innerHTML += '<th>' + '品名' + '</th>';
+                        tr.innerHTML += '<th>' + '數量 (D1)' + '</th>';
+                        tr.innerHTML += '<th>' + '金額 (D1)' + '</th>';
+                        tr.innerHTML += '<th>' + '數量 (D2)' + '</th>';
+                        tr.innerHTML += '<th>' + '金額 (D2)' + '</th>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
-                        tr.innerHTML += '<td>' + 'total' + '</td>';
-                        tr.innerHTML += '<td>' + 'total' + '</td>';
+                        var Tdiscount = discountObj.total.discount;
+                        var TdiscountC = discountObj.total.count;
+                        tr.innerHTML += '<td>' + 'Total' + '</td>';
+                        tr.innerHTML += '<td>' + 'Discount' + '</td>';
+                        tr.innerHTML += '<td>' + TdiscountC + '</td>';
+                        tr.innerHTML += '<td>' + tC(Tdiscount) + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + 'Discount' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                    tbody.appendChild(tr);
+                    var tr = document.createElement('tr');
+                        tr.innerHTML += '<td>' + 'Total' + '</td>';
+                        tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + Tquantity + '</td>';
                         tr.innerHTML += '<td>' + tC(Tsubtotal) + '</td>';
                         tr.innerHTML += '<td>' + tC(Tcost) + '</td>';
                         tr.innerHTML += '<td>' + tC(Tprofit) + '</td>';
+                        tr.innerHTML += '<td>' + 'Total' + '</td>';
+                        tr.innerHTML += '<td>' + TQ1 + '</td>';
+                        tr.innerHTML += '<td>' + tC(TT1) + '</td>';
+                        tr.innerHTML += '<td>' + TQ2 + '</td>';
+                        tr.innerHTML += '<td>' + tC(TT2) + '</td>';
                     tbody.appendChild(tr);
                 table.appendChild(tbody);
             body.appendChild(table);
 
             document.querySelector('#customers').classList.add('hide');
             document.querySelector('#prodcuts').classList.add('hide');
+
+            document.querySelector('button[name="customers"]').disabled = '';
+            document.querySelector('button[name="prodcuts"]').disabled = '';
 
         });
     });
@@ -210,6 +331,8 @@
     }
 
     $(function() {
+        document.querySelector('button[name="customers"]').disabled = 'disabled';
+        document.querySelector('button[name="prodcuts"]').disabled = 'disabled';
         $('button[name="customers"]').on('click', function(ev){
             document.querySelector('#customers').classList.remove('hide');
             document.querySelector('#prodcuts').classList.add('hide');

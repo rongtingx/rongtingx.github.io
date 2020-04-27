@@ -43,12 +43,29 @@
             var body = document.querySelector('body');
             var orderObj = {};
             var discountObj = {'total': {'discount': 0, 'count': 0}};
+            var timeObj = {};
+            var timeHourList = {};
 
             var pTable = document.createElement('table');
                 pTable.id = 'customers';
             var pTbody = document.createElement('tbody');
 
-                pTbody.innerHTML += '<tr><th>' + '年' + '</th><th>' + '月' + '</th><th>' + '日' + '</th><th>' + '時' + '</th><th>' + '訂單編號' + '</th><th>' + '系所' + '</th><th>' + '年級' + '</th><th>' + '折扣碼' + '</th><th>' + 'Total' + '</th><th>' + 'Discount' + '</th><th>' + 'Subtotal' + '</th><th>' + 'Discount' + '</th><th>' + 'Cost' + '</th><th>' + 'Profit' + '</th></tr>';
+                pTbody.innerHTML += '<tr>' 
+                + '<th>' + '年' 
+                + '</th><th>' + '月' 
+                + '</th><th>' + '日' 
+                + '</th><th>' + '時' 
+                + '</th><th>' + '訂單編號' 
+                + '</th><th>' + '系所' 
+                + '</th><th>' + '年級' 
+                + '</th><th>' + '折扣碼' 
+                + '</th><th>' + 'Total' 
+                + '</th><th>' + 'Discount' 
+                + '</th><th>' + 'Subtotal' 
+                + '</th><th>' + 'Discount' 
+                + '</th><th>' + 'Cost' 
+                + '</th><th>' + 'Profit' 
+                + '</th>' + '</tr>';
 
             var TPtotal = 0;
             var TPdiscount = 0;
@@ -140,6 +157,32 @@
                 Pprofit = Psubtotal - Pcost - discount;
 
                 pTbody.innerHTML += '<tr><td>' + year + '</td><td>' + month + '</td><td>' + day + '</td><td>' + hour + '</td><td>' + orderNumber + '</td><td>' + department + '</td><td>' + grade + '</td><td>' + coupon + '</td><td>' + tC(total) + '</td><td>' + tC(discount) + '</td><td>' + tC(Psubtotal) + '</td><td>' + tC(discount) + '</td><td>' + tC(Pcost) + '</td><td>' + tC(Pprofit) + '</td></tr>';
+
+                
+                if (!(day in timeObj)) {
+                    timeObj[day] = {};
+                }
+                for (var j = 0; j < 24; j++) {
+                    if (!(j in timeObj[day])) {
+                        timeObj[day][j] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    }
+                    if (!(j in timeHourList)) {
+                        timeHourList[j] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    }
+                    if (hour == j) {
+                        timeObj[day][j].total += total;
+                        timeObj[day][j].discount += discount;
+                        timeObj[day][j].Psubtotal += Psubtotal;
+                        timeObj[day][j].Pcost += Pcost;
+                        timeObj[day][j].Pprofit += Pprofit;
+
+                        timeHourList[j].total += total;
+                        timeHourList[j].discount += discount;
+                        timeHourList[j].Psubtotal += Psubtotal;
+                        timeHourList[j].Pcost += Pcost;
+                        timeHourList[j].Pprofit += Pprofit;
+                    }
+                }
 
                 TPtotal += total
                 TPdiscount += discount;
@@ -315,11 +358,67 @@
                 table.appendChild(tbody);
             body.appendChild(table);
 
+
+            var timeTable = document.createElement('table');
+                timeTable.id = 'time';
+
+                var timeTbody = document.createElement('tbody');
+                    timeTbody.innerHTML += '<tr><th>' + '日' + '</th><th>' + '時' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                timeTable.appendChild(timeTbody);
+
+                for (var d in timeObj) {
+                    var Dtotal = 0;
+                    var Ddiscount = 0;
+                    var DPsubtotal = 0;
+                    var DPcost = 0;
+                    var DPprofit = 0;
+
+                    var timeTbody = document.createElement('tbody');
+                    for (var h in timeObj[d]) {
+
+                        var total = timeObj[d][h].total;
+                        var discount = timeObj[d][h].discount;
+                        var Psubtotal = timeObj[d][h].Psubtotal;
+                        var Pcost = timeObj[d][h].Pcost;
+                        var Pprofit = timeObj[d][h].Pprofit;
+
+                        timeTbody.innerHTML += '<tr><td>' + d + '</td><td>' + h + '</td><td>' + tC(total) + '</td><td>' + tC(Psubtotal) + '</td><td>'  + tC(discount) + '</td><td>'+ tC(Pcost) + '</td><td>' + tC(Pprofit) + '</td></tr>';
+                        
+                        Dtotal += total;
+                        Ddiscount += discount;
+                        DPsubtotal += Psubtotal;
+                        DPcost += Pcost;
+                        DPprofit += Pprofit;
+                    }
+
+                        timeTbody.innerHTML += '<tr><td>' + d + '</td><td>' + 'total' + '</td><td>' + tC(Dtotal) + '</td><td>' + tC(DPsubtotal) + '</td><td>'  + tC(Ddiscount) + '</td><td>'+ tC(DPcost) + '</td><td>' + tC(DPprofit) + '</td></tr>';
+
+                timeTable.appendChild(timeTbody);
+                }
+
+                for (var h in timeHourList) {
+
+                        var TimeHourtotal = timeHourList[h].total;
+                        var TimeHourdiscount = timeHourList[h].discount;
+                        var TimeHourPsubtotal = timeHourList[h].Psubtotal;
+                        var TimeHourPcost = timeHourList[h].Pcost;
+                        var TimeHourPprofit = timeHourList[h].Pprofit;
+
+                        timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + h + '</td><td>' + tC(TimeHourtotal) + '</td><td>' + tC(TimeHourPsubtotal)  + '</td><td>' + tC(TimeHourdiscount)+ '</td><td>' + tC(TimeHourPcost) + '</td><td>' + tC(TimeHourPprofit) + '</td></tr>';
+
+                timeTable.appendChild(timeTbody);
+                }
+
+            body.appendChild(timeTable);
+
+
             document.querySelector('#customers').classList.add('hide');
             document.querySelector('#prodcuts').classList.add('hide');
+            document.querySelector('#time').classList.add('hide');
 
             document.querySelector('button[name="customers"]').disabled = '';
             document.querySelector('button[name="prodcuts"]').disabled = '';
+            document.querySelector('button[name="time"]').disabled = '';
 
         });
     });
@@ -333,14 +432,22 @@
     $(function() {
         document.querySelector('button[name="customers"]').disabled = 'disabled';
         document.querySelector('button[name="prodcuts"]').disabled = 'disabled';
+        document.querySelector('button[name="time"]').disabled = 'disabled';
         $('button[name="customers"]').on('click', function(ev){
             document.querySelector('#customers').classList.remove('hide');
             document.querySelector('#prodcuts').classList.add('hide');
-        })
+            document.querySelector('#time').classList.add('hide');
+        });
         $('button[name="prodcuts"]').on('click', function(ev){
             document.querySelector('#customers').classList.add('hide');
             document.querySelector('#prodcuts').classList.remove('hide');
-        })
+            document.querySelector('#time').classList.add('hide');
+        });
+        $('button[name="time"]').on('click', function(ev){
+            document.querySelector('#customers').classList.add('hide');
+            document.querySelector('#prodcuts').classList.add('hide');
+            document.querySelector('#time').classList.remove('hide');
+        });
     });
 
 </script>
@@ -378,6 +485,9 @@
     </button>
     <button type="button" name="prodcuts">
         商品
+    </button>
+    <button type="button" name="time">
+        分時
     </button>
 </body>
 </html>

@@ -46,6 +46,10 @@
             var timeObj = {};
             var timeHourList = {};
 
+            var collegeObj = {};
+            var departmentObj = {};
+            var gradeObj = {};
+
             var pTable = document.createElement('table');
                 pTable.id = 'customers';
             var pTbody = document.createElement('tbody');
@@ -88,6 +92,15 @@
                 var timeDay = parseInt(moment(time).format('DD'));
                 var total = mainList[i].total;
                 var order = mainList[i].order;
+
+                var college = '';
+                if (department == '102' || department == '152' || department == '157' || department == '171') {
+                    college = 'edu'
+                } else if (department == '203' || department == '253' || department == '260' || department == '263' || department == '861' || department == '862' || department == '863' ) {
+                    college = 'dip'
+                } else {
+                    college = department.substring(0, 1);
+                }
 
                 var discount = mainList[i].order.totalDiscount + mainList[i].order.merchantDiscount;
                 var coupon = mainList[i].order.coupon.substring(0, 3) || '無';
@@ -183,6 +196,33 @@
                         timeHourList[j].Pprofit += Pprofit;
                     }
                 }
+
+                if (!(department in departmentObj)) {
+                    departmentObj[department] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                }
+                departmentObj[department].total += total;
+                departmentObj[department].discount += discount;
+                departmentObj[department].Psubtotal += Psubtotal;
+                departmentObj[department].Pcost += Pcost;
+                departmentObj[department].Pprofit += Pprofit;
+
+                if (!(grade in gradeObj)) {
+                    gradeObj[grade] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                }
+                gradeObj[grade].total += total;
+                gradeObj[grade].discount += discount;
+                gradeObj[grade].Psubtotal += Psubtotal;
+                gradeObj[grade].Pcost += Pcost;
+                gradeObj[grade].Pprofit += Pprofit;
+
+                if (!(college in collegeObj)) {
+                    collegeObj[college] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                }
+                collegeObj[college].total += total;
+                collegeObj[college].discount += discount;
+                collegeObj[college].Psubtotal += Psubtotal;
+                collegeObj[college].Pcost += Pcost;
+                collegeObj[college].Pprofit += Pprofit;
 
                 TPtotal += total
                 TPdiscount += discount;
@@ -396,29 +436,138 @@
                 timeTable.appendChild(timeTbody);
                 }
 
+                var DTimeHourtotal = 0;
+                var DTimeHourPsubtotal = 0;
+                var DTimeHourdiscount = 0;
+                var DTimeHourPcost = 0;
+                var DTimeHourPprofit = 0;
+
+                var timeTbody = document.createElement('tbody');
                 for (var h in timeHourList) {
 
                         var TimeHourtotal = timeHourList[h].total;
-                        var TimeHourdiscount = timeHourList[h].discount;
                         var TimeHourPsubtotal = timeHourList[h].Psubtotal;
+                        var TimeHourdiscount = timeHourList[h].discount;
                         var TimeHourPcost = timeHourList[h].Pcost;
                         var TimeHourPprofit = timeHourList[h].Pprofit;
 
-                        timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + h + '</td><td>' + tC(TimeHourtotal) + '</td><td>' + tC(TimeHourPsubtotal)  + '</td><td>' + tC(TimeHourdiscount)+ '</td><td>' + tC(TimeHourPcost) + '</td><td>' + tC(TimeHourPprofit) + '</td></tr>';
+                        timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + h + '</td><td>' + tC(TimeHourtotal) + '</td><td>' + tC(TimeHourPsubtotal) + '</td><td>' + tC(TimeHourdiscount)+ '</td><td>' + tC(TimeHourPcost) + '</td><td>' + tC(TimeHourPprofit) + '</td></tr>';
+
+                        DTimeHourtotal += TimeHourtotal;
+                        DTimeHourPsubtotal += TimeHourPsubtotal;
+                        DTimeHourdiscount += TimeHourdiscount;
+                        DTimeHourPcost += TimeHourPcost;
+                        DTimeHourPprofit += TimeHourPprofit;
 
                 timeTable.appendChild(timeTbody);
                 }
 
+                var timeTbody = document.createElement('tbody');
+                    timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + h + '</td><td>' + tC(DTimeHourtotal) + '</td><td>' + tC(DTimeHourPsubtotal) + '</td><td>' + tC(DTimeHourdiscount)+ '</td><td>' + tC(DTimeHourPcost) + '</td><td>' + tC(DTimeHourPprofit) + '</td></tr>';
+                timeTable.appendChild(timeTbody);
+
             body.appendChild(timeTable);
+
+
+
+
+
+
+
+
+            var acTable = document.createElement('table');
+                acTable.id = 'department';
+
+                var acTbody = document.createElement('tbody');
+                    acTbody.innerHTML += '<tr><th>' + '系所' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                acTable.appendChild(acTbody);
+
+                var underACtotal = 0;
+                var underACPsubtotal = 0;
+                var underACdiscount = 0;
+                var underACPcost = 0;
+                var underACPprofit = 0;
+
+                for (var i in departmentObj) {
+                    var ACtotal = departmentObj[i].total;
+                    var ACPsubtotal = departmentObj[i].Psubtotal;
+                    var ACdiscount = departmentObj[i].discount;
+                    var ACPcost = departmentObj[i].Pcost;
+                    var ACPprofit = departmentObj[i].Pprofit;
+                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+
+                    if (i[1] == '0') {
+                        underACtotal += ACtotal;
+                        underACPsubtotal += ACPsubtotal;
+                        underACdiscount += ACdiscount;
+                        underACPcost += ACPcost;
+                        underACPprofit += ACPprofit;
+                    }
+                }
+                acTable.appendChild(acTbody);
+
+            body.appendChild(acTable);
+
+            //
+
+            var acTable = document.createElement('table');
+                acTable.id = 'college';
+
+                var acTbody = document.createElement('tbody');
+                    acTbody.innerHTML += '<tr><th>' + '學院' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                acTable.appendChild(acTbody);
+
+                for (var i in collegeObj) {
+                    var ACtotal = collegeObj[i].total;
+                    var ACPsubtotal = collegeObj[i].Psubtotal;
+                    var ACdiscount = collegeObj[i].discount;
+                    var ACPcost = collegeObj[i].Pcost;
+                    var ACPprofit = collegeObj[i].Pprofit;
+                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                }
+                acTable.appendChild(acTbody);
+
+            body.appendChild(acTable);
+
+            //
+
+            var acTable = document.createElement('table');
+                acTable.id = 'grade';
+
+                var acTbody = document.createElement('tbody');
+                    acTbody.innerHTML += '<tr><th>' + '年級' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                acTable.appendChild(acTbody);
+
+                for (var i in gradeObj) {
+                    var ACtotal = gradeObj[i].total;
+                    var ACPsubtotal = gradeObj[i].Psubtotal;
+                    var ACdiscount = gradeObj[i].discount;
+                    var ACPcost = gradeObj[i].Pcost;
+                    var ACPprofit = gradeObj[i].Pprofit;
+                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                }
+                acTable.appendChild(acTbody);
+
+                var acTbody = document.createElement('tbody');
+                    acTbody.innerHTML += '<tr><td>' + '學士班' + '</td><td>' + tC(underACtotal) + '</td><td>' + tC(underACPsubtotal) + '</td><td>' + tC(underACdiscount)+ '</td><td>' + tC(underACPcost) + '</td><td>' + tC(underACPprofit) + '</td></tr>';
+                acTable.appendChild(acTbody);
+
+            body.appendChild(acTable);
 
 
             document.querySelector('#customers').classList.add('hide');
             document.querySelector('#prodcuts').classList.add('hide');
             document.querySelector('#time').classList.add('hide');
+            document.querySelector('#department').classList.add('hide');
+            document.querySelector('#college').classList.add('hide');
+            document.querySelector('#grade').classList.add('hide');
 
             document.querySelector('button[name="customers"]').disabled = '';
             document.querySelector('button[name="prodcuts"]').disabled = '';
             document.querySelector('button[name="time"]').disabled = '';
+            document.querySelector('button[name="department"]').disabled = '';
+            document.querySelector('button[name="college"]').disabled = '';
+            document.querySelector('button[name="grade"]').disabled = '';
 
         });
     });
@@ -433,20 +582,52 @@
         document.querySelector('button[name="customers"]').disabled = 'disabled';
         document.querySelector('button[name="prodcuts"]').disabled = 'disabled';
         document.querySelector('button[name="time"]').disabled = 'disabled';
+        document.querySelector('button[name="department"]').disabled = 'disabled';
+        document.querySelector('button[name="college"]').disabled = 'disabled';
+        document.querySelector('button[name="grade"]').disabled = 'disabled';
+
+        
         $('button[name="customers"]').on('click', function(ev){
+            var tables = document.querySelectorAll('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].classList.add('hide');
+            }
             document.querySelector('#customers').classList.remove('hide');
-            document.querySelector('#prodcuts').classList.add('hide');
-            document.querySelector('#time').classList.add('hide');
         });
         $('button[name="prodcuts"]').on('click', function(ev){
-            document.querySelector('#customers').classList.add('hide');
+            var tables = document.querySelectorAll('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].classList.add('hide');
+            }
             document.querySelector('#prodcuts').classList.remove('hide');
-            document.querySelector('#time').classList.add('hide');
         });
         $('button[name="time"]').on('click', function(ev){
-            document.querySelector('#customers').classList.add('hide');
-            document.querySelector('#prodcuts').classList.add('hide');
+            var tables = document.querySelectorAll('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].classList.add('hide');
+            }
             document.querySelector('#time').classList.remove('hide');
+        });
+        $('button[name="department"]').on('click', function(ev){
+            var tables = document.querySelectorAll('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].classList.add('hide');
+            }
+            document.querySelector('#department').classList.remove('hide');
+        });
+        $('button[name="college"]').on('click', function(ev){
+            var tables = document.querySelectorAll('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].classList.add('hide');
+            }
+            document.querySelector('#college').classList.remove('hide');
+        });
+        $('button[name="grade"]').on('click', function(ev){
+            var tables = document.querySelectorAll('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].classList.add('hide');
+            }
+            document.querySelector('#grade').classList.remove('hide');
         });
     });
 
@@ -488,6 +669,15 @@
     </button>
     <button type="button" name="time">
         分時
+    </button>
+    <button type="button" name="department">
+        系所
+    </button>
+    <button type="button" name="college">
+        學院
+    </button>
+    <button type="button" name="grade">
+        年級
     </button>
 </body>
 </html>

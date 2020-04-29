@@ -198,8 +198,9 @@
                 }
 
                 if (!(department in departmentObj)) {
-                    departmentObj[department] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    departmentObj[department] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
                 }
+                departmentObj[department].number++;
                 departmentObj[department].total += total;
                 departmentObj[department].discount += discount;
                 departmentObj[department].Psubtotal += Psubtotal;
@@ -207,8 +208,9 @@
                 departmentObj[department].Pprofit += Pprofit;
 
                 if (!(grade in gradeObj)) {
-                    gradeObj[grade] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    gradeObj[grade] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
                 }
+                gradeObj[grade].number++;
                 gradeObj[grade].total += total;
                 gradeObj[grade].discount += discount;
                 gradeObj[grade].Psubtotal += Psubtotal;
@@ -216,8 +218,9 @@
                 gradeObj[grade].Pprofit += Pprofit;
 
                 if (!(college in collegeObj)) {
-                    collegeObj[college] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    collegeObj[college] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
                 }
+                collegeObj[college].number++;
                 collegeObj[college].total += total;
                 collegeObj[college].discount += discount;
                 collegeObj[college].Psubtotal += Psubtotal;
@@ -469,19 +472,14 @@
             body.appendChild(timeTable);
 
 
-
-
-
-
-
-
             var acTable = document.createElement('table');
                 acTable.id = 'department';
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><th>' + '系所' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                    acTbody.innerHTML += '<tr><th>' + '系所' + '</th><th>' + '人次'  + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
                 acTable.appendChild(acTbody);
 
+                var underACnumber = 0;
                 var underACtotal = 0;
                 var underACPsubtotal = 0;
                 var underACdiscount = 0;
@@ -489,14 +487,17 @@
                 var underACPprofit = 0;
 
                 for (var i in departmentObj) {
+
+                    var ACnumber = departmentObj[i].number;
                     var ACtotal = departmentObj[i].total;
                     var ACPsubtotal = departmentObj[i].Psubtotal;
                     var ACdiscount = departmentObj[i].discount;
                     var ACPcost = departmentObj[i].Pcost;
                     var ACPprofit = departmentObj[i].Pprofit;
-                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + ACnumber + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
 
                     if (i[1] == '0') {
+                        underACnumber += ACnumber;
                         underACtotal += ACtotal;
                         underACPsubtotal += ACPsubtotal;
                         underACdiscount += ACdiscount;
@@ -514,16 +515,18 @@
                 acTable.id = 'college';
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><th>' + '學院' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                    acTbody.innerHTML += '<tr><th>' + '學院' + '</th><th>' + '人次'  + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
                 acTable.appendChild(acTbody);
 
                 for (var i in collegeObj) {
+
+                    var ACnumber = collegeObj[i].number;
                     var ACtotal = collegeObj[i].total;
                     var ACPsubtotal = collegeObj[i].Psubtotal;
                     var ACdiscount = collegeObj[i].discount;
                     var ACPcost = collegeObj[i].Pcost;
                     var ACPprofit = collegeObj[i].Pprofit;
-                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + ACnumber  + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
                 }
                 acTable.appendChild(acTbody);
 
@@ -535,21 +538,23 @@
                 acTable.id = 'grade';
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><th>' + '年級' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                    acTbody.innerHTML += '<tr><th>' + '年級' + '</th><th>' + '人次'  + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
                 acTable.appendChild(acTbody);
 
                 for (var i in gradeObj) {
+
+                    var ACnumber = gradeObj[i].number;
                     var ACtotal = gradeObj[i].total;
                     var ACPsubtotal = gradeObj[i].Psubtotal;
                     var ACdiscount = gradeObj[i].discount;
                     var ACPcost = gradeObj[i].Pcost;
                     var ACPprofit = gradeObj[i].Pprofit;
-                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + ACnumber  + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
                 }
                 acTable.appendChild(acTbody);
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><td>' + '學士班' + '</td><td>' + tC(underACtotal) + '</td><td>' + tC(underACPsubtotal) + '</td><td>' + tC(underACdiscount)+ '</td><td>' + tC(underACPcost) + '</td><td>' + tC(underACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + '學士班'+ '</td><td>' + underACnumber + '</td><td>' + tC(underACtotal) + '</td><td>' + tC(underACPsubtotal) + '</td><td>' + tC(underACdiscount)+ '</td><td>' + tC(underACPcost) + '</td><td>' + tC(underACPprofit) + '</td></tr>';
                 acTable.appendChild(acTbody);
 
             body.appendChild(acTable);

@@ -77,8 +77,8 @@
                 + '</th><th>' + '折扣'
                 + '</th><th>' + '小計'
                 + '</th><th>' + '折扣'
-                + '</th><th>' + '成本'
-                + '</th><th>' + '利潤'
+                + '</th><th class="colHighlight cost">' + '成本'
+                + '</th><th class="colHighlight profit">' + '利潤'
                 + '</th><th>' + '利益率'
                 + '</th></tr>';
 
@@ -87,6 +87,9 @@
             var TPsubtotal = 0;
             var TPcost = 0;
             var TPprofit = 0;
+
+            var memberCount = 0;
+            var discountCount = 0;
 
             for (var i = 0; i < mainList.length; i++) {
                 var timestamp = mainList[i].timestamp;
@@ -156,15 +159,16 @@
                             continue;
                         }
                         if (!(p in orderObj[m])) {
-                            orderObj[m][p] = {};
-                            orderObj[m][p].quantity = 0;
-                            orderObj[m][p].subtotal = 0;
-                            orderObj[m][p].Q1 = 0;
-                            orderObj[m][p].T1 = 0;
-                            orderObj[m][p].C1 = 0;
-                            orderObj[m][p].Q2 = 0;
-                            orderObj[m][p].T2 = 0;
-                            orderObj[m][p].C2 = 0;
+                            orderObj[m][p] = {
+                                'quantity': 0,
+                                'subtotal': 0,
+                                'Q1': 0,
+                                'T1': 0,
+                                'C1': 0,
+                                'Q2': 0,
+                                'T2': 0,
+                                'C2': 0
+                            };
                         }
                         Psubtotal += order[m][p].subtotal;
                         Pcost += order[m][p].quantity * productsObj[m][p].cost;
@@ -184,6 +188,13 @@
 
                 Pprofit = Psubtotal - Pcost - discount;
 
+                if (Pprofit == 0 && discount == 0 || total <= 0) {
+                    memberCount++;
+                }
+                if (discount > 0) {
+                    discountCount++;
+                }
+
                 pTbody.innerHTML += '<tr>'
                 + '<td>' + (i+1)
                 + '</td><td>' + month
@@ -198,35 +209,56 @@
                 + '</td><td class="rightAlign">' + tC(discount)
                 + '</td><td class="rightAlign">' + tC(Psubtotal)
                 + '</td><td class="rightAlign">' + tC(discount)
-                + '</td><td class="rightAlign">' + tC(Pcost)
-                + '</td><td class="rightAlign">' + tC(Pprofit)
+                + '</td><td class="rightAlign colHighlight cost">' + tC(Pcost)
+                + '</td><td class="rightAlign colHighlight profit">' + tC(Pprofit)
                 + '</td><td class="rightAlign">' + (Pprofit / total * 100).toFixed(1) + '%'
                 + '</td></tr>';
 
+                TPtotal += total
+                TPdiscount += discount;
+                TPsubtotal += Psubtotal;
+                TPcost += Pcost;
+                TPprofit += Pprofit;
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
-
-                
                 if (!(day in timeObj)) {
                     timeObj[day] = {};
                 }
                 for (var j = 0; j < 24; j++) {
                     if (!(j in timeObj[day])) {
-                        timeObj[day][j] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                        timeObj[day][j] = {
+                            'number': 0,
+                            'total': 0,
+                            'discount': 0,
+                            'Psubtotal': 0,
+                            'Pcost': 0,
+                            'Pprofit': 0
+                        };
                     }
                     if (!(j in timeHourList)) {
-                        timeHourList[j] = {'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                        timeHourList[j] = {
+                            'number': 0,
+                            'total': 0,
+                            'discount': 0,
+                            'Psubtotal': 0,
+                            'Pcost': 0,
+                            'Pprofit': 0
+                        };
                     }
                     if (hour == j) {
+                        timeObj[day][j].number++;
                         timeObj[day][j].total += total;
                         timeObj[day][j].discount += discount;
                         timeObj[day][j].Psubtotal += Psubtotal;
                         timeObj[day][j].Pcost += Pcost;
                         timeObj[day][j].Pprofit += Pprofit;
-
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+                        timeHourList[j].number++;
                         timeHourList[j].total += total;
                         timeHourList[j].discount += discount;
                         timeHourList[j].Psubtotal += Psubtotal;
@@ -234,15 +266,20 @@
                         timeHourList[j].Pprofit += Pprofit;
                     }
                 }
-
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
-
                 if (!(department in departmentObj)) {
-                    departmentObj[department] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    departmentObj[department] = {
+                        'number': 0,
+                        'total': 0,
+                        'discount': 0,
+                        'Psubtotal': 0,
+                        'Pcost': 0,
+                        'Pprofit': 0
+                    };
                 }
                 departmentObj[department].number++;
                 departmentObj[department].total += total;
@@ -250,15 +287,20 @@
                 departmentObj[department].Psubtotal += Psubtotal;
                 departmentObj[department].Pcost += Pcost;
                 departmentObj[department].Pprofit += Pprofit;
-
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
-
                 if (!(grade in gradeObj)) {
-                    gradeObj[grade] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    gradeObj[grade] = {
+                        'number': 0,
+                        'total': 0,
+                        'discount': 0,
+                        'Psubtotal': 0,
+                        'Pcost': 0,
+                        'Pprofit': 0
+                    };
                 }
                 gradeObj[grade].number++;
                 gradeObj[grade].total += total;
@@ -266,15 +308,20 @@
                 gradeObj[grade].Psubtotal += Psubtotal;
                 gradeObj[grade].Pcost += Pcost;
                 gradeObj[grade].Pprofit += Pprofit;
-
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
-
                 if (!(college in collegeObj)) {
-                    collegeObj[college] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
+                    collegeObj[college] = {
+                        'number': 0,
+                        'total': 0,
+                        'discount': 0,
+                        'Psubtotal': 0,
+                        'Pcost': 0,
+                        'Pprofit': 0
+                    };
                 }
                 collegeObj[college].number++;
                 collegeObj[college].total += total;
@@ -282,19 +329,17 @@
                 collegeObj[college].Psubtotal += Psubtotal;
                 collegeObj[college].Pcost += Pcost;
                 collegeObj[college].Pprofit += Pprofit;
-
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
 /*******************************************************/
-
-                TPtotal += total
-                TPdiscount += discount;
-                TPsubtotal += Psubtotal;
-                TPcost += Pcost;
-                TPprofit += Pprofit;
             }
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             pTbody.innerHTML += '<tr>'
             + '<td colspan="9">' + 'Summary'
@@ -302,20 +347,31 @@
             + '</td><td class="rightAlign">' + tC(TPdiscount)
             + '</td><td class="rightAlign">' + tC(TPsubtotal)
             + '</td><td class="rightAlign">' + tC(TPdiscount)
-            + '</td><td class="rightAlign">' + tC(TPcost)
-            + '</td><td class="rightAlign">' + tC(TPprofit)
+            + '</td><td class="rightAlign colHighlight cost">' + tC(TPcost)
+            + '</td><td class="rightAlign colHighlight profit">' + tC(TPprofit)
             + '</td><td class="rightAlign">' + (TPprofit / TPtotal * 100).toFixed(1) + '%'
             + '</td></tr>';
 
             pTbody.innerHTML += '<tr>'
-            + '<td colspan="9">' + 'Average'
+            + '<td colspan="9">' + 'Average (With Member)'
             + '</td><td class="rightAlign">' + tC((TPtotal / (i+1)).toFixed(1))
             + '</td><td class="rightAlign">' + tC((TPdiscount / (i+1)).toFixed(1))
             + '</td><td class="rightAlign">' + tC((TPsubtotal / (i+1)).toFixed(1))
             + '</td><td class="rightAlign">' + tC((TPdiscount / (i+1)).toFixed(1))
-            + '</td><td class="rightAlign">' + tC((TPcost / (i+1)).toFixed(1))
-            + '</td><td class="rightAlign">' + tC((TPprofit / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign colHighlight cost">' + tC((TPcost / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign colHighlight profit">' + tC((TPprofit / (i+1)).toFixed(1))
             + '</td><td class="rightAlign">' + ((TPprofit / (i+1)) / (TPtotal / (i+1)) * 100).toFixed(1) + '%'
+            + '</td></tr>';
+
+            pTbody.innerHTML += '<tr>'
+            + '<td colspan="9">' + 'Without Member'
+            + '</td><td class="rightAlign">' + ''
+            + '</td><td class="rightAlign">' + ''
+            + '</td><td class="rightAlign">' + ''
+            + '</td><td class="rightAlign">' + ''
+            + '</td><td class="rightAlign colHighlight cost">' + ''
+            + '</td><td class="rightAlign colHighlight profit">' + tC((TPprofit / (i-memberCount+1)).toFixed(1))
+            + '</td><td class="rightAlign">' + ''
             + '</td></tr>';
 
             pTable.appendChild(pTbody);
@@ -361,15 +417,15 @@
                         tr.innerHTML += '<th>' + '品名' + '</th>';
                         tr.innerHTML += '<th>' + '數量' + '</th>';
                         tr.innerHTML += '<th>' + '金額' + '</th>';
-                        tr.innerHTML += '<th>' + '成本' + '</th>';
-                        tr.innerHTML += '<th>' + '利潤' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight cost">' + '成本' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight profit">' + '利潤' + '</th>';
                         tr.innerHTML += '<th>' + '品名' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D1)' + '</th>';
-                        tr.innerHTML += '<th>' + '成本 (D1)' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight cost">' + '成本 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D2)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D2)' + '</th>';
-                        tr.innerHTML += '<th>' + '成本 (D2)' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight cost">' + '成本 (D2)' + '</th>';
                     tbody.appendChild(tr);
 
                 for (var p in orderObj[m]) {
@@ -383,13 +439,13 @@
                         tr.innerHTML += '<td>' + quantity + '</td>';
                         var subtotal = orderObj[m][p].subtotal;
                         Msubtotal += subtotal;
-                        tr.innerHTML += '<td>' + tC(subtotal) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(subtotal) + '</td>';
                         var cost = orderObj[m][p].quantity * productsObj[m][p].cost;
                         Mcost += cost;
-                        tr.innerHTML += '<td>' + tC(cost) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(cost) + '</td>';
                         var profit = subtotal - cost;
                         Mprofit += profit;
-                        tr.innerHTML += '<td>' + tC(profit) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight profit">' + tC(profit) + '</td>';
 
                         var product = p;
                         tr.innerHTML += '<td>' + p + '</td>';
@@ -398,19 +454,19 @@
                         tr.innerHTML += '<td>' + Q1 + '</td>';
                         var T1 = orderObj[m][p].T1;
                         MT1 += T1;
-                        tr.innerHTML += '<td>' + tC(T1) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(T1) + '</td>';
                         var C1 = orderObj[m][p].C1;
                         MC1 += C1;
-                        tr.innerHTML += '<td>' + tC(C1) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(C1) + '</td>';
                         var Q2 = orderObj[m][p].Q2;
                         MQ2 += Q2;
                         tr.innerHTML += '<td>' + Q2 + '</td>';
                         var T2 = orderObj[m][p].T2;
                         MT2 += T2;
-                        tr.innerHTML += '<td>' + tC(T2) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(T2) + '</td>';
                         var C2 = orderObj[m][p].C2;
                         MC2 += C2;
-                        tr.innerHTML += '<td>' + tC(C2) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(C2) + '</td>';
 
                     tbody.appendChild(tr);
                 }
@@ -420,31 +476,31 @@
                         tr.innerHTML += '<td>' + m + '</td>';
                         tr.innerHTML += '<td>' + 'Discount' + '</td>';
                         tr.innerHTML += '<td>' + MdiscountC + '</td>';
-                        tr.innerHTML += '<td>' + tC(Mdiscount) + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(Mdiscount) + '</td>';
+                        tr.innerHTML += '<td class="colHighlight cost">' + '' + '</td>';
+                        tr.innerHTML += '<td class="colHighlight profit">' + '' + '</td>';
                         tr.innerHTML += '<td>' + 'Discount' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td class="colHighlight cost">' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td class="colHighlight cost">' + '' + '</td>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
                         tr.innerHTML += '<td>' + m + '</td>';
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + Mquantity + '</td>';
-                        tr.innerHTML += '<td>' + tC(Msubtotal) + '</td>';
-                        tr.innerHTML += '<td>' + tC(Mcost) + '</td>';
-                        tr.innerHTML += '<td>' + tC(Mprofit) + '</td>';
-                        tr.innerHTML += '<td>' + 'Total' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(Msubtotal) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(Mcost) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight profit">' + tC(Mprofit) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + MQ1 + '</td>';
-                        tr.innerHTML += '<td>' + tC(MT1) + '</td>';
-                        tr.innerHTML += '<td>' + tC(MC1) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(MT1) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(MC1) + '</td>';
                         tr.innerHTML += '<td>' + MQ2 + '</td>';
-                        tr.innerHTML += '<td>' + tC(MT2) + '</td>';
-                        tr.innerHTML += '<td>' + tC(MC2) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(MT2) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(MC2) + '</td>';
                     tbody.appendChild(tr);
                     Tquantity += Mquantity;
                     Tsubtotal += Msubtotal;
@@ -465,15 +521,15 @@
                         tr.innerHTML += '<th>' + '品名' + '</th>';
                         tr.innerHTML += '<th>' + '數量' + '</th>';
                         tr.innerHTML += '<th>' + '金額' + '</th>';
-                        tr.innerHTML += '<th>' + '成本' + '</th>';
-                        tr.innerHTML += '<th>' + '利潤' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight cost">' + '成本' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight profit">' + '利潤' + '</th>';
                         tr.innerHTML += '<th>' + '品名' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D1)' + '</th>';
-                        tr.innerHTML += '<th>' + '成本 (D1)' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight cost">' + '成本 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D2)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D2)' + '</th>';
-                        tr.innerHTML += '<th>' + '成本 (D2)' + '</th>';
+                        tr.innerHTML += '<th class="colHighlight cost">' + '成本 (D2)' + '</th>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
                         var Tdiscount = discountObj.total.discount;
@@ -481,31 +537,31 @@
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + 'Discount' + '</td>';
                         tr.innerHTML += '<td>' + TdiscountC + '</td>';
-                        tr.innerHTML += '<td>' + tC(Tdiscount) + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(Tdiscount) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight profit">' + '' + '</td>';
                         tr.innerHTML += '<td>' + 'Discount' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
-                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + '' + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + '' + '</td>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + Tquantity + '</td>';
-                        tr.innerHTML += '<td>' + tC(Tsubtotal) + '</td>';
-                        tr.innerHTML += '<td>' + tC(Tcost) + '</td>';
-                        tr.innerHTML += '<td>' + tC(Tprofit) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(Tsubtotal) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(Tcost) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight profit">' + tC(Tprofit) + '</td>';
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + TQ1 + '</td>';
-                        tr.innerHTML += '<td>' + tC(TT1) + '</td>';
-                        tr.innerHTML += '<td>' + tC(TC1) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(TT1) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(TC1) + '</td>';
                         tr.innerHTML += '<td>' + TQ2 + '</td>';
-                        tr.innerHTML += '<td>' + tC(TT2) + '</td>';
-                        tr.innerHTML += '<td>' + tC(TC2) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign">' + tC(TT2) + '</td>';
+                        tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(TC2) + '</td>';
                     tbody.appendChild(tr);
                 table.appendChild(tbody);
             body.appendChild(table);
@@ -515,7 +571,15 @@
                 timeTable.id = 'time';
 
                 var timeTbody = document.createElement('tbody');
-                    timeTbody.innerHTML += '<tr><th>' + '日' + '</th><th>' + '時' + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                    timeTbody.innerHTML += '<tr>'
+                    + '<th>' + '日' 
+                    + '</th><th>' + '時' 
+                    + '</th><th>' + '金額' 
+                    + '</th><th>' + '小計'  
+                    + '</th><th>' + '折扣'
+                    + '</th><th class="colHighlight cost">' + '成本' 
+                    + '</th><th class="colHighlight profit">' + '利潤'
+                    + '</th></tr>';
                 timeTable.appendChild(timeTbody);
 
                 for (var d in timeObj) {
@@ -534,7 +598,15 @@
                         var Pcost = timeObj[d][h].Pcost;
                         var Pprofit = timeObj[d][h].Pprofit;
 
-                        timeTbody.innerHTML += '<tr><td>' + d + '</td><td>' + h + '</td><td>' + tC(total) + '</td><td>' + tC(Psubtotal) + '</td><td>'  + tC(discount) + '</td><td>'+ tC(Pcost) + '</td><td>' + tC(Pprofit) + '</td></tr>';
+                        timeTbody.innerHTML += '<tr>'
+                        + '<td>' + d 
+                        + '</td><td>' + h 
+                        + '</td><td>' + tC(total) 
+                        + '</td><td>' + tC(Psubtotal) 
+                        + '</td><td>'  + tC(discount) 
+                        + '</td><td class="colHighlight cost">'+ tC(Pcost) 
+                        + '</td><td class="colHighlight profit">' + tC(Pprofit)
+                        + '</td></tr>';
                         
                         Dtotal += total;
                         Ddiscount += discount;
@@ -543,7 +615,15 @@
                         DPprofit += Pprofit;
                     }
 
-                        timeTbody.innerHTML += '<tr><td>' + d + '</td><td>' + 'total' + '</td><td>' + tC(Dtotal) + '</td><td>' + tC(DPsubtotal) + '</td><td>'  + tC(Ddiscount) + '</td><td>'+ tC(DPcost) + '</td><td>' + tC(DPprofit) + '</td></tr>';
+                        timeTbody.innerHTML += '<tr>'
+                        + '<td>' + d 
+                        + '</td><td>' + 'total' 
+                        + '</td><td>' + tC(Dtotal) 
+                        + '</td><td>' + tC(DPsubtotal) 
+                        + '</td><td>'  + tC(Ddiscount) 
+                        + '</td><td class="colHighlight cost">'+ tC(DPcost) 
+                        + '</td><td class="colHighlight profit">' + tC(DPprofit)
+                        + '</td></tr>';
 
                 timeTable.appendChild(timeTbody);
                 }
@@ -563,7 +643,15 @@
                         var TimeHourPcost = timeHourList[h].Pcost;
                         var TimeHourPprofit = timeHourList[h].Pprofit;
 
-                        timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + h + '</td><td>' + tC(TimeHourtotal) + '</td><td>' + tC(TimeHourPsubtotal) + '</td><td>' + tC(TimeHourdiscount)+ '</td><td>' + tC(TimeHourPcost) + '</td><td>' + tC(TimeHourPprofit) + '</td></tr>';
+                        timeTbody.innerHTML += '<tr>' 
+                        + '<td>' + '' 
+                        + '</td><td>' + h
+                        + '</td><td>' + tC(TimeHourtotal)
+                        + '</td><td>' + tC(TimeHourPsubtotal)
+                        + '</td><td>' + tC(TimeHourdiscount)
+                        + '</td><td class="colHighlight cost">' + tC(TimeHourPcost)
+                        + '</td><td class="colHighlight profit">' + tC(TimeHourPprofit)
+                        + '</td></tr>';
 
                         DTimeHourtotal += TimeHourtotal;
                         DTimeHourPsubtotal += TimeHourPsubtotal;
@@ -575,7 +663,15 @@
                 }
 
                 var timeTbody = document.createElement('tbody');
-                    timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + 'total' + '</td><td>' + tC(DTimeHourtotal) + '</td><td>' + tC(DTimeHourPsubtotal) + '</td><td>' + tC(DTimeHourdiscount)+ '</td><td>' + tC(DTimeHourPcost) + '</td><td>' + tC(DTimeHourPprofit) + '</td></tr>';
+                    timeTbody.innerHTML += '<tr>'
+                    + '<td>' + '' 
+                    + '</td><td>' + 'total'
+                    + '</td><td>' + tC(DTimeHourtotal)
+                    + '</td><td>' + tC(DTimeHourPsubtotal)
+                    + '</td><td>' + tC(DTimeHourdiscount)
+                    + '</td><td class="colHighlight cost">' + tC(DTimeHourPcost)
+                    + '</td><td class="colHighlight profit">' + tC(DTimeHourPprofit)
+                    + '</td></tr>';
                 timeTable.appendChild(timeTbody);
 
             body.appendChild(timeTable);
@@ -585,7 +681,14 @@
                 acTable.id = 'department';
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><th>' + '系所' + '</th><th>' + '人次'  + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                    acTbody.innerHTML += '<tr><th>' + '系所' 
+                    + '</th><th>' + '人次'  
+                    + '</th><th>' + '金額' 
+                    + '</th><th>' + '小計'  
+                    + '</th><th>' + '折扣'
+                    + '</th><th class="colHighlight cost">' + '成本' 
+                    + '</th><th class="colHighlight profit">' + '利潤'
+                    + '</th></tr>';
                 acTable.appendChild(acTbody);
 
                 var underACnumber = 0;
@@ -603,7 +706,14 @@
                     var ACdiscount = departmentObj[i].discount;
                     var ACPcost = departmentObj[i].Pcost;
                     var ACPprofit = departmentObj[i].Pprofit;
-                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + ACnumber + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + i 
+                    + '</td><td>' + ACnumber 
+                    + '</td><td>' + tC(ACtotal) 
+                    + '</td><td>' + tC(ACPsubtotal) 
+                    + '</td><td>' + tC(ACdiscount)
+                    + '</td><td class="colHighlight cost">' + tC(ACPcost) 
+                    + '</td><td class="colHighlight profit">' + tC(ACPprofit)
+                    + '</td></tr>';
 
                     if (i[1] == '0') {
                         underACnumber += ACnumber;
@@ -624,7 +734,15 @@
                 acTable.id = 'college';
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><th>' + '學院' + '</th><th>' + '人次'  + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                    acTbody.innerHTML += '<tr>' 
+                    + '<th>' + '學院' 
+                    + '</th><th>' + '人次'
+                    + '</th><th>' + '金額'
+                    + '</th><th>' + '小計'
+                    + '</th><th>' + '折扣'
+                    + '</th><th class="colHighlight cost">' + '成本'
+                    + '</th><th class="colHighlight profit">' + '利潤'
+                    + '</th></tr>';
                 acTable.appendChild(acTbody);
 
                 for (var i in collegeObj) {
@@ -635,7 +753,14 @@
                     var ACdiscount = collegeObj[i].discount;
                     var ACPcost = collegeObj[i].Pcost;
                     var ACPprofit = collegeObj[i].Pprofit;
-                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + ACnumber  + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + i 
+                    + '</td><td>' + ACnumber  
+                    + '</td><td>' + tC(ACtotal) 
+                    + '</td><td>' + tC(ACPsubtotal) 
+                    + '</td><td>' + tC(ACdiscount)
+                    + '</td><td class="colHighlight cost">' + tC(ACPcost) 
+                    + '</td><td class="colHighlight profit">' + tC(ACPprofit)
+                    + '</td></tr>';
                 }
                 acTable.appendChild(acTbody);
 
@@ -647,7 +772,14 @@
                 acTable.id = 'grade';
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><th>' + '年級' + '</th><th>' + '人次'  + '</th><th>' + '金額' + '</th><th>' + '小計'  + '</th><th>' + '折扣'+ '</th><th>' + '成本' + '</th><th>' + '利潤' + '</th></tr>';
+                    acTbody.innerHTML += '<tr><th>' + '年級' 
+                    + '</th><th>' + '人次'
+                    + '</th><th>' + '金額'
+                    + '</th><th>' + '小計'
+                    + '</th><th>' + '折扣'
+                    + '</th><th class="colHighlight cost">' + '成本'
+                    + '</th><th class="colHighlight profit">' + '利潤'
+                    + '</th></tr>';
                 acTable.appendChild(acTbody);
 
                 for (var i in gradeObj) {
@@ -658,23 +790,37 @@
                     var ACdiscount = gradeObj[i].discount;
                     var ACPcost = gradeObj[i].Pcost;
                     var ACPprofit = gradeObj[i].Pprofit;
-                    acTbody.innerHTML += '<tr><td>' + i + '</td><td>' + ACnumber  + '</td><td>' + tC(ACtotal) + '</td><td>' + tC(ACPsubtotal) + '</td><td>' + tC(ACdiscount)+ '</td><td>' + tC(ACPcost) + '</td><td>' + tC(ACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + i 
+                    + '</td><td>' + ACnumber  
+                    + '</td><td>' + tC(ACtotal) 
+                    + '</td><td>' + tC(ACPsubtotal) 
+                    + '</td><td>' + tC(ACdiscount)
+                    + '</td><td class="colHighlight cost">' + tC(ACPcost) 
+                    + '</td><td class="colHighlight profit">' + tC(ACPprofit)
+                    + '</td></tr>';
                 }
                 acTable.appendChild(acTbody);
 
                 var acTbody = document.createElement('tbody');
-                    acTbody.innerHTML += '<tr><td>' + '學士班'+ '</td><td>' + underACnumber + '</td><td>' + tC(underACtotal) + '</td><td>' + tC(underACPsubtotal) + '</td><td>' + tC(underACdiscount)+ '</td><td>' + tC(underACPcost) + '</td><td>' + tC(underACPprofit) + '</td></tr>';
+                    acTbody.innerHTML += '<tr><td>' + '學士班'
+                    + '</td><td>' + underACnumber 
+                    + '</td><td>' + tC(underACtotal) 
+                    + '</td><td>' + tC(underACPsubtotal) 
+                    + '</td><td>' + tC(underACdiscount)
+                    + '</td><td class="colHighlight cost">' + tC(underACPcost) 
+                    + '</td><td class="colHighlight profit">' + tC(underACPprofit)
+                    + '</td></tr>';
                 acTable.appendChild(acTbody);
 
             body.appendChild(acTable);
-
+/*
             document.querySelector('#customers').classList.add('hide');
             document.querySelector('#prodcuts').classList.add('hide');
             document.querySelector('#time').classList.add('hide');
             document.querySelector('#department').classList.add('hide');
             document.querySelector('#college').classList.add('hide');
             document.querySelector('#grade').classList.add('hide');
-
+*/
             document.querySelector('button[name="customers"]').disabled = '';
             document.querySelector('button[name="prodcuts"]').disabled = '';
             document.querySelector('button[name="time"]').disabled = '';
@@ -699,7 +845,6 @@
         document.querySelector('button[name="college"]').disabled = 'disabled';
         document.querySelector('button[name="grade"]').disabled = 'disabled';
 
-        
         $('button[name="customers"]').on('click', function(ev){
             var tables = document.querySelectorAll('table');
             for (var i = 0; i < tables.length; i++) {
@@ -775,6 +920,12 @@
     .rightAlign {
         text-align: right;
         border: 1px #000 solid;
+    }
+    .colHighlight.cost {
+        background-color: #FF9;
+    }
+    .colHighlight.profit {
+        background-color: #9F9;
     }
 </style>
 <body>

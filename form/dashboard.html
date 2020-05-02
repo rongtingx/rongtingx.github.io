@@ -38,38 +38,49 @@
                 mainList.push(row);
             }
 
-
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             var body = document.querySelector('body');
             var orderObj = {};
             var discountObj = {'total': {'discount': 0, 'count': 0}};
             var timeObj = {};
             var timeHourList = {};
-
             var collegeObj = {};
             var departmentObj = {};
             var gradeObj = {};
+
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             var pTable = document.createElement('table');
                 pTable.id = 'customers';
             var pTbody = document.createElement('tbody');
 
                 pTbody.innerHTML += '<tr>' 
-                + '<th>' + '年' 
-                + '</th><th>' + '月' 
-                + '</th><th>' + '日' 
-                + '</th><th>' + '時' 
-                + '</th><th>' + '訂單編號' 
-                + '</th><th>' + '系所' 
-                + '</th><th>' + '年級' 
-                + '</th><th>' + '折扣碼' 
-                + '</th><th>' + 'Total' 
-                + '</th><th>' + 'Discount' 
-                + '</th><th>' + 'Subtotal' 
-                + '</th><th>' + 'Discount' 
-                + '</th><th>' + 'Cost' 
-                + '</th><th>' + 'Profit' 
-                + '</th>' + '</tr>';
+                + '<th>' + 'No.'
+                + '</th><th>' + '月'
+                + '</th><th>' + '日'
+                + '</th><th>' + '時'
+                + '</th><th>' + '訂單編號'
+                + '</th><th>' + '系所'
+                + '</th><th>' + '年級'
+                + '</th><th>' + '取貨'
+                + '</th><th>' + '折扣碼'
+                + '</th><th>' + '金額'
+                + '</th><th>' + '折扣'
+                + '</th><th>' + '小計'
+                + '</th><th>' + '折扣'
+                + '</th><th>' + '成本'
+                + '</th><th>' + '利潤'
+                + '</th><th>' + '利益率'
+                + '</th></tr>';
 
             var TPtotal = 0;
             var TPdiscount = 0;
@@ -94,9 +105,18 @@
                 var order = mainList[i].order;
 
                 var college = '';
-                if (department == '102' || department == '152' || department == '157' || department == '171') {
+                if (department == '102' 
+                    || department == '152' 
+                    || department == '157' 
+                    || department == '171') {
                     college = 'edu'
-                } else if (department == '203' || department == '253' || department == '260' || department == '263' || department == '861' || department == '862' || department == '863' ) {
+                } else if (department == '203' 
+                    || department == '253' 
+                    || department == '260' 
+                    || department == '263' 
+                    || department == '861' 
+                    || department == '862' 
+                    || department == '863' ) {
                     college = 'dip'
                 } else {
                     college = department.substring(0, 1);
@@ -136,40 +156,58 @@
                             continue;
                         }
                         if (!(p in orderObj[m])) {
-                            orderObj[m][p] = order[m][p];
-                            delete orderObj[m][p].price;
-                            Psubtotal += order[m][p].subtotal;
-                            Pcost += order[m][p].quantity * productsObj[m][p].cost;
-                            if (timeDay == 13) {
-                                orderObj[m][p].Q1 = order[m][p].quantity;
-                                orderObj[m][p].T1 = order[m][p].subtotal;
-                                orderObj[m][p].Q2 = 0;
-                                orderObj[m][p].T2 = 0;
-                            } else {
-                                orderObj[m][p].Q1 = 0;
-                                orderObj[m][p].T1 = 0;
-                                orderObj[m][p].Q2 = order[m][p].quantity;
-                                orderObj[m][p].T2 = order[m][p].subtotal;
-                            }
+                            orderObj[m][p] = {};
+                            orderObj[m][p].quantity = 0;
+                            orderObj[m][p].subtotal = 0;
+                            orderObj[m][p].Q1 = 0;
+                            orderObj[m][p].T1 = 0;
+                            orderObj[m][p].C1 = 0;
+                            orderObj[m][p].Q2 = 0;
+                            orderObj[m][p].T2 = 0;
+                            orderObj[m][p].C2 = 0;
+                        }
+                        Psubtotal += order[m][p].subtotal;
+                        Pcost += order[m][p].quantity * productsObj[m][p].cost;
+                        orderObj[m][p].quantity += order[m][p].quantity;
+                        orderObj[m][p].subtotal += order[m][p].subtotal;
+                        if (timeDay == 13) {
+                            orderObj[m][p].Q1 += order[m][p].quantity;
+                            orderObj[m][p].T1 += order[m][p].subtotal;
+                            orderObj[m][p].C1 += (order[m][p].quantity * productsObj[m][p].cost);
                         } else {
-                            orderObj[m][p].quantity += order[m][p].quantity;
-                            orderObj[m][p].subtotal += order[m][p].subtotal;
-                            Psubtotal += order[m][p].subtotal;
-                            Pcost += order[m][p].quantity * productsObj[m][p].cost;
-                            if (timeDay == 13) {
-                                orderObj[m][p].Q1 += order[m][p].quantity;
-                                orderObj[m][p].T1 += order[m][p].subtotal;
-                            } else {
-                                orderObj[m][p].Q2 += order[m][p].quantity;
-                                orderObj[m][p].T2 += order[m][p].subtotal;
-                            }
+                            orderObj[m][p].Q2 += order[m][p].quantity;
+                            orderObj[m][p].T2 += order[m][p].subtotal;
+                            orderObj[m][p].C2 += (order[m][p].quantity * productsObj[m][p].cost);
                         }
                     }
                 }
 
                 Pprofit = Psubtotal - Pcost - discount;
 
-                pTbody.innerHTML += '<tr><td>' + year + '</td><td>' + month + '</td><td>' + day + '</td><td>' + hour + '</td><td>' + orderNumber + '</td><td>' + department + '</td><td>' + grade + '</td><td>' + coupon + '</td><td>' + tC(total) + '</td><td>' + tC(discount) + '</td><td>' + tC(Psubtotal) + '</td><td>' + tC(discount) + '</td><td>' + tC(Pcost) + '</td><td>' + tC(Pprofit) + '</td></tr>';
+                pTbody.innerHTML += '<tr>'
+                + '<td>' + (i+1)
+                + '</td><td>' + month
+                + '</td><td>' + day
+                + '</td><td>' + hour 
+                + '</td><td>' + orderNumber
+                + '</td><td>' + department
+                + '</td><td>' + grade
+                + '</td><td>' + timeDay
+                + '</td><td>' + coupon
+                + '</td><td class="rightAlign">' + tC(total)
+                + '</td><td class="rightAlign">' + tC(discount)
+                + '</td><td class="rightAlign">' + tC(Psubtotal)
+                + '</td><td class="rightAlign">' + tC(discount)
+                + '</td><td class="rightAlign">' + tC(Pcost)
+                + '</td><td class="rightAlign">' + tC(Pprofit)
+                + '</td><td class="rightAlign">' + (Pprofit / total * 100).toFixed(1) + '%'
+                + '</td></tr>';
+
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
                 
                 if (!(day in timeObj)) {
@@ -197,6 +235,12 @@
                     }
                 }
 
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+
                 if (!(department in departmentObj)) {
                     departmentObj[department] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
                 }
@@ -206,6 +250,12 @@
                 departmentObj[department].Psubtotal += Psubtotal;
                 departmentObj[department].Pcost += Pcost;
                 departmentObj[department].Pprofit += Pprofit;
+
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
                 if (!(grade in gradeObj)) {
                     gradeObj[grade] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
@@ -217,6 +267,12 @@
                 gradeObj[grade].Pcost += Pcost;
                 gradeObj[grade].Pprofit += Pprofit;
 
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+
                 if (!(college in collegeObj)) {
                     collegeObj[college] = {'number': 0, 'total': 0, 'discount': 0, 'Psubtotal': 0, 'Pcost': 0, 'Pprofit': 0};
                 }
@@ -227,20 +283,49 @@
                 collegeObj[college].Pcost += Pcost;
                 collegeObj[college].Pprofit += Pprofit;
 
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+
                 TPtotal += total
                 TPdiscount += discount;
                 TPsubtotal += Psubtotal;
                 TPcost += Pcost;
                 TPprofit += Pprofit;
-
             }
 
-            pTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + '' + '</td><td>' + tC(TPtotal) + '</td><td>' + tC(TPdiscount) + '</td><td>' + tC(TPsubtotal) + '</td><td>' + tC(TPdiscount) + '</td><td>' + tC(TPcost) + '</td><td>' + tC(TPprofit) + '</td></tr>';
+            pTbody.innerHTML += '<tr>'
+            + '<td colspan="9">' + 'Summary'
+            + '</td><td class="rightAlign">' + tC(TPtotal)
+            + '</td><td class="rightAlign">' + tC(TPdiscount)
+            + '</td><td class="rightAlign">' + tC(TPsubtotal)
+            + '</td><td class="rightAlign">' + tC(TPdiscount)
+            + '</td><td class="rightAlign">' + tC(TPcost)
+            + '</td><td class="rightAlign">' + tC(TPprofit)
+            + '</td><td class="rightAlign">' + (TPprofit / TPtotal * 100).toFixed(1) + '%'
+            + '</td></tr>';
+
+            pTbody.innerHTML += '<tr>'
+            + '<td colspan="9">' + 'Average'
+            + '</td><td class="rightAlign">' + tC((TPtotal / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign">' + tC((TPdiscount / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign">' + tC((TPsubtotal / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign">' + tC((TPdiscount / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign">' + tC((TPcost / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign">' + tC((TPprofit / (i+1)).toFixed(1))
+            + '</td><td class="rightAlign">' + ((TPprofit / (i+1)) / (TPtotal / (i+1)) * 100).toFixed(1) + '%'
+            + '</td></tr>';
 
             pTable.appendChild(pTbody);
             body.appendChild(pTable);
 
-
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             var Tquantity = 0;
             var Tsubtotal = 0;
@@ -249,8 +334,10 @@
 
             var TQ1 = 0;
             var TT1 = 0;
+            var TC1 = 0;
             var TQ2 = 0;
             var TT2 = 0;
+            var TC2 = 0;
 
             var table = document.createElement('table');
                 table.id = 'prodcuts';
@@ -262,11 +349,13 @@
 
                 var MQ1 = 0;
                 var MT1 = 0;
+                var MC1 = 0;
                 var MQ2 = 0;
                 var MT2 = 0;
+                var MC2 = 0;
 
                 var tbody = document.createElement('tbody');
-                    tbody.innerHTML += '<tr><th colspan=11>' + m + '</th></tr>';
+                    tbody.innerHTML += '<tr><th colspan=13>' + m + '</th></tr>';
                     var tr = document.createElement('tr');
                         tr.innerHTML += '<th>' + '廠商' + '</th>';
                         tr.innerHTML += '<th>' + '品名' + '</th>';
@@ -277,8 +366,10 @@
                         tr.innerHTML += '<th>' + '品名' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D1)' + '</th>';
+                        tr.innerHTML += '<th>' + '成本 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D2)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D2)' + '</th>';
+                        tr.innerHTML += '<th>' + '成本 (D2)' + '</th>';
                     tbody.appendChild(tr);
 
                 for (var p in orderObj[m]) {
@@ -308,12 +399,18 @@
                         var T1 = orderObj[m][p].T1;
                         MT1 += T1;
                         tr.innerHTML += '<td>' + tC(T1) + '</td>';
+                        var C1 = orderObj[m][p].C1;
+                        MC1 += C1;
+                        tr.innerHTML += '<td>' + tC(C1) + '</td>';
                         var Q2 = orderObj[m][p].Q2;
                         MQ2 += Q2;
                         tr.innerHTML += '<td>' + Q2 + '</td>';
                         var T2 = orderObj[m][p].T2;
                         MT2 += T2;
                         tr.innerHTML += '<td>' + tC(T2) + '</td>';
+                        var C2 = orderObj[m][p].C2;
+                        MC2 += C2;
+                        tr.innerHTML += '<td>' + tC(C2) + '</td>';
 
                     tbody.appendChild(tr);
                 }
@@ -331,6 +428,8 @@
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
                         tr.innerHTML += '<td>' + m + '</td>';
@@ -342,8 +441,10 @@
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + MQ1 + '</td>';
                         tr.innerHTML += '<td>' + tC(MT1) + '</td>';
+                        tr.innerHTML += '<td>' + tC(MC1) + '</td>';
                         tr.innerHTML += '<td>' + MQ2 + '</td>';
                         tr.innerHTML += '<td>' + tC(MT2) + '</td>';
+                        tr.innerHTML += '<td>' + tC(MC2) + '</td>';
                     tbody.appendChild(tr);
                     Tquantity += Mquantity;
                     Tsubtotal += Msubtotal;
@@ -351,12 +452,14 @@
                     Tprofit += Mprofit;
                     TQ1 += MQ1;
                     TT1 += MT1;
+                    TC1 += MC1;
                     TQ2 += MQ2;
                     TT2 += MT2;
+                    TC2 += MC2;
                 table.appendChild(tbody);
             }
                 var tbody = document.createElement('tbody');
-                    tbody.innerHTML += '<tr><th colspan=11>' + 'Total' + '</th></tr>';
+                    tbody.innerHTML += '<tr><th colspan=13>' + 'Total' + '</th></tr>';
                     var tr = document.createElement('tr');
                         tr.innerHTML += '<th>' + '廠商' + '</th>';
                         tr.innerHTML += '<th>' + '品名' + '</th>';
@@ -367,8 +470,10 @@
                         tr.innerHTML += '<th>' + '品名' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D1)' + '</th>';
+                        tr.innerHTML += '<th>' + '成本 (D1)' + '</th>';
                         tr.innerHTML += '<th>' + '數量 (D2)' + '</th>';
                         tr.innerHTML += '<th>' + '金額 (D2)' + '</th>';
+                        tr.innerHTML += '<th>' + '成本 (D2)' + '</th>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
                         var Tdiscount = discountObj.total.discount;
@@ -384,6 +489,8 @@
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
                         tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
+                        tr.innerHTML += '<td>' + '' + '</td>';
                     tbody.appendChild(tr);
                     var tr = document.createElement('tr');
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
@@ -395,8 +502,10 @@
                         tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + TQ1 + '</td>';
                         tr.innerHTML += '<td>' + tC(TT1) + '</td>';
+                        tr.innerHTML += '<td>' + tC(TC1) + '</td>';
                         tr.innerHTML += '<td>' + TQ2 + '</td>';
                         tr.innerHTML += '<td>' + tC(TT2) + '</td>';
+                        tr.innerHTML += '<td>' + tC(TC2) + '</td>';
                     tbody.appendChild(tr);
                 table.appendChild(tbody);
             body.appendChild(table);
@@ -466,7 +575,7 @@
                 }
 
                 var timeTbody = document.createElement('tbody');
-                    timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + h + '</td><td>' + tC(DTimeHourtotal) + '</td><td>' + tC(DTimeHourPsubtotal) + '</td><td>' + tC(DTimeHourdiscount)+ '</td><td>' + tC(DTimeHourPcost) + '</td><td>' + tC(DTimeHourPprofit) + '</td></tr>';
+                    timeTbody.innerHTML += '<tr><td>' + '' + '</td><td>' + 'total' + '</td><td>' + tC(DTimeHourtotal) + '</td><td>' + tC(DTimeHourPsubtotal) + '</td><td>' + tC(DTimeHourdiscount)+ '</td><td>' + tC(DTimeHourPcost) + '</td><td>' + tC(DTimeHourPprofit) + '</td></tr>';
                 timeTable.appendChild(timeTbody);
 
             body.appendChild(timeTable);
@@ -558,7 +667,6 @@
                 acTable.appendChild(acTbody);
 
             body.appendChild(acTable);
-
 
             document.querySelector('#customers').classList.add('hide');
             document.querySelector('#prodcuts').classList.add('hide');
@@ -663,6 +771,10 @@
     }
     .hide {
         display: none;
+    }
+    .rightAlign {
+        text-align: right;
+        border: 1px #000 solid;
     }
 </style>
 <body>

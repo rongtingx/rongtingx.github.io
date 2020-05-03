@@ -397,6 +397,22 @@
 
             var table = document.createElement('table');
                 table.id = 'prodcuts';
+            var table2 = document.createElement('table');
+                table2.id = 'merchants';
+
+                var tbody2 = document.createElement('tbody');
+                    tbody2.innerHTML += '<tr>'
+                        + '<th>' + '廠商'
+                        + '</th><th>' + '數量'
+                        + '</th><th class="colHighlight cost">' + '成本'
+                        + '</th><th>' + '數量 (D1)'
+                        + '</th><th class="colHighlight cost">' + '成本 (D1)'
+                        + '</th><th>' + '數量 (D2)'
+                        + '</th><th class="colHighlight cost">' + '成本 (D2)'
+                        + '</th><th class="colHighlight profit">' + '利潤'
+                        + '</th>'
+                        + '</tr>';
+
             for (var m in orderObj) {
                 var Mquantity = 0;
                 var Msubtotal = 0;
@@ -411,22 +427,26 @@
                 var MC2 = 0;
 
                 var tbody = document.createElement('tbody');
-                    tbody.innerHTML += '<tr><th colspan=13>' + m + '</th></tr>';
-                    var tr = document.createElement('tr');
-                        tr.innerHTML += '<th>' + '廠商' + '</th>';
-                        tr.innerHTML += '<th>' + '品名' + '</th>';
-                        tr.innerHTML += '<th>' + '數量' + '</th>';
-                        tr.innerHTML += '<th>' + '金額' + '</th>';
-                        tr.innerHTML += '<th class="colHighlight cost">' + '成本' + '</th>';
-                        tr.innerHTML += '<th class="colHighlight profit">' + '利潤' + '</th>';
-                        tr.innerHTML += '<th>' + '品名' + '</th>';
-                        tr.innerHTML += '<th>' + '數量 (D1)' + '</th>';
-                        tr.innerHTML += '<th>' + '金額 (D1)' + '</th>';
-                        tr.innerHTML += '<th class="colHighlight cost">' + '成本 (D1)' + '</th>';
-                        tr.innerHTML += '<th>' + '數量 (D2)' + '</th>';
-                        tr.innerHTML += '<th>' + '金額 (D2)' + '</th>';
-                        tr.innerHTML += '<th class="colHighlight cost">' + '成本 (D2)' + '</th>';
-                    tbody.appendChild(tr);
+                    tbody.innerHTML += '<tr>'
+                        + '<th colspan=13>' + m
+                        + '</th>'
+                        + '</tr>'
+                    + '<tr>'
+                        + '<th>' + '廠商'
+                        + '</th><th>' + '品名'
+                        + '</th><th>' + '數量'
+                        + '</th><th>' + '金額'
+                        + '</th><th class="colHighlight cost">' + '成本'
+                        + '</th><th class="colHighlight profit">' + '利潤'
+                        + '</th><th>' + '品名'
+                        + '</th><th>' + '數量 (D1)'
+                        + '</th><th>' + '金額 (D1)'
+                        + '</th><th class="colHighlight cost">' + '成本 (D1)'
+                        + '</th><th>' + '數量 (D2)'
+                        + '</th><th>' + '金額 (D2)'
+                        + '</th><th class="colHighlight cost">' + '成本 (D2)'
+                        + '</th>'
+                    + '</tr>';
 
                 for (var p in orderObj[m]) {
                     var tr = document.createElement('tr');
@@ -467,9 +487,21 @@
                         var C2 = orderObj[m][p].C2;
                         MC2 += C2;
                         tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(C2) + '</td>';
-
                     tbody.appendChild(tr);
                 }
+
+                tbody2.innerHTML += '<tr>'
+                    + '<td>' + m
+                    + '</td><td>' + Mquantity
+                    + '</td><td class="rightAlign colHighlight cost">' + tC(Mcost)
+                    + '</td><td>' + MQ1
+                    + '</td><td class="rightAlign colHighlight cost">' + tC(MC1)
+                    + '</td><td>' + MQ2
+                    + '</td><td class="rightAlign colHighlight cost">' + tC(MC2)
+                    + '</td><td class="rightAlign colHighlight profit">' + tC(Mprofit)
+                    + '</td>'
+                    + '</tr>';
+
                     var tr = document.createElement('tr');
                         var Mdiscount = discountObj[m].discount;
                         var MdiscountC = discountObj[m].count;
@@ -494,7 +526,7 @@
                         tr.innerHTML += '<td class="rightAlign">' + tC(Msubtotal) + '</td>';
                         tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(Mcost) + '</td>';
                         tr.innerHTML += '<td class="rightAlign colHighlight profit">' + tC(Mprofit) + '</td>';
-                        tr.innerHTML += '<td class="rightAlign">' + 'Total' + '</td>';
+                        tr.innerHTML += '<td>' + 'Total' + '</td>';
                         tr.innerHTML += '<td>' + MQ1 + '</td>';
                         tr.innerHTML += '<td class="rightAlign">' + tC(MT1) + '</td>';
                         tr.innerHTML += '<td class="rightAlign colHighlight cost">' + tC(MC1) + '</td>';
@@ -513,7 +545,11 @@
                     TT2 += MT2;
                     TC2 += MC2;
                 table.appendChild(tbody);
+                table2.appendChild(tbody2);
             }
+
+            body.appendChild(table2);
+
                 var tbody = document.createElement('tbody');
                     tbody.innerHTML += '<tr><th colspan=13>' + 'Total' + '</th></tr>';
                     var tr = document.createElement('tr');
@@ -566,6 +602,11 @@
                 table.appendChild(tbody);
             body.appendChild(table);
 
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             var timeTable = document.createElement('table');
                 timeTable.id = 'time';
@@ -676,6 +717,11 @@
 
             body.appendChild(timeTable);
 
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             var acTable = document.createElement('table');
                 acTable.id = 'department';
@@ -728,7 +774,11 @@
 
             body.appendChild(acTable);
 
-            //
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             var acTable = document.createElement('table');
                 acTable.id = 'college';
@@ -766,7 +816,11 @@
 
             body.appendChild(acTable);
 
-            //
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
 
             var acTable = document.createElement('table');
                 acTable.id = 'grade';
@@ -813,22 +867,35 @@
                 acTable.appendChild(acTbody);
 
             body.appendChild(acTable);
-/*
-            document.querySelector('#customers').classList.add('hide');
-            document.querySelector('#prodcuts').classList.add('hide');
-            document.querySelector('#time').classList.add('hide');
-            document.querySelector('#department').classList.add('hide');
-            document.querySelector('#college').classList.add('hide');
-            document.querySelector('#grade').classList.add('hide');
-*/
-            document.querySelector('button[name="customers"]').disabled = '';
-            document.querySelector('button[name="prodcuts"]').disabled = '';
-            document.querySelector('button[name="time"]').disabled = '';
-            document.querySelector('button[name="department"]').disabled = '';
-            document.querySelector('button[name="college"]').disabled = '';
-            document.querySelector('button[name="grade"]').disabled = '';
+
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+/*******************************************************/
+
+            var buttons = document.querySelectorAll('button');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = '';
+            }
 
         });
+    });
+
+    $(function() {
+        var buttons = document.querySelectorAll('button');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].disabled = 'disabled';
+        }
+
+        $('button').on('click', function(ev){
+            var tables = document.querySelectorAll('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].classList.add('hide');
+            }
+            document.getElementById(this.name).classList.remove('hide');
+        });
+
     });
 
     function tC(num){
@@ -836,58 +903,6 @@
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         return '$' + parts.join('.');
     }
-
-    $(function() {
-        document.querySelector('button[name="customers"]').disabled = 'disabled';
-        document.querySelector('button[name="prodcuts"]').disabled = 'disabled';
-        document.querySelector('button[name="time"]').disabled = 'disabled';
-        document.querySelector('button[name="department"]').disabled = 'disabled';
-        document.querySelector('button[name="college"]').disabled = 'disabled';
-        document.querySelector('button[name="grade"]').disabled = 'disabled';
-
-        $('button[name="customers"]').on('click', function(ev){
-            var tables = document.querySelectorAll('table');
-            for (var i = 0; i < tables.length; i++) {
-                tables[i].classList.add('hide');
-            }
-            document.querySelector('#customers').classList.remove('hide');
-        });
-        $('button[name="prodcuts"]').on('click', function(ev){
-            var tables = document.querySelectorAll('table');
-            for (var i = 0; i < tables.length; i++) {
-                tables[i].classList.add('hide');
-            }
-            document.querySelector('#prodcuts').classList.remove('hide');
-        });
-        $('button[name="time"]').on('click', function(ev){
-            var tables = document.querySelectorAll('table');
-            for (var i = 0; i < tables.length; i++) {
-                tables[i].classList.add('hide');
-            }
-            document.querySelector('#time').classList.remove('hide');
-        });
-        $('button[name="department"]').on('click', function(ev){
-            var tables = document.querySelectorAll('table');
-            for (var i = 0; i < tables.length; i++) {
-                tables[i].classList.add('hide');
-            }
-            document.querySelector('#department').classList.remove('hide');
-        });
-        $('button[name="college"]').on('click', function(ev){
-            var tables = document.querySelectorAll('table');
-            for (var i = 0; i < tables.length; i++) {
-                tables[i].classList.add('hide');
-            }
-            document.querySelector('#college').classList.remove('hide');
-        });
-        $('button[name="grade"]').on('click', function(ev){
-            var tables = document.querySelectorAll('table');
-            for (var i = 0; i < tables.length; i++) {
-                tables[i].classList.add('hide');
-            }
-            document.querySelector('#grade').classList.remove('hide');
-        });
-    });
 
 </script>
 <style>
@@ -931,6 +946,9 @@
 <body>
     <button type="button" name="customers">
         顧客
+    </button>
+    <button type="button" name="merchants">
+        廠商
     </button>
     <button type="button" name="prodcuts">
         商品

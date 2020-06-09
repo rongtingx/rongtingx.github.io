@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
-        <title>投票輔助系統 VAA</title>
+        <title>宜中投票輔助系統 VAA</title>
         <!--jquery-->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <!--時間處理插件-->
@@ -326,14 +326,14 @@
 
                         //console.log(postData);
 
-                    $.ajax({
-                        type: 'post',
-                        data: postData,
-                        url: 'https://script.google.com/macros/s/AKfycbxX8KJ65_pn8TkIKhEHaVSrqvzEWOD2esgimi_ZKUxJAiu975tC/exec',
-                        success: function(e) {
-                            alert(e);
-                        }
-                    });
+                        $.ajax({
+                            type: 'post',
+                            data: postData,
+                            url: 'https://script.google.com/macros/s/AKfycbxX8KJ65_pn8TkIKhEHaVSrqvzEWOD2esgimi_ZKUxJAiu975tC/exec',
+                            success: function(e) {
+                                alert(e);
+                            }
+                        });
 
                         render(userData, list);
 
@@ -518,15 +518,18 @@
                 background-color: #EEE;
                 padding: 1.5em;
             }
+
             .a1container,.a1.row, .a1_text {
                 display: flex;
                 align-items: center;
             }
+
             .a1container {
                 flex-direction: column;
                 justify-content: center;
                 width: 100%;
             }
+
             .a1.row {
                 width: 100%;
                 padding: 1em;
@@ -534,39 +537,49 @@
                 border: 0.05em #999 solid;
                 border-radius: 0.5em;
             }
+
             .a1.row:hover {
                 background-color: #EEE;
             }
+
             .a1.row > label, .a1_text {
                 height: 100%;
                 width: 100%;
             }
+
             .component {
                 width: 3em;
             }
+
             input.component {
                 text-align: center;
                 -moz-appearance: textfield;
             }
+
             input.component::-webkit-inner-spin-button {
                 -moz-appearance: textfield;
                 -webkit-appearance: none;
             }
+
             .description, .warning {
                 font-size: 0.8em;
                 font-size: 0.8em;
             }
+
             .warning {
                 margin-bottom: 1em;
                 color: #F00;
                 font-weight: 700;
             }
+
             .container {
                 display: flex;
             }
+
             .container.multiple {
                 flex-direction: column;
             }
+
             .button {
                 display: flex;
                 border: 0.05em #999 solid;
@@ -575,10 +588,12 @@
                 padding: 1em;
                 padding-left: 2em;
             }
+
             .button.multiple {
                 width: 100%;
                 margin: 0.1em;
             }
+
             @media screen and (min-width: 667px) {
                 .container.single {
                     flex-direction: row;
@@ -590,7 +605,12 @@
                     text-align: center;
                     padding-left: 1em;
                 }
+                .row.p select {
+                    font-size: 2em;
+                    padding: 0.25em;
+                }
             }
+
             @media screen and (max-width: 667px) {
                 .container.single {
                     flex-direction: column;
@@ -599,52 +619,66 @@
                     width: 100%;
                     margin: 0.1em;
                 }
+                .row.p select {
+                    font-size: 1em;
+                    padding-top: 1em;
+                    padding-bottom: 1em;
+                }
             }
+
             .button:hover {
                 background-color: #999;
                 color: #FFF;
             }
+
             .button.active:hover {
                 background-color: #000;
                 color: #FFF;
             }
+
             .button.active {
                 font-weight: 1000;
             }
+
             .button .icon {
                 display: none;
                 height: 100%;
                 margin-right: 1em;
                 height: 100%;
             }
+
             .button.active .icon {
                 display: flex;
                 justify-content: center;
                 align-items: center;
             }
+
             .icon::before {
                 content: 'V';
             }
+
             section {
                 padding-bottom: 2em;
                 border-bottom: 0.05em #999 solid;
             }
+
             .container.p {
                 display: flex;
                 flex-direction: row;
                 justify-content: center;
                 align-items: center;
             }
+
             .row.p {
                 margin-left: 1em;
                 margin-right: 1em;
                 width: 100%;
             }
+
             .row.p select {
                 width: 100%;
-                font-size: 1.5em;
-                padding: 0.25em;
             }
+
             button#submit {
                 display: flex;
                 border: 0.05em #999 solid;
@@ -656,17 +690,21 @@
                 width: 50%;
                 text-align: center;
             }
+
             button#submit:hover {
                 background-color: #999;
                 color: #FFF;
             }
+
             .s {
                 padding: 0;
             }
+
             #result-render section:nth-last-of-type(1) {
                 padding-bottom: 0em;
                 border-bottom: 0;
             }
+
             footer {
                 font-size: 0.8em;
                 padding-top: 1.5em;
@@ -677,7 +715,9 @@
     </head>
     <body>
         <header>
-            <h1>宜蘭高中自治會<br>會長、副會長投票輔助系統 VAA</h1>
+            <h1>
+                宜蘭高中學生自治會<br>會長副會長選舉投票輔助系統 VAA
+            </h1>
         </header>
         <div id="main">
             <form>
@@ -690,9 +730,13 @@
                             <li>
                                 選舉公報：<a href="https://drive.google.com/file/d/16N08wGcBWGdydw-1AG7TTC0B_8jr9VqH/view?usp=sharing" target="_blank">點我</a>
                             </li>
-                            <li>投票時間：6.18 (四) 8:00-12:30</li>
+                            <li>
+                                投票時間：<a href="https://drive.google.com/file/d/1kJveFggulY-FfzJGrv0giax3gM1H8bKh/view" target="_blank">點我</a>
+                                （民國 109 年 6 月 18 日星期四）
+                            </li>
                             <li>投票地點：活動中心</li>
-                        </ul></div>
+                        </ul>
+                    </div>
                 </section>
                 <section id="intro">
                     <h2>
@@ -700,7 +744,8 @@
                     </h2>
                     <div class="outline">
                         <p>投票輔助系統（VAA，Voting Aid Application），旨在以簡單、方便的方式，提供選民了解候選人與自身對於各議題立場的遠近，作為投票之參考，得以更有效率的投下神聖的一票，並促進校園議題討論，以落實學生自治、校園民主的核心價值。</p>
-                        <p>本次共有 4 組候選人，選委會一共蒐集到 k 組候選人表態，填答率 n%。</p></div>
+                        <p>本次共有 4 組候選人，選委會一共蒐集到 k 組候選人表態，填答率 n%。</p>
+                    </div>
                 </section>
                 <section id="instruction">
                     <h2>
@@ -709,71 +754,83 @@
                     <div class="outline">
                         <p>本問卷共有七題。</p>
                         <p>在完成填答並送出後，系統將根據您的填答，計算您與候選人的立場相似度，並將結果呈現排列於頁末。</p>
-                        <p>如有任何疑慮或建議，請親洽選委，並請不吝提供給選委會，謝謝！</p></div>
+                        <p>如有任何疑慮或建議，請親洽選委，並請不吝提供給選委會，謝謝！</p>
+                    </div>
                 </section>
-
-<section id="a1">
-    <h2>第一題</h2>
-    <h3>在接下來的一年中，您認為：自治會會長的任務，按照重要性高低的排序為何？</h3>
-    <p class="description">請按 1 到 5 排序（可使用上下鍵移動或輸入排序移動位置，結果以文字順序為準），1 為最重要，5 為最不重要。</p>
-    <div class="warning"></div>
-    <div class="a1container">
-        <div class="a1 row" id="a1_0">
-            <label for="a1_input_0">
-                <div class="a1_text">向校方爭取權益</div>
-            </label>
-            <button type="button" class="component up">↑</button>
-            <button type="button" class="component down">↓</button>
-            <input type="number" class="component input" id="a1_input_0" value="1">
-            <button type="button" class="component go">Go</button>
-        </div>
-        <div class="a1 row" id="a1_1">
-            <label for="a1_input_1">
-                <div class="a1_text">對社會議題進行表態、倡議</div>
-            </label>
-            <button type="button" class="component up">↑</button>
-            <button type="button" class="component down">↓</button>
-            <input type="number" class="component input" id="a1_input_1" value="2">
-            <button type="button" class="component go">Go</button>
-        </butt></div>
-        <div class="a1 row" id="a1_2">
-            <label for="a1_input_2">
-                <div class="a1_text">提供平台，串連校內學生資源</div>
-            </label>
-            <button type="button" class="component up">↑</button>
-            <button type="button" class="component down">↓</button>
-            <input type="number" class="component input" id="a1_input_2" value="3">
-            <button type="button" class="component go">Go</button>
-        </div>
-        <div class="a1 row" id="a1_3">
-            <label for="a1_input_3">
-                <div class="a1_text">舉辦全校性講座或活動</div>
-            </label>
-            <button type="button" class="component up">↑</button>
-            <button type="button" class="component down">↓</button>
-            <input type="number" class="component input" id="a1_input_3" value="4">
-            <button type="button" class="component go">Go
-        </butt></div>
-        <div class="a1 row" id="a1_4">
-            <label for="a1_input_4">
-                <div class="a1_text">資訊公開，例如：公開學生會內部會議紀錄、或與校方的會議紀錄</div>
-            </label>
-            <button type="button" class="component up">↑</button>
-            <button type="button" class="component down">↓</button>
-            <input type="number" class="component input" id="a1_input_4" value="5">
-            <button type="button" class="component go">Go</button>
-        </div>
-    </div>
-</section>
+                <section id="a1">
+                    <h2>第一題</h2>
+                    <h3>在接下來的一年中，您認為：自治會會長的任務，按照重要性高低的排序為何？</h3>
+                    <p class="description">請按 1 到 5 排序（可使用上下鍵移動或輸入排序移動位置，結果以文字順序為準），1 為最重要，5 為最不重要。</p>
+                    <div class="warning"></div>
+                    <div class="a1container">
+                        <div class="a1 row" id="a1_0">
+                            <label for="a1_input_0">
+                                <div class="a1_text">向校方爭取權益</div>
+                            </label>
+                            <button type="button" class="component up">↑</button>
+                            <button type="button" class="component down">↓</button>
+                            <input type="number" class="component input" id="a1_input_0" value="1">
+                            <button type="button" class="component go">Go</button>
+                        </div>
+                        <div class="a1 row" id="a1_1">
+                            <label for="a1_input_1">
+                                <div class="a1_text">對社會議題進行表態、倡議</div>
+                            </label>
+                            <button type="button" class="component up">↑</button>
+                            <button type="button" class="component down">↓</button>
+                            <input type="number" class="component input" id="a1_input_1" value="2">
+                            <button type="button" class="component go">Go</button>
+</butt></div>
+<div class="a1 row" id="a1_2">
+    <label for="a1_input_2">
+        <div class="a1_text">提供平台，串連校內學生資源</div>
+    </label>
+    <button type="button" class="component up">↑</button>
+    <button type="button" class="component down">↓</button>
+    <input type="number" class="component input" id="a1_input_2" value="3">
+    <button type="button" class="component go">Go</button>
+</div>
+<div class="a1 row" id="a1_3">
+    <label for="a1_input_3">
+        <div class="a1_text">舉辦全校性講座或活動</div>
+    </label>
+    <button type="button" class="component up">↑</button>
+    <button type="button" class="component down">↓</button>
+    <input type="number" class="component input" id="a1_input_3" value="4">
+    <button type="button" class="component go">Go
+        
+</butt></div>
+<div class="a1 row" id="a1_4">
+    <label for="a1_input_4">
+        <div class="a1_text">資訊公開，例如：公開學生會內部會議紀錄、或與校方的會議紀錄</div>
+    </label>
+    <button type="button" class="component up">↑</button>
+    <button type="button" class="component down">↓</button>
+    <input type="number" class="component input" id="a1_input_4" value="5">
+    <button type="button" class="component go">Go</button>
+</div>
+</div></section>
 <section id="a2">
     <h2>第二題</h2>
     <h3>面對與學生身份無關、且學生意見分歧之議題（例如：廢除死刑議題）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
     <div class="warning"></div>
     <div class="container single">
-        <div class="button single a2" id="a2_0"><div class="icon"></div>一定不行</div>
-        <div class="button single a2" id="a2_1"><div class="icon"></div>偏向不行</div>
-        <div class="button single a2" id="a2_2"><div class="icon"></div>偏向可以</div>
-        <div class="button single a2" id="a2_3"><div class="icon"></div>一定可以</div>
+        <div class="button single a2" id="a2_0">
+            <div class="icon"></div>
+            一定不行
+        </div>
+        <div class="button single a2" id="a2_1">
+            <div class="icon"></div>
+            偏向不行
+        </div>
+        <div class="button single a2" id="a2_2">
+            <div class="icon"></div>
+            偏向可以
+        </div>
+        <div class="button single a2" id="a2_3">
+            <div class="icon"></div>
+            一定可以
+        </div>
     </div>
 </section>
 <section id="a3">
@@ -781,10 +838,22 @@
     <h3>面對與學生身份無關、但學生意見普遍一致之議題（例如：婚姻平權議題）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
     <div class="warning"></div>
     <div class="container single">
-        <div class="button single a3" id="a3_0"><div class="icon"></div>一定不行</div>
-        <div class="button single a3" id="a3_1"><div class="icon"></div>偏向不行</div>
-        <div class="button single a3" id="a3_2"><div class="icon"></div>偏向可以</div>
-        <div class="button single a3" id="a3_3"><div class="icon"></div>一定可以</div>
+        <div class="button single a3" id="a3_0">
+            <div class="icon"></div>
+            一定不行
+        </div>
+        <div class="button single a3" id="a3_1">
+            <div class="icon"></div>
+            偏向不行
+        </div>
+        <div class="button single a3" id="a3_2">
+            <div class="icon"></div>
+            偏向可以
+        </div>
+        <div class="button single a3" id="a3_3">
+            <div class="icon"></div>
+            一定可以
+        </div>
     </div>
 </section>
 <section id="a4">
@@ -792,10 +861,22 @@
     <h3>面對與學生身份有關、但學生意見分歧之議題（例如：穿著制服上課）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
     <div class="warning"></div>
     <div class="container single">
-        <div class="button single a4" id="a4_0"><div class="icon"></div>一定不行</div>
-        <div class="button single a4" id="a4_1"><div class="icon"></div>偏向不行</div>
-        <div class="button single a4" id="a4_2"><div class="icon"></div>偏向可以</div>
-        <div class="button single a4" id="a4_3"><div class="icon"></div>一定可以</div>
+        <div class="button single a4" id="a4_0">
+            <div class="icon"></div>
+            一定不行
+        </div>
+        <div class="button single a4" id="a4_1">
+            <div class="icon"></div>
+            偏向不行
+        </div>
+        <div class="button single a4" id="a4_2">
+            <div class="icon"></div>
+            偏向可以
+        </div>
+        <div class="button single a4" id="a4_3">
+            <div class="icon"></div>
+            一定可以
+        </div>
     </div>
 </section>
 <section id="a5">
@@ -803,23 +884,48 @@
     <h3>面對與學生身份有關、且學生意見普遍一致之議題（例如：自行訂購外食）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
     <div class="warning"></div>
     <div class="container single">
-        <div class="button single a5" id="a5_0"><div class="icon"></div>一定不行</div>
-        <div class="button single a5" id="a5_1"><div class="icon"></div>偏向不行</div>
-        <div class="button single a5" id="a5_2"><div class="icon"></div>偏向可以</div>
-        <div class="button single a5" id="a5_3"><div class="icon"></div>一定可以</div>
+        <div class="button single a5" id="a5_0">
+            <div class="icon"></div>
+            一定不行
+        </div>
+        <div class="button single a5" id="a5_1">
+            <div class="icon"></div>
+            偏向不行
+        </div>
+        <div class="button single a5" id="a5_2">
+            <div class="icon"></div>
+            偏向可以
+        </div>
+        <div class="button single a5" id="a5_3">
+            <div class="icon"></div>
+            一定可以
+        </div>
     </div>
 </section>
 <section id="a6">
     <h2>第六題</h2>
     <h3>您認為，自治會與校方之間的關係，應該要比較接近以下哪一種？</h3>
-    <p class="description">橋樑式：協調為主（傾向採取溫和的、體制內的手段，例如出席校內會議、與校內行政人員磋商）<br>
-    工會式：抗爭為主（傾向採取激進的、體制外的手段，例如發文抗議、發起連署、佔領處室）</p>
+    <p class="description">
+        橋樑式：協調為主（傾向採取溫和的、體制內的手段，例如出席校內會議、與校內行政人員磋商）<br>工會式：抗爭為主（傾向採取激進的、體制外的手段，例如發文抗議、發起連署、佔領處室）
+    </p>
     <div class="warning"></div>
     <div class="container single">
-        <div class="button single a6" id="a6_0"><div class="icon"></div>橋樑式學生會</div>
-        <div class="button single a6" id="a6_1"><div class="icon"></div>較偏向橋樑式學生會</div>
-        <div class="button single a6" id="a6_2"><div class="icon"></div>較偏向工會式學生會</div>
-        <div class="button single a6" id="a6_3"><div class="icon"></div>工會式學生會</div>
+        <div class="button single a6" id="a6_0">
+            <div class="icon"></div>
+            橋樑式學生會
+        </div>
+        <div class="button single a6" id="a6_1">
+            <div class="icon"></div>
+            較偏向橋樑式學生會
+        </div>
+        <div class="button single a6" id="a6_2">
+            <div class="icon"></div>
+            較偏向工會式學生會
+        </div>
+        <div class="button single a6" id="a6_3">
+            <div class="icon"></div>
+            工會式學生會
+        </div>
     </div>
 </section>
 <section id="a7">
@@ -828,23 +934,74 @@
     <p class="description">請選至少 1 個、至多 2 個選項。再點一次已選的選項即可取消選取。</p>
     <div class="warning"></div>
     <div class="container multiple">
-        <div class="button multiple a7" id="a7_0"><div class="icon"></div>康樂活動（例：體育競賽、手遊比賽）</div>
-        <div class="button multiple a7" id="a7_1"><div class="icon"></div>講座活動（例：專題講座、各領域人物演講分享經驗）</div>
-        <div class="button multiple a7" id="a7_2"><div class="icon"></div>商品創作與銷售（例：校T、書包、紀念品、宜中卡）</div>
-        <div class="button multiple a7" id="a7_3"><div class="icon"></div>監督自治會與資訊公開（例：自治會運作透明化、財務公開）</div>
-        <div class="button multiple a7" id="a7_4"><div class="icon"></div>藝文活動（例：藝文、音樂活動、戲劇比賽）</div>
-        <div class="button multiple a7" id="a7_5"><div class="icon"></div>校園環保（例：加強校園整潔、園遊會非塑膠餐具）</div>
-        <div class="button multiple a7" id="a7_6"><div class="icon"></div>跨校交流（例：跨校性活動、各領域交流）</div>
-        <div class="button multiple a7" id="a7_7"><div class="icon"></div>服儀規範與校服款式（例：段考穿著短褲應試、修改運動服長褲）</div>
-        <div class="button multiple a7" id="a7_8"><div class="icon"></div>校務資訊追蹤（例：工程建設進度、體育館興建、校產監督）</div>
-        <div class="button multiple a7" id="a7_9"><div class="icon"></div>社團活動（例：社團博覽會、社辦場地）</div>
-        <div class="button multiple a7" id="a7_10"><div class="icon"></div>在校學習（例：第八節輔導課形式、到校時間調整）</div>
-        <div class="button multiple a7" id="a7_11"><div class="icon"></div>校園設備改善與增設（例：飲水機、課桌椅、球場設備）</div>
-        <div class="button multiple a7" id="a7_12"><div class="icon"></div>學生意見表達（例：請願機制、留言箱設置）</div>
-        <div class="button multiple a7" id="a7_13"><div class="icon"></div>校務參與（例：校級會議學生代表席次增加、與校長有約）</div>
-        <div class="button multiple a7" id="a7_14"><div class="icon"></div>對外開放性活動（例：歲末聯歡、園遊會）</div>
-        <div class="button multiple a7" id="a7_15"><div class="icon"></div>校外議題倡議（例：國際議題、永續發展目標、飢餓十二）</div>
-        <div class="button multiple a7" id="a7_16"><div class="icon"></div>校園餐飲（例：學生自行外訂、販賣機、增售熱食、增加便當廠商與種類）</div>
+        <div class="button multiple a7" id="a7_0">
+            <div class="icon"></div>
+            康樂活動（例：體育競賽、手遊比賽）
+        </div>
+        <div class="button multiple a7" id="a7_1">
+            <div class="icon"></div>
+            講座活動（例：專題講座、各領域人物演講分享經驗）
+        </div>
+        <div class="button multiple a7" id="a7_2">
+            <div class="icon"></div>
+            商品創作與銷售（例：校T、書包、紀念品、宜中卡）
+        </div>
+        <div class="button multiple a7" id="a7_3">
+            <div class="icon"></div>
+            監督自治會與資訊公開（例：自治會運作透明化、財務公開）
+        </div>
+        <div class="button multiple a7" id="a7_4">
+            <div class="icon"></div>
+            藝文活動（例：藝文、音樂活動、戲劇比賽）
+        </div>
+        <div class="button multiple a7" id="a7_5">
+            <div class="icon"></div>
+            校園環保（例：加強校園整潔、園遊會非塑膠餐具）
+        </div>
+        <div class="button multiple a7" id="a7_6">
+            <div class="icon"></div>
+            跨校交流（例：跨校性活動、各領域交流）
+        </div>
+        <div class="button multiple a7" id="a7_7">
+            <div class="icon"></div>
+            服儀規範與校服款式（例：段考穿著短褲應試、修改運動服長褲）
+        </div>
+        <div class="button multiple a7" id="a7_8">
+            <div class="icon"></div>
+            校務資訊追蹤（例：工程建設進度、體育館興建、校產監督）
+        </div>
+        <div class="button multiple a7" id="a7_9">
+            <div class="icon"></div>
+            社團活動（例：社團博覽會、社辦場地）
+        </div>
+        <div class="button multiple a7" id="a7_10">
+            <div class="icon"></div>
+            在校學習（例：第八節輔導課形式、到校時間調整）
+        </div>
+        <div class="button multiple a7" id="a7_11">
+            <div class="icon"></div>
+            校園設備改善與增設（例：飲水機、課桌椅、球場設備）
+        </div>
+        <div class="button multiple a7" id="a7_12">
+            <div class="icon"></div>
+            學生意見表達（例：請願機制、留言箱設置）
+        </div>
+        <div class="button multiple a7" id="a7_13">
+            <div class="icon"></div>
+            校務參與（例：校級會議學生代表席次增加、與校長有約）
+        </div>
+        <div class="button multiple a7" id="a7_14">
+            <div class="icon"></div>
+            對外開放性活動（例：歲末聯歡、園遊會）
+        </div>
+        <div class="button multiple a7" id="a7_15">
+            <div class="icon"></div>
+            校外議題倡議（例：國際議題、永續發展目標、飢餓十二）
+        </div>
+        <div class="button multiple a7" id="a7_16">
+            <div class="icon"></div>
+            校園餐飲（例：學生自行外訂、販賣機、增售熱食、增加便當廠商與種類）
+        </div>
     </div>
 </section>
 <section id="p">
@@ -852,6 +1009,7 @@
     <div class="container p">
         <div class="row p">
             年級：
+            
             <select name="grade" id="p1_answer">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -860,6 +1018,7 @@
         </div>
         <div class="row p">
             班級：
+            
             <select name="grade" id="p2_answer">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -880,17 +1039,17 @@
         </div>
         <div class="row p">
             性別：
+            
             <select name="sex" id="p3_answer">
                 <option value="1">生理男</option>
                 <option value="2">生理女</option>
             </select>
-        <div>
-    </div>
+            <div></div>
 </section>
-<section class="s"><button type="button" id="submit">開始計算</button></section>
-</form>
-</div>
-
+<section class="s">
+    <button type="button" id="submit">開始計算</button>
+</section>
+</form></div>
 <div id="result">
     <h1>測驗結果</h1>
     <div id="result-render">你還沒填完問卷……</div>

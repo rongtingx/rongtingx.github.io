@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+        <title>投票輔助系統 VAA</title>
+        <!--jquery-->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <!--時間處理插件-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+        <!--CSS-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet" type="text/css">
+        <script>
+            $(function() {
+                let list = [];
+                getList();
+
+                function getList() {
+                    const dataset = '10L5wiz0iwG1ZGkvMYlnJYBZFfYZO-VsxS5VsoU0bGOA';
+                    const datasetNumber = '1';
+                    $.get("https://spreadsheets.google.com/feeds/list/" + dataset + "/" + datasetNumber + "/public/values?alt=json").then(function(data) {
+                        readData(data);
+                    }).then(main);
+                    return;
+                }
+                function readData(data) {
+                    let d = data.feed.entry;
+                    for (let i = 0; i < d.length; i++) {
+                        let name = d[i].gsx$name.$t;
+                        //console.log(name);
+                        if (name == '#N/A') {
+                            break;
+                        }
+                        let number = parseInt(d[i].gsx$number.$t);
+                        //console.log(d[i].gsx$obj.$t);
+                        let obj = JSON.parse(d[i].gsx$obj.$t);
+                        let d1 = d[i].gsx$d1.$t;
+                        let d2 = d[i].gsx$d2.$t;
+                        let d3 = d[i].gsx$d3.$t;
+                        let d4 = d[i].gsx$d4.$t;
+                        let d5 = d[i].gsx$d5.$t;
+                        let d6 = d[i].gsx$d6.$t;
+                        let d7 = d[i].gsx$d7.$t;
+                        let dother = d[i].gsx$dother.$t;
+                        list.push({
+                            'name': name,
+                            'number': number,
+                            'd1': d1,
+                            'd2': d2,
+                            'd3': d3,
+                            'd4': d4,
+                            'd5': d5,
+                            'd6': d6,
+                            'd7': d7,
+                            'dother': dother,
+                            'obj': obj,
+                        });
+                        //console.log(list);
+                    }
+                    return;
+                }
+
+                function main() {
+                    //console.log(list);
+
+                    const a1 = Array.from(document.querySelectorAll('div.a1'));
+
+                    const a2 = document.querySelectorAll('div.a2');
+                    const a3 = document.querySelectorAll('div.a3');
+                    const a4 = document.querySelectorAll('div.a4');
+                    const a5 = document.querySelectorAll('div.a5');
+                    const a6 = document.querySelectorAll('div.a6');
+                    const a7 = document.querySelectorAll('div.a7');
+
+                    const up = document.querySelectorAll('.up');
+                    const down = document.querySelectorAll('.down');
+                    const go = document.querySelectorAll('.go');
+
+                    //console.log(a1)
+                    //console.log(up)
+                    //console.log(down)
+                    //console.log(go)
+
+                    up.forEach(function(item) {
+                        let opts = [];
+                        item.addEventListener('click', function() {
+                            opts = Array.from(document.querySelectorAll('div.a1'));
+                            //console.log(opts);
+                            let opt = this.parentNode;
+                            let pivotIndex = (opts.indexOf(opt) - 1 < 0 ? 0 : opts.indexOf(opt) - 1)
+                            //console.log(pivotIndex)
+                            let pivot = opts[pivotIndex];
+                            //console.log(pivot)
+                            //console.log(opt)
+                            opt.parentNode.insertBefore(opt, pivot);
+                            opts = Array.from(document.querySelectorAll('div.a1'));
+                            for (var i = 0; i < opts.length; i++) {
+                                opts[i].querySelector('input').value = i + 1;
+                            }
+                            //console.log(a1);
+                            //console.log(opts);
+                        });
+                    });
+
+                    down.forEach(function(item) {
+                        let opts = [];
+                        item.addEventListener('click', function() {
+                            opts = Array.from(document.querySelectorAll('div.a1'));
+                            //console.log(opts);
+                            let opt = this.parentNode;
+                            let pivotIndex = (opts.indexOf(opt) + 2 > opts.length ? opts.length : opts.indexOf(opt) + 2)
+                            //console.log(pivotIndex)
+                            let pivot = opts[pivotIndex];
+                            //console.log(pivot)
+                            //console.log(opt)
+                            opt.parentNode.insertBefore(opt, pivot);
+                            opts = Array.from(document.querySelectorAll('div.a1'));
+                            for (var i = 0; i < opts.length; i++) {
+                                opts[i].querySelector('input').value = i + 1;
+                            }
+                            //console.log(a1);
+                            //console.log(opts);
+                        });
+                    });
+
+                    go.forEach(function(item) {
+                        let opts = [];
+                        item.addEventListener('click', function() {
+                            opts = Array.from(document.querySelectorAll('div.a1'));
+                            //console.log(opts);
+                            let opt = this.parentNode;
+                            let pivotIndex = 0
+                            if (opts.indexOf(opt) < parseInt(this.parentNode.querySelector('input').value)) {
+                                pivotIndex = parseInt(this.parentNode.querySelector('input').value);
+                            } else {
+                                pivotIndex = parseInt(this.parentNode.querySelector('input').value - 1);
+                            }
+                            //console.log(this.parentNode.querySelector('input').value)
+                            //console.log(pivotIndex)
+                            let pivot = opts[pivotIndex];
+                            //console.log(pivot)
+                            //console.log(opt)
+                            opt.parentNode.insertBefore(opt, pivot);
+                            opts = Array.from(document.querySelectorAll('div.a1'));
+                            for (var i = 0; i < opts.length; i++) {
+                                opts[i].querySelector('input').value = i + 1;
+                            }
+                            //console.log(a1);
+                            //console.log(opts);
+                        });
+                    });
+
+                    const singleButtonDiv = document.querySelectorAll('.button.single');
+                    const multipleButtonDiv = document.querySelectorAll('.button.multiple');
+
+                    singleButtonDiv.forEach(function(item) {
+                        item.addEventListener('click', function() {
+                            this.parentNode.parentNode.querySelector('.warning').innerHTML = '';
+                            let activeOpt = this.parentNode.querySelectorAll('.active');
+                            if (activeOpt.length != 0) {
+                                activeOpt.forEach(function(n) {
+                                    n.classList.remove('active');
+                                });
+                            }
+                            this.classList.add('active');
+                            //console.log(document.querySelectorAll('.active'))
+                        });
+                    });
+
+                    multipleButtonDiv.forEach(function(item) {
+                        item.addEventListener('click', function() {
+                            this.parentNode.parentNode.querySelector('.warning').innerHTML = '';
+                            if (this.classList.contains('active')) {
+                                this.classList.remove('active');
+                                return;
+                            }
+                            this.classList.add('active');
+                            let activeOpt = this.parentNode.querySelectorAll('.active');
+                            if (activeOpt.length > 2) {
+                                this.classList.remove('active');
+                                this.parentNode.parentNode.querySelector('.warning').innerHTML = '第七題最多只能選擇兩個選項！';
+                                alert('第七題最多只能選擇兩個選項！');
+                                return;
+                            }
+                            //console.log(document.querySelectorAll('.active'))
+                        });
+                    });
+
+                    const submitBtn = document.querySelector('button#submit');
+
+                    submitBtn.addEventListener('click', submit);
+
+                    function submit() {
+                        let a1 = [];
+                        let a2 = NaN;
+                        let a3 = NaN;
+                        let a4 = NaN;
+                        let a5 = NaN;
+                        let a6 = NaN;
+                        let a7 = [];
+
+                        let a1Opts = document.querySelectorAll('div.a1');
+                        for (let i = 0; i < a1Opts.length; i++) {
+                            a1.push(parseInt(a1Opts[i].id.split('_')[1]));
+                        }
+
+                        if (document.querySelectorAll('div.button.a2.active').length != 1) {
+                            document.querySelector('#a2').querySelector('.warning').innerHTML = '第二題必須選擇一個選項！';
+                        }
+                        if (document.querySelectorAll('div.button.a3.active').length != 1) {
+                            document.querySelector('#a3').querySelector('.warning').innerHTML = '第三題必須選擇一個選項！';
+                        }
+                        if (document.querySelectorAll('div.button.a4.active').length != 1) {
+                            document.querySelector('#a4').querySelector('.warning').innerHTML = '第四題必須選擇一個選項！';
+                        }
+                        if (document.querySelectorAll('div.button.a5.active').length != 1) {
+                            document.querySelector('#a5').querySelector('.warning').innerHTML = '第五題必須選擇一個選項！';
+                        }
+                        if (document.querySelectorAll('div.button.a6.active').length != 1) {
+                            document.querySelector('#a6').querySelector('.warning').innerHTML = '第六題必須選擇一個選項！';
+                        }
+                        if (document.querySelectorAll('div.button.a7.active').length < 1) {
+                            document.querySelector('#a7').querySelector('.warning').innerHTML = '第七題必須選擇一個選項！';
+                        }
+
+                        if (document.querySelectorAll('div.button.a2.active').length != 1) {
+                            alert('第二題必須選擇一個選項！');
+                            return;
+                        }
+                        if (document.querySelectorAll('div.button.a3.active').length != 1) {
+                            alert('第三題必須選擇一個選項！');
+                            return;
+                        }
+                        if (document.querySelectorAll('div.button.a4.active').length != 1) {
+                            alert('第四題必須選擇一個選項！');
+                            return;
+                        }
+                        if (document.querySelectorAll('div.button.a5.active').length != 1) {
+                            alert('第五題必須選擇一個選項！');
+                            return;
+                        }
+                        if (document.querySelectorAll('div.button.a6.active').length != 1) {
+                            alert('第六題必須選擇一個選項！');
+                            return;
+                        }
+                        if (document.querySelectorAll('div.button.a7.active').length < 1) {
+                            alert('第七題必須選擇一個選項！');
+                            return;
+                        }
+
+                        a2 = parseInt(document.querySelector('div.button.a2.active').id.split('_')[1]);
+                        a3 = parseInt(document.querySelector('div.button.a3.active').id.split('_')[1]);
+                        a4 = parseInt(document.querySelector('div.button.a4.active').id.split('_')[1]);
+                        a5 = parseInt(document.querySelector('div.button.a5.active').id.split('_')[1]);
+                        a6 = parseInt(document.querySelector('div.button.a6.active').id.split('_')[1]);
+
+                        let a7Opts = Array.from(document.querySelectorAll('div.button.multiple.a7.active'));
+                        a7Opts.forEach(function(opt) {
+                            a7.push(parseInt(opt.id.split('_')[1]));
+                        });
+
+                        let userData = {
+                            'a1': a1,
+                            'a2': a2,
+                            'a3': a3,
+                            'a4': a4,
+                            'a5': a5,
+                            'a6': a6,
+                            'a7': a7,
+                        }
+                        //console.log(userData)
+
+                        /*
+                    const testData = [{
+                                        'name': 'etsttwdvhvzr',
+                                        'number': 1,
+                                        'd1': 'd5ed56rewg1re56g',
+                                        'd2': 'd5ed56rewg1re56g',
+                                        'd3': 'd5ed56rewg1re56g',
+                                        'd4': 'd5ed56rewg1re56g',
+                                        'd5': 'd5ed56rewg1re56g',
+                                        'd6': 'd5ed56rewg1re56g',
+                                        'd7': 'd5ed56rewg1re56g',
+                                        'dother': 'd5ed56rewg1re56g',
+                                        'obj': {
+                                            'a1': [0, 1, 2, 3, 4],
+                                            'a2': 1,
+                                            'a3': 1,
+                                            'a4': 1,
+                                            'a5': 1,
+                                            'a6': 1,
+                                            'a7': [0, 1],
+                                        },
+                                    }, 
+                                    {
+                                        'name': 'fgnnxgfnxgf',
+                                        'number': 2,
+                                        'd1': 'dxgn  xgfgzn dn',
+                                        'd2': 'dxgntfzgtdbfzgvnd ',
+                                        'd3': 'd5ed56rewg1re56g',
+                                        'd4': 'gdxndzx b vng',
+                                        'd5': 'd5ed56rewg1re56g',
+                                        'd6': 'ezdtgbfhfzd',
+                                        'd7': 'd5ed56rewg1re56g',
+                                        'dother': 'tsedrhgsb',
+                                        'obj': {
+                                            'a1': [4, 3, 2, 1, 0],
+                                            'a2': 3,
+                                            'a3': 2,
+                                            'a4': 1,
+                                            'a5': 0,
+                                            'a6': 1,
+                                            'a7': [13, 15],
+                                        },
+                                    }]*/
+
+                        let postData = JSON.parse(JSON.stringify(userData));
+                        postData.a1 = JSON.stringify(postData.a1);
+                        postData.a7 = JSON.stringify(postData.a7);
+                        postData.grade = parseInt(document.querySelector('#p1_answer').options[document.querySelector('#p1_answer').selectedIndex].value);
+                        postData.class = parseInt(document.querySelector('#p2_answer').options[document.querySelector('#p2_answer').selectedIndex].value);
+                        postData.sex = parseInt(document.querySelector('#p3_answer').options[document.querySelector('#p3_answer').selectedIndex].value);
+
+                        postData.method = 'write';
+                        postData.timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
+
+                        //console.log(postData);
+
+                    $.ajax({
+                        type: 'post',
+                        data: postData,
+                        url: 'https://script.google.com/macros/s/AKfycbxX8KJ65_pn8TkIKhEHaVSrqvzEWOD2esgimi_ZKUxJAiu975tC/exec',
+                        success: function(e) {
+                            alert(e);
+                        }
+                    });
+
+                        render(userData, list);
+
+                    }
+
+                    function compareTo(obj1, obj2) {
+                        const a1CostMax = 320;
+                        const denominatorMax = 27;
+                        a1DistMax = Math.pow(a1CostMax / denominatorMax, 1 / 2);
+                        //console.log(a1DistMax)
+                        let a1Cost = 0;
+                        let orderA1Obj1 = [];
+                        let orderA1Obj2 = [];
+                        for (let i = 0; i <= 4; i++) {
+                            orderA1Obj1.push(obj1['a1'].indexOf(i));
+                            orderA1Obj2.push(obj2['a1'].indexOf(i));
+                        }
+                        let a1DistList = [];
+                        let weight = [];
+                        let denominator = 0;
+                        for (let i = 0; i < orderA1Obj2.length; i++) {
+                            a1DistList.push(Math.pow(orderA1Obj1[i] - orderA1Obj2[i], 2));
+                            weight.push(Math.pow((Math.abs(orderA1Obj2[i] - 2) + 1), 2));
+                        }
+                        for (let i = 0; i < a1DistList.length; i++) {
+                            a1Cost += a1DistList[i] * weight[i];
+                            denominator += weight[i];
+                        }
+                        let a1Dist = Math.pow(a1Cost / denominator, 1 / 2);
+                        a1Dist = 1 - a1Dist / a1DistMax;
+                        //console.log(a1Dist)
+
+                        let a2Dist = 1 - Math.abs(toDistValue(obj1['a2']) - toDistValue(obj2['a2'])) / 6;
+                        let a3Dist = 1 - Math.abs(toDistValue(obj1['a3']) - toDistValue(obj2['a3'])) / 6;
+                        let a4Dist = 1 - Math.abs(toDistValue(obj1['a4']) - toDistValue(obj2['a4'])) / 6;
+                        let a5Dist = 1 - Math.abs(toDistValue(obj1['a5']) - toDistValue(obj2['a5'])) / 6;
+                        let a6Dist = 1 - Math.abs(toDistValue(obj1['a6']) - toDistValue(obj2['a6'])) / 6;
+
+                        let a7Match = 0;
+
+                        for (var i = 0; i < obj1['a7'].length; i++) {
+                            //console.log(obj1['a7'][i]);
+                            if (obj2['a7'].indexOf(obj1['a7'][i]) != -1) {
+                                a7Match++;
+                                continue;
+                            }
+                        }
+
+                        let a7Dist = a7Match / obj2['a7'].length;
+
+                        //console.log(a1Dist, a2Dist, a3Dist, a4Dist, a5Dist, a6Dist, a7Dist);
+
+                        const rs = Math.pow((a1Dist * a1Dist * 2 + a2Dist * a2Dist * 1 + a3Dist * a3Dist * 1 + a4Dist * a4Dist * 1 + a5Dist * a5Dist * 1 + a6Dist * a6Dist * 1 + a7Dist * a7Dist * 2) / 9, 1 / 2);
+
+                        return rs;
+                    }
+
+                    function toDistValue(v) {
+                        switch (v) {
+                        case 0:
+                            return -3;
+                        case 1:
+                            return -2;
+                        case 2:
+                            return 2;
+                        case 3:
+                            return 3;
+                        }
+                    }
+
+                    function render(userData, testData) {
+                        document.querySelector('#result-render').innerHTML = '';
+                        const option = {
+                            'a1': ['向校方爭取權益', '對社會議題進行表態、倡議', '提供平台，串連校內學生資源', '舉辦全校性講座或活動', '資訊公開，例如：公開自治會內部會議紀錄、或與校方的會議紀錄'],
+                            'a2': ['一定不行', '偏向不行', '偏向可以', '一定可以'],
+                            'a3': ['一定不行', '偏向不行', '偏向可以', '一定可以'],
+                            'a4': ['一定不行', '偏向不行', '偏向可以', '一定可以'],
+                            'a5': ['一定不行', '偏向不行', '偏向可以', '一定可以'],
+                            'a6': ['完全橋樑式', '較偏向橋樑式', '較偏向工會式', '完全工會式'],
+                            'a7': ['康樂活動（例：體育競賽、手遊比賽）', '講座活動（例：專題講座、各領域人物演講分享經驗）', '商品創作與銷售（例：校T、書包、紀念品、宜中卡）', '監督自治會與資訊公開（例：自治會運作透明化、財務公開）', '藝文活動（例：藝文、音樂活動、戲劇比賽）', '校園環保（例：加強校園整潔、園遊會非塑膠餐具）', '跨校交流（例：跨校性活動、各領域交流）', '服儀規範與校服款式（例：段考穿著短褲應試、修改運動服長褲）', '校務資訊追蹤（例：工程建設進度、體育館興建、校產監督）', '社團活動（例：社團博覽會、社辦場地）', '在校學習（例：第八節輔導課形式、到校時間調整）', '校園設備改善與增設（例：飲水機、課桌椅、球場設備）', '學生意見表達（例：請願機制、留言箱設置）', '校務參與（例：校級會議學生代表席次增加、與校長有約）', '對外開放性活動（例：歲末聯歡、園遊會）', '校外議題倡議（例：國際議題、永續發展目標、飢餓十二）', '校園餐飲（例：學生自行外訂、販賣機、增售熱食、增加便當廠商與種類）'],
+                        }
+
+                        testData.sort(function(a, b) {
+                            return compareTo(userData, b.obj) - compareTo(userData, a.obj);
+                        })
+
+                        for (var i = 0; i < testData.length; i++) {
+                            let rs = '';
+                            rs += '<section>';
+                            rs += '<h2><span>第 ' + (i + 1) + ' 名：' + testData[i].name + '，相似度 ' + (compareTo(userData, testData[i].obj) * 100).toFixed(2) + ' %！</span></h2>';
+                            rs += '<p>這位是 ' + testData[i].number + ' 號候選人。</p>';
+                            rs += '<h3>這位候選人認為...</h3>';
+                            rs += '<p>';
+                            rs += '一、在接下來的一年中，自治會會長的任務，按照重要性高低的排序為：「' + option.a1[testData[i].obj.a1[0]] + '」、「' + option.a1[testData[i].obj.a1[1]] + '」、「' + option.a1[testData[i].obj.a1[2]] + '」、「' + option.a1[testData[i].obj.a1[3]] + '」、「' + option.a1[testData[i].obj.a1[4]] + '」。<br>';
+                            rs += '<br>';
+                            rs += '補充說明：' + (testData[i].d1 == '' ? '無。' : testData[i].d1) + '<br>';
+                            rs += '<br>';
+                            rs += '二、面對與學生身份無關、且學生意見分歧之議題（例如：廢除死刑議題），自治會會長「' + option.a2[testData[i].obj.a2] + '」代表宜中學生進行議題表態。<br>';
+                            rs += '<br>';
+                            rs += '補充說明：' + (testData[i].d2 == '' ? '無。' : testData[i].d2) + '<br>';
+                            rs += '<br>';
+                            rs += '三、面對與學生身份無關、但學生意見普遍一致之議題（例如：婚姻平權議題），自治會會長「' + option.a3[testData[i].obj.a3] + '」代表宜中學生進行議題表態。<br>';
+                            rs += '<br>';
+                            rs += '補充說明：' + (testData[i].d3 == '' ? '無。' : testData[i].d3) + '<br>';
+                            rs += '<br>';
+                            rs += '四、面對與學生身份有關、但學生意見分歧之議題（例如：穿著制服上課），自治會會長「' + option.a4[testData[i].obj.a4] + '」代表宜中學生進行議題表態。<br>';
+                            rs += '<br>';
+                            rs += '補充說明：' + (testData[i].d4 == '' ? '無。' : testData[i].d4) + '<br>';
+                            rs += '<br>';
+                            rs += '五、面對與學生身份有關、且學生意見普遍一致之議題（例如：自行訂購外食），自治會會長「' + option.a5[testData[i].obj.a5] + '」代表宜中學生進行議題表態。<br>';
+                            rs += '<br>';
+                            rs += '補充說明：' + (testData[i].d5 == '' ? '無。' : testData[i].d5) + '<br>';
+                            rs += '<br>';
+                            rs += '六、學生會與校方之間的關係，應該要比較接近「' + option.a6[testData[i].obj.a6] + '」。<br>';
+                            rs += '<br>';
+                            rs += '補充說明：' + (testData[i].d6 == '' ? '無。' : testData[i].d6) + '<br>';
+                            rs += '<br>';
+                            rs += '七、接下來的一年中，最重要、最值得被推動的校園議題類別是：「' + option.a7[testData[i].obj.a7[0]] + (testData[i].obj.a7.length > 1 ? '、「' + option.a7[testData[i].obj.a7[1]] + '」' : '') + '。<br>';
+                            rs += '<br>';
+                            rs += '補充說明：' + (testData[i].d7 == '' ? '無。' : testData[i].d7) + '<br>';
+                            rs += '<br>';
+                            rs += '其他說明與建議：' + (testData[i].dother == '' ? '無。' : testData[i].dother) + '';
+                            rs += '</p>';
+                            rs += '</section>';
+                            document.querySelector('#result-render').innerHTML += rs;
+                        }
+                    }
+                }
+
+            });
+        </script>
+        <style type="text/css">
+            * {
+                box-sizing: border-box;
+                margin-block-start: 0;
+                margin-block-end: 0;
+                margin-inline-start: 0;
+                margin-inline-end: 0;
+            }
+
+            ul {
+                padding-left: 1.5em;
+            }
+
+            p, li {
+                line-height: 1.5;
+            }
+
+            p {
+                margin-bottom: 1em;
+            }
+
+            .outline p:nth-last-of-type(1) {
+                margin-bottom: 0;
+            }
+
+            h2 {
+                margin-top: 1em;
+                margin-bottom: 1em;
+            }
+
+            h3 {
+                margin-top: 0.5em;
+                margin-bottom: 0.5em;
+                line-height: 1.5;
+            }
+
+            body {
+                margin: 2em;
+            }
+
+            .active {
+                background-color: #000;
+                color: #FFF;
+            }
+
+            div.span.row {
+                width: 50%;
+            }
+
+            .outline {
+                background-color: #EEE;
+                padding: 1.5em;
+            }
+            .a1container,.a1.row, .a1_text {
+                display: flex;
+                align-items: center;
+            }
+            .a1container {
+                flex-direction: column;
+                justify-content: center;
+                width: 100%;
+            }
+            .a1.row {
+                width: 100%;
+                padding: 1em;
+                margin: 0.1em;
+                border: 0.05em #999 solid;
+                border-radius: 0.5em;
+            }
+            .a1.row:hover {
+                background-color: #EEE;
+            }
+            .a1.row > label, .a1_text {
+                height: 100%;
+                width: 100%;
+            }
+            .component {
+                width: 3em;
+            }
+            input.component {
+                text-align: center;
+                -moz-appearance: textfield;
+            }
+            input.component::-webkit-inner-spin-button {
+                -moz-appearance: textfield;
+                -webkit-appearance: none;
+            }
+            .description, .warning {
+                font-size: 0.8em;
+                font-size: 0.8em;
+            }
+            .warning {
+                margin-bottom: 1em;
+                color: #F00;
+                font-weight: 700;
+            }
+            .container {
+                display: flex;
+            }
+            .container.multiple {
+                flex-direction: column;
+            }
+            .button {
+                display: flex;
+                border: 0.05em #999 solid;
+                border-radius: 10em;
+                align-items: center;
+                padding: 1em;
+                padding-left: 2em;
+            }
+            .button.multiple {
+                width: 100%;
+                margin: 0.1em;
+            }
+            @media screen and (min-width: 667px) {
+                .container.single {
+                    flex-direction: row;
+                }
+                .button.single {
+                    width: 25%;
+                    justify-content: center;
+                    margin: 0.1em;
+                    text-align: center;
+                    padding-left: 1em;
+                }
+            }
+            @media screen and (max-width: 667px) {
+                .container.single {
+                    flex-direction: column;
+                }
+                .button.single {
+                    width: 100%;
+                    margin: 0.1em;
+                }
+            }
+            .button:hover {
+                background-color: #999;
+                color: #FFF;
+            }
+            .button.active:hover {
+                background-color: #000;
+                color: #FFF;
+            }
+            .button.active {
+                font-weight: 1000;
+            }
+            .button .icon {
+                display: none;
+                height: 100%;
+                margin-right: 1em;
+                height: 100%;
+            }
+            .button.active .icon {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .icon::before {
+                content: 'V';
+            }
+            section {
+                padding-bottom: 2em;
+                border-bottom: 0.05em #999 solid;
+            }
+            .container.p {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+            }
+            .row.p {
+                margin-left: 1em;
+                margin-right: 1em;
+                width: 100%;
+            }
+            .row.p select {
+                width: 100%;
+                font-size: 1.5em;
+                padding: 0.25em;
+            }
+            button#submit {
+                display: flex;
+                border: 0.05em #999 solid;
+                border-radius: 5em;
+                justify-content: center;
+                align-items: center;
+                padding: 1em;
+                margin: 1em auto;
+                width: 50%;
+                text-align: center;
+            }
+            button#submit:hover {
+                background-color: #999;
+                color: #FFF;
+            }
+            .s {
+                padding: 0;
+            }
+            #result-render section:nth-last-of-type(1) {
+                padding-bottom: 0em;
+                border-bottom: 0;
+            }
+            footer {
+                font-size: 0.8em;
+                padding-top: 1.5em;
+                border-top: 0.05em #999 solid;
+                margin-top: 1.5em;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>宜蘭高中自治會<br>會長、副會長投票輔助系統 VAA</h1>
+        </header>
+        <div id="main">
+            <form>
+                <section id="info">
+                    <h2>
+                        <span>選舉資訊</span>
+                    </h2>
+                    <div class="outline">
+                        <ul>
+                            <li>
+                                選舉公報：<a href="https://drive.google.com/file/d/16N08wGcBWGdydw-1AG7TTC0B_8jr9VqH/view?usp=sharing" target="_blank">點我</a>
+                            </li>
+                            <li>投票時間：6.18 (四) 8:00-12:30</li>
+                            <li>投票地點：活動中心</li>
+                        </ul></div>
+                </section>
+                <section id="intro">
+                    <h2>
+                        <span>VAA 簡介</span>
+                    </h2>
+                    <div class="outline">
+                        <p>投票輔助系統（VAA，Voting Aid Application），旨在以簡單、方便的方式，提供選民了解候選人與自身對於各議題立場的遠近，作為投票之參考，得以更有效率的投下神聖的一票，並促進校園議題討論，以落實學生自治、校園民主的核心價值。</p>
+                        <p>本次共有 4 組候選人，選委會一共蒐集到 k 組候選人表態，填答率 n%。</p></div>
+                </section>
+                <section id="instruction">
+                    <h2>
+                        <span>系統使用說明</span>
+                    </h2>
+                    <div class="outline">
+                        <p>本問卷共有七題。</p>
+                        <p>在完成填答並送出後，系統將根據您的填答，計算您與候選人的立場相似度，並將結果呈現排列於頁末。</p>
+                        <p>如有任何疑慮或建議，請親洽選委，並請不吝提供給選委會，謝謝！</p></div>
+                </section>
+
+<section id="a1">
+    <h2>第一題</h2>
+    <h3>在接下來的一年中，您認為：自治會會長的任務，按照重要性高低的排序為何？</h3>
+    <p class="description">請按 1 到 5 排序（可使用上下鍵移動或輸入排序移動位置，結果以文字順序為準），1 為最重要，5 為最不重要。</p>
+    <div class="warning"></div>
+    <div class="a1container">
+        <div class="a1 row" id="a1_0">
+            <label for="a1_input_0">
+                <div class="a1_text">向校方爭取權益</div>
+            </label>
+            <button type="button" class="component up">↑</button>
+            <button type="button" class="component down">↓</button>
+            <input type="number" class="component input" id="a1_input_0" value="1">
+            <button type="button" class="component go">Go</button>
+        </div>
+        <div class="a1 row" id="a1_1">
+            <label for="a1_input_1">
+                <div class="a1_text">對社會議題進行表態、倡議</div>
+            </label>
+            <button type="button" class="component up">↑</button>
+            <button type="button" class="component down">↓</button>
+            <input type="number" class="component input" id="a1_input_1" value="2">
+            <button type="button" class="component go">Go</button>
+        </butt></div>
+        <div class="a1 row" id="a1_2">
+            <label for="a1_input_2">
+                <div class="a1_text">提供平台，串連校內學生資源</div>
+            </label>
+            <button type="button" class="component up">↑</button>
+            <button type="button" class="component down">↓</button>
+            <input type="number" class="component input" id="a1_input_2" value="3">
+            <button type="button" class="component go">Go</button>
+        </div>
+        <div class="a1 row" id="a1_3">
+            <label for="a1_input_3">
+                <div class="a1_text">舉辦全校性講座或活動</div>
+            </label>
+            <button type="button" class="component up">↑</button>
+            <button type="button" class="component down">↓</button>
+            <input type="number" class="component input" id="a1_input_3" value="4">
+            <button type="button" class="component go">Go
+        </butt></div>
+        <div class="a1 row" id="a1_4">
+            <label for="a1_input_4">
+                <div class="a1_text">資訊公開，例如：公開學生會內部會議紀錄、或與校方的會議紀錄</div>
+            </label>
+            <button type="button" class="component up">↑</button>
+            <button type="button" class="component down">↓</button>
+            <input type="number" class="component input" id="a1_input_4" value="5">
+            <button type="button" class="component go">Go</button>
+        </div>
+    </div>
+</section>
+<section id="a2">
+    <h2>第二題</h2>
+    <h3>面對與學生身份無關、且學生意見分歧之議題（例如：廢除死刑議題）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
+    <div class="warning"></div>
+    <div class="container single">
+        <div class="button single a2" id="a2_0"><div class="icon"></div>一定不行</div>
+        <div class="button single a2" id="a2_1"><div class="icon"></div>偏向不行</div>
+        <div class="button single a2" id="a2_2"><div class="icon"></div>偏向可以</div>
+        <div class="button single a2" id="a2_3"><div class="icon"></div>一定可以</div>
+    </div>
+</section>
+<section id="a3">
+    <h2>第三題</h2>
+    <h3>面對與學生身份無關、但學生意見普遍一致之議題（例如：婚姻平權議題）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
+    <div class="warning"></div>
+    <div class="container single">
+        <div class="button single a3" id="a3_0"><div class="icon"></div>一定不行</div>
+        <div class="button single a3" id="a3_1"><div class="icon"></div>偏向不行</div>
+        <div class="button single a3" id="a3_2"><div class="icon"></div>偏向可以</div>
+        <div class="button single a3" id="a3_3"><div class="icon"></div>一定可以</div>
+    </div>
+</section>
+<section id="a4">
+    <h2>第四題</h2>
+    <h3>面對與學生身份有關、但學生意見分歧之議題（例如：穿著制服上課）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
+    <div class="warning"></div>
+    <div class="container single">
+        <div class="button single a4" id="a4_0"><div class="icon"></div>一定不行</div>
+        <div class="button single a4" id="a4_1"><div class="icon"></div>偏向不行</div>
+        <div class="button single a4" id="a4_2"><div class="icon"></div>偏向可以</div>
+        <div class="button single a4" id="a4_3"><div class="icon"></div>一定可以</div>
+    </div>
+</section>
+<section id="a5">
+    <h2>第五題</h2>
+    <h3>面對與學生身份有關、且學生意見普遍一致之議題（例如：自行訂購外食）時，在未經學生意見調查的前提下，您認為宜中自治會會長可否代表宜中學生進行議題表態？</h3>
+    <div class="warning"></div>
+    <div class="container single">
+        <div class="button single a5" id="a5_0"><div class="icon"></div>一定不行</div>
+        <div class="button single a5" id="a5_1"><div class="icon"></div>偏向不行</div>
+        <div class="button single a5" id="a5_2"><div class="icon"></div>偏向可以</div>
+        <div class="button single a5" id="a5_3"><div class="icon"></div>一定可以</div>
+    </div>
+</section>
+<section id="a6">
+    <h2>第六題</h2>
+    <h3>您認為，自治會與校方之間的關係，應該要比較接近以下哪一種？</h3>
+    <p class="description">橋樑式：協調為主（傾向採取溫和的、體制內的手段，例如出席校內會議、與校內行政人員磋商）<br>
+    工會式：抗爭為主（傾向採取激進的、體制外的手段，例如發文抗議、發起連署、佔領處室）</p>
+    <div class="warning"></div>
+    <div class="container single">
+        <div class="button single a6" id="a6_0"><div class="icon"></div>橋樑式學生會</div>
+        <div class="button single a6" id="a6_1"><div class="icon"></div>較偏向橋樑式學生會</div>
+        <div class="button single a6" id="a6_2"><div class="icon"></div>較偏向工會式學生會</div>
+        <div class="button single a6" id="a6_3"><div class="icon"></div>工會式學生會</div>
+    </div>
+</section>
+<section id="a7">
+    <h2>第七題</h2>
+    <h3>在接下來的一年中，您認為：最重要、最值得被推動的校園議題是什麼？</h3>
+    <p class="description">請選至少 1 個、至多 2 個選項。再點一次已選的選項即可取消選取。</p>
+    <div class="warning"></div>
+    <div class="container multiple">
+        <div class="button multiple a7" id="a7_0"><div class="icon"></div>康樂活動（例：體育競賽、手遊比賽）</div>
+        <div class="button multiple a7" id="a7_1"><div class="icon"></div>講座活動（例：專題講座、各領域人物演講分享經驗）</div>
+        <div class="button multiple a7" id="a7_2"><div class="icon"></div>商品創作與銷售（例：校T、書包、紀念品、宜中卡）</div>
+        <div class="button multiple a7" id="a7_3"><div class="icon"></div>監督自治會與資訊公開（例：自治會運作透明化、財務公開）</div>
+        <div class="button multiple a7" id="a7_4"><div class="icon"></div>藝文活動（例：藝文、音樂活動、戲劇比賽）</div>
+        <div class="button multiple a7" id="a7_5"><div class="icon"></div>校園環保（例：加強校園整潔、園遊會非塑膠餐具）</div>
+        <div class="button multiple a7" id="a7_6"><div class="icon"></div>跨校交流（例：跨校性活動、各領域交流）</div>
+        <div class="button multiple a7" id="a7_7"><div class="icon"></div>服儀規範與校服款式（例：段考穿著短褲應試、修改運動服長褲）</div>
+        <div class="button multiple a7" id="a7_8"><div class="icon"></div>校務資訊追蹤（例：工程建設進度、體育館興建、校產監督）</div>
+        <div class="button multiple a7" id="a7_9"><div class="icon"></div>社團活動（例：社團博覽會、社辦場地）</div>
+        <div class="button multiple a7" id="a7_10"><div class="icon"></div>在校學習（例：第八節輔導課形式、到校時間調整）</div>
+        <div class="button multiple a7" id="a7_11"><div class="icon"></div>校園設備改善與增設（例：飲水機、課桌椅、球場設備）</div>
+        <div class="button multiple a7" id="a7_12"><div class="icon"></div>學生意見表達（例：請願機制、留言箱設置）</div>
+        <div class="button multiple a7" id="a7_13"><div class="icon"></div>校務參與（例：校級會議學生代表席次增加、與校長有約）</div>
+        <div class="button multiple a7" id="a7_14"><div class="icon"></div>對外開放性活動（例：歲末聯歡、園遊會）</div>
+        <div class="button multiple a7" id="a7_15"><div class="icon"></div>校外議題倡議（例：國際議題、永續發展目標、飢餓十二）</div>
+        <div class="button multiple a7" id="a7_16"><div class="icon"></div>校園餐飲（例：學生自行外訂、販賣機、增售熱食、增加便當廠商與種類）</div>
+    </div>
+</section>
+<section id="p">
+    <h2>基本資料</h2>
+    <div class="container p">
+        <div class="row p">
+            年級：
+            <select name="grade" id="p1_answer">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div class="row p">
+            班級：
+            <select name="grade" id="p2_answer">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+            </select>
+        </div>
+        <div class="row p">
+            性別：
+            <select name="sex" id="p3_answer">
+                <option value="1">生理男</option>
+                <option value="2">生理女</option>
+            </select>
+        <div>
+    </div>
+</section>
+<section class="s"><button type="button" id="submit">開始計算</button></section>
+</form>
+</div>
+
+<div id="result">
+    <h1>測驗結果</h1>
+    <div id="result-render">你還沒填完問卷……</div>
+    <footer>
+        <h3>國立宜蘭高中學生自治會選舉委員會</h3>
+        <p>原作者：Katrina H.-Y. Chan／國立臺灣大學學生會選舉罷免執行委員會</p>
+    </footer>
+</div>
+</body></html>

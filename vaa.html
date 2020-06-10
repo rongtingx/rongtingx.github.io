@@ -374,7 +374,39 @@
 
                         let a7Match = 0;
 
-                        for (var i = 0; i < obj1['a7'].length; i++) {
+                        const a7Group = [
+                            [1, 2, 3, 5, 7, 15],
+                            [4, 9],
+                            [10, 13],
+                            [6, 16],
+                            [8, 11, 12, 14, 17]
+                        ];
+
+                        let a7G1 = [0, 0, 0, 0, 0];
+                        let a7G2 = [0, 0, 0, 0, 0];
+
+                        for (let i = 0; i < a7Group.length; i++) {
+                            for (let j = 0; j < a7Group[i].length; j++) {
+                                if (obj1['a7'].indexOf(a7Group[i][j]-1) != -1) {
+                                    a7G1[i] = 1;
+                                }
+                                if (obj2['a7'].indexOf(a7Group[i][j]-1) != -1) {
+                                    a7G2[i] = 1;
+                                }
+                            }
+                        }
+
+                        let a7GIndex = 0;
+                        let a7G2Sum = 0;
+
+                        for (let i = 0; i < 5; i++) {
+                            a7GIndex += a7G1[i] * a7G2[i];
+                            a7G2Sum += a7G2[i];
+                        }
+
+                        a7GIndex = a7GIndex / a7G2Sum;
+
+                        for (let i = 0; i < obj1['a7'].length; i++) {
                             //console.log(obj1['a7'][i]);
                             if (obj2['a7'].indexOf(obj1['a7'][i]) != -1) {
                                 a7Match++;
@@ -382,7 +414,9 @@
                             }
                         }
 
-                        let a7Dist = a7Match / obj2['a7'].length;
+                        let a7OIndex = a7Match / obj2['a7'].length;
+
+                        let a7Dist = (a7GIndex + a7OIndex * 2) / 3;
 
                         //console.log(a1Dist, a2Dist, a3Dist, a4Dist, a5Dist, a6Dist, a7Dist);
 

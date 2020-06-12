@@ -71,6 +71,7 @@
                     const a5 = document.querySelectorAll('div.a5');
                     const a6 = document.querySelectorAll('div.a6');
                     const a7 = document.querySelectorAll('div.a7');
+                    const a8 = document.querySelectorAll('div.a8');
 
                     const up = document.querySelectorAll('.up');
                     const down = document.querySelectorAll('.down');
@@ -198,6 +199,7 @@
                         let a5 = NaN;
                         let a6 = NaN;
                         let a7 = [];
+                        let a8 = NaN;
 
                         let a1Opts = document.querySelectorAll('div.a1');
                         for (let i = 0; i < a1Opts.length; i++) {
@@ -221,6 +223,9 @@
                         }
                         if (document.querySelectorAll('div.button.a7.active').length < 1) {
                             document.querySelector('#a7').querySelector('.warning').innerHTML = '第七題必須選擇一個選項！';
+                        }
+                        if (document.querySelectorAll('div.button.a8.active').length < 1) {
+                            document.querySelector('#a8').querySelector('.warning').innerHTML = '第八題必須選擇一個選項！';
                         }
 
                         if (document.querySelectorAll('div.button.a2.active').length != 1) {
@@ -247,6 +252,10 @@
                             alert('第七題必須選擇一個選項！');
                             return;
                         }
+                        if (document.querySelectorAll('div.button.a8.active').length != 1) {
+                            alert('第八題必須選擇一個選項！');
+                            return;
+                        }
 
                         a2 = parseInt(document.querySelector('div.button.a2.active').id.split('_')[1]);
                         a3 = parseInt(document.querySelector('div.button.a3.active').id.split('_')[1]);
@@ -259,6 +268,8 @@
                             a7.push(parseInt(opt.id.split('_')[1]));
                         });
 
+                        a8 = parseInt(document.querySelector('div.button.a8.active').id.split('_')[1]);
+
                         let userData = {
                             'a1': a1,
                             'a2': a2,
@@ -267,6 +278,7 @@
                             'a5': a5,
                             'a6': a6,
                             'a7': a7,
+                            'a8': a8,
                         }
                         //console.log(userData)
 
@@ -418,9 +430,19 @@
 
                         let a7Dist = (a7GIndex + a7OIndex * 2) / 3;
 
+                        let a8W = toWeightValue(obj1.a8);
+                        //console.log(a8W);
+
                         //console.log(a1Dist, a2Dist, a3Dist, a4Dist, a5Dist, a6Dist, a7Dist);
 
-                        const rs = Math.pow((a1Dist * a1Dist * 2 + a2Dist * a2Dist * 1 + a3Dist * a3Dist * 1 + a4Dist * a4Dist * 1 + a5Dist * a5Dist * 1 + a6Dist * a6Dist * 1 + a7Dist * a7Dist * 2) / 9, 1 / 2);
+                        const rs = Math.pow((a1Dist * a1Dist * a8W.a
+                                            + a7Dist * a7Dist * a8W.a
+                                                + ((a2Dist * a2Dist
+                                                + a3Dist * a3Dist
+                                                + a4Dist * a4Dist
+                                                + a5Dist * a5Dist
+                                                + a6Dist * a6Dist) / 5) * a8W.b
+                                            ) / ((a8W.a * 2 + a8W.b)), (1 / 2));
 
                         return rs;
                     }
@@ -435,6 +457,21 @@
                             return 2;
                         case 3:
                             return 3;
+                        }
+                    }
+
+                    function toWeightValue(v) {
+                        switch (v) {
+                        case 0:
+                            return {'a': 2, 'b': 1};
+                        case 1:
+                            return {'a': 1.5, 'b': 1};
+                        case 2:
+                            return {'a': 1, 'b': 1};
+                        case 3:
+                            return {'a': 1, 'b': 2};
+                        case 4:
+                            return {'a': 1, 'b': 3};
                         }
                     }
 
@@ -485,7 +522,7 @@
                             rs += '<br>';
                             rs += '補充說明：' + (testData[i].d6 == '' ? '無。' : testData[i].d6) + '<br>';
                             rs += '<br>';
-                            rs += '七、接下來的一年中，最重要、最值得被推動的校園議題類別是：「' + option.a7[testData[i].obj.a7[0]] + (testData[i].obj.a7.length > 1 ? '、「' + option.a7[testData[i].obj.a7[1]] + '」' : '') + '。<br>';
+                            rs += '七、接下來的一年中，最重要、最值得被推動的校園議題類別是：「' + option.a7[testData[i].obj.a7[0]] + '」' + (testData[i].obj.a7.length > 1 ? '、「' + option.a7[testData[i].obj.a7[1]] + '」' : '') + '。<br>';
                             rs += '<br>';
                             rs += '補充說明：' + (testData[i].d7 == '' ? '無。' : testData[i].d7) + '<br>';
                             rs += '<br>';
@@ -784,7 +821,7 @@
                     </h2>
                     <div class="outline">
                         <p>投票輔助系統（VAA，Voting Aid Application），旨在以簡單、方便的方式，提供選民了解候選人與自身對於各議題立場的遠近，作為投票之參考，得以更有效率的投下神聖的一票，並促進校園議題討論，以落實學生自治、校園民主的核心價值。</p>
-                        <p>本次共有 4 組候選人，選委會一共蒐集到 k 組候選人表態，填答率 n%。</p>
+                        <p>本次共有 4 組候選人，選委會一共蒐集到 4 組候選人表態，填答率 100 %。</p>
                     </div>
                 </section>
                 <section id="instruction">
@@ -970,22 +1007,22 @@
     <div class="container single">
         <div class="button single a6" id="a6_0">
             <div class="icon"></div>
-            橋樑式學生會
+            完全橋樑式
         
         </div>
         <div class="button single a6" id="a6_1">
             <div class="icon"></div>
-            較偏向橋樑式學生會
+            較偏向橋樑式
         
         </div>
         <div class="button single a6" id="a6_2">
             <div class="icon"></div>
-            較偏向工會式學生會
+            較偏向工會式
         
         </div>
         <div class="button single a6" id="a6_3">
             <div class="icon"></div>
-            工會式學生會
+            完全工會式
         
         </div>
     </div>
@@ -1080,6 +1117,33 @@
             <div class="icon"></div>
             校園餐飲（例：學生自行外訂、販賣機、增售熱食、增加便當廠商與種類）
         
+        </div>
+    </div>
+</section>
+<section id="a8">
+    <h2>第八題</h2>
+    <h3>您在選擇投票對象的時候，會比較傾向關注候選人所提出議題的種類與內容，還是傾向關注候選人對議題的表態手法？</h3>
+    <div class="warning"></div>
+    <div class="container single">
+        <div class="button single a8" id="a8_0">
+            <div class="icon"></div>
+            議題種類
+        </div>
+        <div class="button single a8" id="a8_1">
+            <div class="icon"></div>
+            較偏向議題種類
+        </div>
+        <div class="button single a8" id="a8_2">
+            <div class="icon"></div>
+            介於議題種類與表態手法之間
+        </div>
+        <div class="button single a8" id="a8_3">
+            <div class="icon"></div>
+            較偏向表態手法
+        </div>
+        <div class="button single a8" id="a8_4">
+            <div class="icon"></div>
+            表態手法
         </div>
     </div>
 </section>
